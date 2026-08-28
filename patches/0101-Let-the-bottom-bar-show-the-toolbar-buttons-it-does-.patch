@@ -1,4 +1,4 @@
-From 529588aa28d0aebc132905b019ef75ba68e0d98c Mon Sep 17 00:00:00 2001
+From 0a146f253ef930044bd0eafc10ae9b223c4ceb3c Mon Sep 17 00:00:00 2001
 From: Bare <57wsdx6b8d@privaterelay.appleid.com>
 Date: Fri, 28 Aug 2026 18:49:21 +0000
 Subject: [PATCH] Let the bottom bar show the toolbar buttons it does not have
@@ -28,22 +28,35 @@ that to whatever displays the button. The adapter therefore observes the
 activity tab itself and re-asks the provider on every change, including the
 tab that is already in front when it starts.
 
-Only Share is adapted here, to keep the first use of the bridge to one action.
-The catalogue skips any variant whose provider is absent, so adding the rest
-later is a line each.
+Three actions go through it: Share, Translate and Bookmark. They were chosen
+because they answer different questions about whether one adapter is enough.
+Share is always applicable. Translate applies only to some pages, so its
+provider reports nothing to show on a new tab page and the action goes quiet.
+Bookmark carries state, and it turns out to carry it by swapping its whole
+ButtonSpec between an outline star reading "Bookmark this page" and a filled
+one reading "Edit Bookmark", rather than through the spec's own selected or
+checked flags, which it never sets. Copying the icon and the description
+therefore carries the bookmark state without the adapter knowing what a
+bookmark is. All three work through one adapter with no per-action code.
 
-No button moves and no layout changes: the adapted action is registered but
+Of the two similar flags on the spec only isSelected is copied. It becomes
+View.setSelected on the optional button, which is what IS_SELECTED becomes
+here. isChecked drives the checked appearance of a contextual page action,
+which the bottom bar has no equivalent for and which only price tracking
+sets; folding the two together would draw a price-tracked page as selected.
+
+No button moves and no layout changes: the adapted actions are registered but
 not yet placed in a slot.
 ---
  chrome/android/chrome_java_sources.gni        |   2 +
- .../bare/BareButtonDataActionAdapter.java     | 162 ++++++++++++++++++
- .../bare/BareToolbarActionCatalogue.java      |  86 ++++++++++
+ .../bare/BareButtonDataActionAdapter.java     | 168 ++++++++++++++++++
+ .../bare/BareToolbarActionCatalogue.java      |  98 ++++++++++
  .../tabbed_mode/TabbedRootUiCoordinator.java  |  15 ++
  .../ui/AdaptiveToolbarUiCoordinator.java      |   8 +
  .../chrome/browser/ui/RootUiCoordinator.java  |  13 ++
- .../chrome/browser/ui/actions/ActionId.java   |   2 +
+ .../chrome/browser/ui/actions/ActionId.java   |   6 +
  .../AdaptiveToolbarButtonController.java      |  12 ++
- 8 files changed, 300 insertions(+)
+ 8 files changed, 322 insertions(+)
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
 
@@ -62,10 +75,10 @@ index ddaf9410ae..99811d6743 100644
    "java/src/org/chromium/chrome/browser/background_sync/BackgroundSyncBackgroundTask.java",
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
 new file mode 100644
-index 0000000000..67c49bb4a1
+index 0000000000..af05e7da7b
 --- /dev/null
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
-@@ -0,0 +1,162 @@
+@@ -0,0 +1,168 @@
 +// Copyright 2026 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -195,7 +208,13 @@ index 0000000000..67c49bb4a1
 +        mModel.set(
 +                ActionProperties.CONTENT_DESCRIPTION_RESOLVER,
 +                context -> spec.getContentDescription());
-+        mModel.set(ActionProperties.IS_SELECTED, spec.isSelected() || spec.isChecked());
++        // isSelected only. ButtonSpec carries two similar-looking flags that upstream treats
++        // differently: isSelected becomes View.setSelected on the optional button, which is
++        // exactly what ActionProperties.IS_SELECTED becomes here, while isChecked drives a
++        // contextual-page-action "checked" appearance that the bottom bar has no equivalent for
++        // and that only price tracking sets. Folding the two together would draw a price-tracked
++        // page's button as selected, which the top toolbar does not do.
++        mModel.set(ActionProperties.IS_SELECTED, spec.isSelected());
 +
 +        mOnClick = spec.getOnClickListener();
 +        boolean usable = data.canShow() && data.isEnabled() && mOnClick != null;
@@ -230,10 +249,10 @@ index 0000000000..67c49bb4a1
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
 new file mode 100644
-index 0000000000..da0bdf8817
+index 0000000000..05f378bc61
 --- /dev/null
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
-@@ -0,0 +1,86 @@
+@@ -0,0 +1,98 @@
 +// Copyright 2026 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -288,6 +307,18 @@ index 0000000000..da0bdf8817
 +            ActivityTabProvider tabProvider,
 +            ActionRegistry registry) {
 +        adapt(source, tabProvider, registry, ActionId.SHARE, AdaptiveToolbarButtonVariant.SHARE);
++        adapt(
++                source,
++                tabProvider,
++                registry,
++                ActionId.TRANSLATE,
++                AdaptiveToolbarButtonVariant.TRANSLATE);
++        adapt(
++                source,
++                tabProvider,
++                registry,
++                ActionId.BOOKMARK,
++                AdaptiveToolbarButtonVariant.ADD_TO_BOOKMARKS);
 +    }
 +
 +    /**
@@ -418,22 +449,26 @@ index b383dd73f2..210011856d 100644
          return mAdaptiveToolbarUiCoordinator;
      }
 diff --git a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
-index 1c341a1f5d..c7b6462256 100644
+index 1c341a1f5d..2064a652f2 100644
 --- a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
 +++ b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
-@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
+@@ -23,6 +23,9 @@ import java.lang.annotation.Target;
      ActionId.GLIC,
      ActionId.AI_MODE,
      ActionId.INCOGNITO,
 +    ActionId.SHARE,
++    ActionId.TRANSLATE,
++    ActionId.BOOKMARK,
  })
  @Retention(RetentionPolicy.SOURCE)
  @Target(ElementType.TYPE_USE)
-@@ -36,4 +37,5 @@ public @interface ActionId {
+@@ -36,4 +39,7 @@ public @interface ActionId {
      int GLIC = 5;
      int AI_MODE = 6;
      int INCOGNITO = 7;
 +    int SHARE = 8;
++    int TRANSLATE = 9;
++    int BOOKMARK = 10;
  }
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java
 index 14d5105a4d..97378874ca 100644
