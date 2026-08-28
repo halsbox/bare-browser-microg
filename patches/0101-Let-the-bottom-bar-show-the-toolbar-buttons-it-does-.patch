@@ -1,4 +1,4 @@
-From 6c289a5e07ebd3ce9c39b72b17d98796493d4f6b Mon Sep 17 00:00:00 2001
+From 5053967f668f95b5dcd18e2a69eca1a72999b867 Mon Sep 17 00:00:00 2001
 From: Bare <57wsdx6b8d@privaterelay.appleid.com>
 Date: Fri, 28 Aug 2026 18:49:21 +0000
 Subject: [PATCH] Let the bottom bar show the toolbar buttons it does not have
@@ -64,30 +64,52 @@ the first position does not vanish with the homepage and Home does not become
 permanent by being moved out of it.
 
 Nothing writes a preference, so a profile that has never been customised
-resolves to the arrangement Bare shipped.
+resolves to the arrangement Bare shipped. A write that does happen forgets the
+resolved bar, so the next thing to ask about a position does not get the answer
+from before the write.
+
+The tests that described the old arrangement described it as a fact about
+positions, which is what has stopped being true. Asking the view for the
+container belonging to an action now answers only for actions the bar is
+actually showing, and the mediator's shared-slot handling is asked of the
+action rather than of the position it used to occupy, so both are tested that
+way. The resolver, the rendering table and the adapter each get direct
+coverage: every stored arrangement resolving to three valid distinct actions,
+Home and the app menu keeping their own rendering while an ordinary action in
+the same position gets neither, and the model receiving a Drawable of its own.
 ---
  chrome/android/chrome_java_sources.gni        |   2 +
- .../bare/BareButtonDataActionAdapter.java     | 212 ++++++++++++++++++
- .../bare/BareToolbarActionCatalogue.java      | 106 +++++++++
+ .../bare/BareButtonDataActionAdapter.java     | 212 +++++++++++++
+ .../bare/BareToolbarActionCatalogue.java      | 106 +++++++
  .../tabbed_mode/TabbedRootUiCoordinator.java  |  18 ++
  .../ui/AdaptiveToolbarUiCoordinator.java      |   8 +
- .../chrome/browser/ui/RootUiCoordinator.java  |  13 ++
+ .../chrome/browser/ui/RootUiCoordinator.java  |  13 +
+ chrome/android/junit/BUILD.gn                 |   1 +
+ .../BareButtonDataActionAdapterUnitTest.java  | 266 +++++++++++++++++
  .../chrome/browser/ui/actions/ActionId.java   |   6 +
- chrome/browser/ui/android/bottombar/BUILD.gn  |   1 +
- .../bottombar/BareToolbarActionRendering.java | 122 ++++++++++
- .../ui/bottombar/BareToolbarDefaults.java     |  45 ++--
- .../ui/bottombar/BareToolbarLayout.java       | 131 +++++++++--
- .../ui/bottombar/BareToolbarPrefs.java        |   4 +-
- .../ui/bottombar/BottomBarCoordinator.java    | 123 ++++------
+ chrome/browser/ui/android/bottombar/BUILD.gn  |   3 +
+ .../bottombar/BareToolbarActionRendering.java | 122 ++++++++
+ .../BareToolbarActionRenderingUnitTest.java   | 205 +++++++++++++
+ .../ui/bottombar/BareToolbarDefaults.java     |  45 +--
+ .../ui/bottombar/BareToolbarLayout.java       | 131 ++++++--
+ .../bottombar/BareToolbarLayoutUnitTest.java  | 282 ++++++++++++++++++
+ .../ui/bottombar/BareToolbarPrefs.java        |  13 +-
+ .../ui/bottombar/BottomBarCoordinator.java    | 123 +++-----
+ .../BottomBarCoordinatorUnitTest.java         |  58 ++--
  .../ui/bottombar/BottomBarMediator.java       |  20 +-
- .../ui/bottombar/BottomBarProperties.java     |  30 +++
+ .../bottombar/BottomBarMediatorUnitTest.java  |  14 +-
+ .../ui/bottombar/BottomBarProperties.java     |  30 ++
  .../browser/ui/bottombar/BottomBarView.java   |  17 ++
- .../ui/bottombar/BottomBarViewBinder.java     |  31 +--
+ .../ui/bottombar/BottomBarViewBinder.java     |  31 +-
+ .../BottomBarViewBinderUnitTest.java          |  68 +++--
  .../AdaptiveToolbarButtonController.java      |  12 +
- 18 files changed, 754 insertions(+), 147 deletions(-)
+ 25 files changed, 1592 insertions(+), 214 deletions(-)
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
+ create mode 100644 chrome/android/junit/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapterUnitTest.java
  create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRendering.java
+ create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java
+ create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayoutUnitTest.java
 
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
 index ddaf9410ae..99811d6743 100644
@@ -532,6 +554,290 @@ index b383dd73f2..210011856d 100644
      public @Nullable AdaptiveToolbarUiCoordinator getAdaptiveToolbarUiCoordinatorForTesting() {
          return mAdaptiveToolbarUiCoordinator;
      }
+diff --git a/chrome/android/junit/BUILD.gn b/chrome/android/junit/BUILD.gn
+index a7b47bd61e..227829c51c 100644
+--- a/chrome/android/junit/BUILD.gn
++++ b/chrome/android/junit/BUILD.gn
+@@ -429,6 +429,7 @@ if (is_android) {
+     sources = [
+       "//chrome/android/java/src/org/chromium/chrome/browser/bottombar/BottomBarAppMenuUpdateBadgeControllerUnitTest.java",
+       "//chrome/android/java/src/org/chromium/chrome/browser/bottombar/BottomBarContainerCoordinatorUnitTest.java",
++      "src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapterUnitTest.java",
+       "src/org/chromium/chrome/browser/BrowserExitReasonTrackerUnitTest.java",
+       "src/org/chromium/chrome/browser/ChromeActionModeHandlerUnitTest.java",
+       "src/org/chromium/chrome/browser/ChromeActivityUnitTest.java",
+diff --git a/chrome/android/junit/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapterUnitTest.java b/chrome/android/junit/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapterUnitTest.java
+new file mode 100644
+index 0000000000..e525215b2b
+--- /dev/null
++++ b/chrome/android/junit/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapterUnitTest.java
+@@ -0,0 +1,266 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.bare;
++
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertFalse;
++import static org.junit.Assert.assertNotNull;
++import static org.junit.Assert.assertNotSame;
++import static org.junit.Assert.assertNull;
++import static org.junit.Assert.assertSame;
++import static org.junit.Assert.assertTrue;
++import static org.mockito.Mockito.mock;
++import static org.mockito.Mockito.when;
++
++import android.app.Activity;
++import android.graphics.Color;
++import android.graphics.drawable.ColorDrawable;
++import android.graphics.drawable.Drawable;
++import android.view.View;
++
++import androidx.test.ext.junit.rules.ActivityScenarioRule;
++
++import org.junit.Before;
++import org.junit.Rule;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.mockito.junit.MockitoJUnit;
++import org.mockito.junit.MockitoRule;
++import org.mockito.quality.Strictness;
++
++import org.chromium.base.test.BaseRobolectricTestRunner;
++import org.chromium.chrome.browser.ActivityTabProvider;
++import org.chromium.chrome.browser.toolbar.adaptive.AdaptiveToolbarButtonVariant;
++import org.chromium.chrome.browser.toolbar.optional_button.ButtonData;
++import org.chromium.chrome.browser.toolbar.optional_button.ButtonData.ButtonSpec;
++import org.chromium.chrome.browser.toolbar.optional_button.ButtonDataProvider;
++import org.chromium.chrome.browser.ui.actions.ActionId;
++import org.chromium.chrome.browser.ui.actions.ActionProperties;
++import org.chromium.chrome.browser.ui.actions.ActionRegistry;
++import org.chromium.ui.base.TestActivity;
++import org.chromium.ui.modelutil.PropertyModel;
++
++/** Unit tests for {@link BareButtonDataActionAdapter}. */
++@RunWith(BaseRobolectricTestRunner.class)
++public class BareButtonDataActionAdapterUnitTest {
++    @Rule public MockitoRule mMockitoRule = MockitoJUnit.rule().strictness(Strictness.LENIENT);
++
++    @Rule
++    public ActivityScenarioRule<TestActivity> mActivityScenarioRule =
++            new ActivityScenarioRule<>(TestActivity.class);
++
++    private Activity mActivity;
++    private ActivityTabProvider mTabProvider;
++    private ActionRegistry mRegistry;
++    private ButtonDataProvider mProvider;
++    private ButtonData mButtonData;
++
++    @Before
++    public void setUp() {
++        mActivityScenarioRule.getScenario().onActivity(activity -> mActivity = activity);
++        mTabProvider = new ActivityTabProvider();
++        mRegistry = new ActionRegistry();
++        mProvider = mock(ButtonDataProvider.class);
++        mButtonData = mock(ButtonData.class);
++        when(mProvider.get(null)).thenReturn(mButtonData);
++        when(mButtonData.canShow()).thenReturn(true);
++        when(mButtonData.isEnabled()).thenReturn(true);
++    }
++
++    private static ButtonSpec spec(Drawable drawable, boolean checked, boolean selected) {
++        return new ButtonSpec.Builder(drawable, "Share", /* supportsTinting= */ true)
++                .setOnClickListener(v -> {})
++                .setButtonVariant(AdaptiveToolbarButtonVariant.SHARE)
++                .setIsChecked(checked)
++                .setIsSelected(selected)
++                .build();
++    }
++
++    private BareButtonDataActionAdapter attach() {
++        return new BareButtonDataActionAdapter(
++                ActionId.SHARE, mProvider, mTabProvider, mRegistry, mActivity);
++    }
++
++    private PropertyModel model() {
++        PropertyModel model = mRegistry.get(ActionId.SHARE).get();
++        assertNotNull("the adapter should have published a model", model);
++        return model;
++    }
++
++    // ---- drawable isolation ------------------------------------------------------------------
++
++    @Test
++    public void testTheModelGetsACopyRatherThanTheProvidersOwnDrawable() {
++        Drawable source = new ColorDrawable(Color.RED);
++        when(mButtonData.getButtonSpec()).thenReturn(spec(source, false, false));
++
++        BareButtonDataActionAdapter adapter = attach();
++        Drawable published = model().get(ActionProperties.ICON_DRAWABLE);
++
++        assertNotNull(published);
++        assertNotSame(
++                "the bar must not be handed the provider's own Drawable", source, published);
++        assertNotSame(
++                "the copy must not share mutable state with the original",
++                source.getConstantState(),
++                published.getConstantState());
++        adapter.destroy();
++    }
++
++    @Test
++    public void testTheSameIconIsCopiedOnlyOnce() {
++        Drawable source = new ColorDrawable(Color.RED);
++        when(mButtonData.getButtonSpec()).thenReturn(spec(source, false, false));
++
++        BareButtonDataActionAdapter adapter = attach();
++        Drawable first = model().get(ActionProperties.ICON_DRAWABLE);
++
++        adapter.buttonDataChanged(true);
++        Drawable second = model().get(ActionProperties.ICON_DRAWABLE);
++
++        assertSame("a redraw should reuse the copy it already made", first, second);
++        adapter.destroy();
++    }
++
++    @Test
++    public void testAProviderWithTwoIconsGetsTwoStableCopies() {
++        // Bookmark swaps between an outline and a filled star, so the adapter sees two Drawables
++        // alternating and must keep a copy of each rather than rebuilding on every swap.
++        Drawable outline = new ColorDrawable(Color.RED);
++        Drawable filled = new ColorDrawable(Color.BLUE);
++
++        when(mButtonData.getButtonSpec()).thenReturn(spec(outline, false, false));
++        BareButtonDataActionAdapter adapter = attach();
++        Drawable outlineCopy = model().get(ActionProperties.ICON_DRAWABLE);
++
++        when(mButtonData.getButtonSpec()).thenReturn(spec(filled, false, false));
++        adapter.buttonDataChanged(true);
++        Drawable filledCopy = model().get(ActionProperties.ICON_DRAWABLE);
++
++        assertNotSame(outlineCopy, filledCopy);
++        assertNotSame(filled, filledCopy);
++
++        when(mButtonData.getButtonSpec()).thenReturn(spec(outline, false, false));
++        adapter.buttonDataChanged(true);
++        assertSame(
++                "returning to the first icon should return the first copy",
++                outlineCopy,
++                model().get(ActionProperties.ICON_DRAWABLE));
++        adapter.destroy();
++    }
++
++    // ---- selected / checked ------------------------------------------------------------------
++
++    @Test
++    public void testCheckedIsNotFoldedIntoSelected() {
++        // isChecked drives a contextual page action appearance the bottom bar has no equivalent
++        // for. Copying it into IS_SELECTED would draw a price-tracked page as selected.
++        Drawable source = new ColorDrawable(Color.RED);
++        when(mButtonData.getButtonSpec())
++                .thenReturn(spec(source, /* checked= */ true, /* selected= */ false));
++
++        BareButtonDataActionAdapter adapter = attach();
++        assertFalse(
++                "a checked action is not a selected one",
++                model().get(ActionProperties.IS_SELECTED));
++        adapter.destroy();
++    }
++
++    @Test
++    public void testSelectedIsCopied() {
++        Drawable source = new ColorDrawable(Color.RED);
++        when(mButtonData.getButtonSpec())
++                .thenReturn(spec(source, /* checked= */ false, /* selected= */ true));
++
++        BareButtonDataActionAdapter adapter = attach();
++        assertTrue(model().get(ActionProperties.IS_SELECTED));
++        adapter.destroy();
++    }
++
++    // ---- unavailable rather than absent ------------------------------------------------------
++
++    @Test
++    public void testAnActionThatCannotRunKeepsItsPlaceAndStopsResponding() {
++        Drawable source = new ColorDrawable(Color.RED);
++        when(mButtonData.getButtonSpec()).thenReturn(spec(source, false, false));
++        when(mButtonData.canShow()).thenReturn(false);
++
++        BareButtonDataActionAdapter adapter = attach();
++        PropertyModel model = model();
++
++        assertNull(
++                "an unavailable action should have nothing to press",
++                model.get(ActionProperties.ON_PRESS_CALLBACK));
++        assertNotNull(
++                "but it should still have an icon, so the bar does not reflow",
++                model.get(ActionProperties.ICON_DRAWABLE));
++        adapter.destroy();
++    }
++
++    @Test
++    public void testBecomingAvailableAgainRestoresThePress() {
++        Drawable source = new ColorDrawable(Color.RED);
++        when(mButtonData.getButtonSpec()).thenReturn(spec(source, false, false));
++        when(mButtonData.canShow()).thenReturn(false);
++
++        BareButtonDataActionAdapter adapter = attach();
++        assertNull(model().get(ActionProperties.ON_PRESS_CALLBACK));
++
++        when(mButtonData.canShow()).thenReturn(true);
++        adapter.buttonDataChanged(true);
++        assertNotNull(model().get(ActionProperties.ON_PRESS_CALLBACK));
++        adapter.destroy();
++    }
++
++    // ---- lifetime ----------------------------------------------------------------------------
++
++    @Test
++    public void testDestroyUnregistersAndIsSafeToRepeat() {
++        Drawable source = new ColorDrawable(Color.RED);
++        when(mButtonData.getButtonSpec()).thenReturn(spec(source, false, false));
++
++        BareButtonDataActionAdapter adapter = attach();
++        assertNotNull(mRegistry.get(ActionId.SHARE).get());
++
++        adapter.destroy();
++        assertNull(
++                "the action should no longer be offered", mRegistry.get(ActionId.SHARE).get());
++
++        adapter.destroy();
++    }
++
++    @Test
++    public void testTheProvidersContentDescriptionIsPublished() {
++        Drawable source = new ColorDrawable(Color.RED);
++        when(mButtonData.getButtonSpec()).thenReturn(spec(source, false, false));
++
++        BareButtonDataActionAdapter adapter = attach();
++        assertEquals(
++                "Share",
++                model()
++                        .get(ActionProperties.CONTENT_DESCRIPTION_RESOLVER)
++                        .resolve(mActivity)
++                        .toString());
++        adapter.destroy();
++    }
++
++    @Test
++    public void testPressingRunsTheProvidersOwnClickHandling() {
++        boolean[] clicked = new boolean[1];
++        Drawable source = new ColorDrawable(Color.RED);
++        ButtonSpec buttonSpec =
++                new ButtonSpec.Builder(source, "Share", /* supportsTinting= */ true)
++                        .setOnClickListener(v -> clicked[0] = true)
++                        .setButtonVariant(AdaptiveToolbarButtonVariant.SHARE)
++                        .build();
++        when(mButtonData.getButtonSpec()).thenReturn(buttonSpec);
++
++        BareButtonDataActionAdapter adapter = attach();
++        model().get(ActionProperties.ON_PRESS_CALLBACK).onResult(new View(mActivity));
++
++        assertTrue("the provider's own listener should have run", clicked[0]);
++        adapter.destroy();
++    }
++}
 diff --git a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
 index 1c341a1f5d..2064a652f2 100644
 --- a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
@@ -555,7 +861,7 @@ index 1c341a1f5d..2064a652f2 100644
 +    int BOOKMARK = 10;
  }
 diff --git a/chrome/browser/ui/android/bottombar/BUILD.gn b/chrome/browser/ui/android/bottombar/BUILD.gn
-index 4b6726fc0f..191b896b5b 100644
+index 4b6726fc0f..1cbfdcf1ad 100644
 --- a/chrome/browser/ui/android/bottombar/BUILD.gn
 +++ b/chrome/browser/ui/android/bottombar/BUILD.gn
 @@ -60,6 +60,7 @@ android_library("java") {
@@ -566,6 +872,15 @@ index 4b6726fc0f..191b896b5b 100644
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayout.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java",
+@@ -128,6 +129,8 @@ robolectric_library("junit") {
+   sources = [
+     "java/src/org/chromium/chrome/browser/ui/bottombar/AiModeActionCoordinatorUnitTest.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/AppMenuActionButtonBinderUnitTest.java",
++    "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java",
++    "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayoutUnitTest.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarActionEligibilityUnitTest.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarButtonContainerUnitTest.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarButtonManagerUnitTest.java",
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRendering.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRendering.java
 new file mode 100644
 index 0000000000..081f17e236
@@ -692,6 +1007,217 @@ index 0000000000..081f17e236
 +                || actionId == ActionId.GLIC
 +                || actionId == ActionId.AI_MODE
 +                || actionId == ActionId.INCOGNITO;
++    }
++}
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java
+new file mode 100644
+index 0000000000..196ca093cc
+--- /dev/null
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java
+@@ -0,0 +1,205 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.ui.bottombar;
++
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertFalse;
++import static org.junit.Assert.assertNotEquals;
++import static org.junit.Assert.assertTrue;
++import static org.mockito.Mockito.mock;
++
++import android.app.Activity;
++import android.os.Build.VERSION_CODES;
++import android.view.LayoutInflater;
++import android.view.View;
++
++import androidx.test.ext.junit.rules.ActivityScenarioRule;
++
++import org.junit.Before;
++import org.junit.Rule;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.robolectric.annotation.Config;
++
++import org.chromium.base.test.BaseRobolectricTestRunner;
++import org.chromium.chrome.browser.ui.actions.ActionId;
++import org.chromium.chrome.browser.ui.actions.HomeActionProperties;
++import org.chromium.chrome.browser.ui.actions.appmenu.AppMenuActionProperties;
++import org.chromium.ui.base.TestActivity;
++import org.chromium.ui.listmenu.ListMenuDelegate;
++import org.chromium.ui.modelutil.PropertyKey;
++import org.chromium.ui.modelutil.PropertyModel;
++import org.chromium.ui.modelutil.PropertyModelChangeProcessor.ViewBinder;
++
++/**
++ * Unit tests for {@link BareToolbarActionRendering}.
++ *
++ * <p>These protect the rule that how a button is drawn is a fact about the action and not about
++ * where it sits, which is what lets the bar be rearranged at all.
++ */
++@RunWith(BaseRobolectricTestRunner.class)
++public class BareToolbarActionRenderingUnitTest {
++    @Rule
++    public ActivityScenarioRule<TestActivity> mActivityScenarioRule =
++            new ActivityScenarioRule<>(TestActivity.class);
++
++    private Activity mActivity;
++
++    @Before
++    public void setUp() {
++        mActivityScenarioRule.getScenario().onActivity(activity -> mActivity = activity);
++    }
++
++    private View inflate(int layout) {
++        return LayoutInflater.from(mActivity).inflate(layout, null, false);
++    }
++
++    // ---- templates -------------------------------------------------------------------------
++
++    @Test
++    public void testHomeNeedsAViewThatCanShowAMenu() {
++        assertEquals(
++                R.layout.bottom_bar_list_menu_template,
++                BareToolbarActionRendering.templateForAction(ActionId.HOME_BUTTON));
++    }
++
++    @Test
++    public void testOrdinaryActionsUseTheGenericTemplate() {
++        for (int action :
++                new int[] {
++                    ActionId.SHARE, ActionId.TRANSLATE, ActionId.BOOKMARK, ActionId.INCOGNITO
++                }) {
++            assertEquals(
++                    "action " + action + " should use the generic template",
++                    R.layout.bottom_bar_generic_template,
++                    BareToolbarActionRendering.templateForAction(action));
++        }
++    }
++
++    @Test
++    public void testAppMenuTemplateCarriesTheBadgeWhenThereIsOne() {
++        int template = BareToolbarActionRendering.templateForAction(ActionId.APP_MENU);
++        if (BottomBarConfigUtils.shouldShowAppMenuUpdateBadge()) {
++            assertEquals(R.layout.bottom_bar_app_menu_template, template);
++            assertNotEquals(
++                    "the badge template must not be the generic one",
++                    R.layout.bottom_bar_generic_template,
++                    template);
++        } else {
++            assertEquals(R.layout.bottom_bar_generic_template, template);
++        }
++    }
++
++    // ---- view ids --------------------------------------------------------------------------
++
++    @Test
++    public void testTheTwoIdsLookedUpElsewhereFollowTheirActions() {
++        assertEquals(
++                R.id.home_button, BareToolbarActionRendering.viewIdForAction(ActionId.HOME_BUTTON));
++        assertEquals(
++                R.id.menu_button, BareToolbarActionRendering.viewIdForAction(ActionId.APP_MENU));
++    }
++
++    @Test
++    public void testAnOrdinaryActionDoesNotInheritANameItIsNot() {
++        // A search across the activity for the menu button must not find Share because Share
++        // happens to be sitting where the menu button used to be.
++        for (int action : new int[] {ActionId.SHARE, ActionId.TRANSLATE, ActionId.BOOKMARK}) {
++            assertEquals(
++                    "action " + action + " should carry no id",
++                    View.NO_ID,
++                    BareToolbarActionRendering.viewIdForAction(action));
++        }
++    }
++
++    // ---- binders ---------------------------------------------------------------------------
++
++    // View.hasOnLongClickListeners arrived in T, and it is the only way to ask a view whether a
++    // listener was bound without also firing it. Firing it would open the menu, which needs a
++    // window this test does not have.
++    @Test
++    @Config(minSdk = VERSION_CODES.TIRAMISU)
++    public void testHomeKeepsItsLongPressMenuWhereverItIsPlaced() {
++        View view = inflate(R.layout.bottom_bar_list_menu_template);
++        PropertyModel model = new PropertyModel.Builder(HomeActionProperties.ALL_KEYS).build();
++        model.set(HomeActionProperties.LONG_PRESS_MENU_DELEGATE, mock(ListMenuDelegate.class));
++
++        ViewBinder<PropertyModel, View, PropertyKey> binder =
++                BareToolbarActionRendering.binderForAction(ActionId.HOME_BUTTON);
++        binder.bind(model, view, HomeActionProperties.LONG_PRESS_MENU_DELEGATE);
++
++        assertTrue(
++                "home should have bound a long press menu", view.hasOnLongClickListeners());
++    }
++
++    @Test
++    @Config(minSdk = VERSION_CODES.TIRAMISU)
++    public void testAnOrdinaryActionInHomesPositionDoesNotInheritHomesLongPress() {
++        View view = inflate(R.layout.bottom_bar_list_menu_template);
++        PropertyModel model = new PropertyModel.Builder(HomeActionProperties.ALL_KEYS).build();
++        model.set(HomeActionProperties.LONG_PRESS_MENU_DELEGATE, mock(ListMenuDelegate.class));
++
++        ViewBinder<PropertyModel, View, PropertyKey> binder =
++                BareToolbarActionRendering.binderForAction(ActionId.SHARE);
++        binder.bind(model, view, HomeActionProperties.LONG_PRESS_MENU_DELEGATE);
++
++        assertFalse(
++                "the generic binder should not act on a home-only property",
++                view.hasOnLongClickListeners());
++    }
++
++    @Test
++    public void testAppMenuKeepsItsBadgeWhereverItIsPlaced() {
++        BottomBarAppMenu view = (BottomBarAppMenu) inflate(R.layout.bottom_bar_app_menu_template);
++        View badge = view.findViewById(R.id.menu_badge);
++        PropertyModel model = new PropertyModel.Builder(AppMenuActionProperties.ALL_KEYS).build();
++
++        ViewBinder<PropertyModel, View, PropertyKey> binder =
++                BareToolbarActionRendering.binderForAction(ActionId.APP_MENU);
++        model.set(AppMenuActionProperties.SHOW_UPDATE_BADGE, true);
++        binder.bind(model, view, AppMenuActionProperties.SHOW_UPDATE_BADGE);
++
++        assertEquals("the badge should be showing", View.VISIBLE, badge.getVisibility());
++    }
++
++    @Test
++    public void testAnOrdinaryActionInTheAppMenusPositionShowsNoBadge() {
++        BottomBarAppMenu view = (BottomBarAppMenu) inflate(R.layout.bottom_bar_app_menu_template);
++        View badge = view.findViewById(R.id.menu_badge);
++        PropertyModel model = new PropertyModel.Builder(AppMenuActionProperties.ALL_KEYS).build();
++
++        ViewBinder<PropertyModel, View, PropertyKey> binder =
++                BareToolbarActionRendering.binderForAction(ActionId.BOOKMARK);
++        model.set(AppMenuActionProperties.SHOW_UPDATE_BADGE, true);
++        binder.bind(model, view, AppMenuActionProperties.SHOW_UPDATE_BADGE);
++
++        assertNotEquals(
++                "the generic binder should not raise the app menu badge",
++                View.VISIBLE,
++                badge.getVisibility());
++    }
++
++    // ---- who decides its own visibility ------------------------------------------------------
++
++    @Test
++    public void testOnlyHomeAndTheSharedSlotActionsManageTheirOwnVisibility() {
++        for (int action :
++                new int[] {
++                    ActionId.HOME_BUTTON, ActionId.GLIC, ActionId.AI_MODE, ActionId.INCOGNITO
++                }) {
++            assertTrue(
++                    "action " + action + " decides its own visibility",
++                    BareToolbarActionRendering.hasManagedVisibility(action));
++        }
++        for (int action :
++                new int[] {
++                    ActionId.SHARE, ActionId.TRANSLATE, ActionId.BOOKMARK, ActionId.APP_MENU
++                }) {
++            assertFalse(
++                    "action " + action + " is shown because the user placed it",
++                    BareToolbarActionRendering.hasManagedVisibility(action));
++        }
 +    }
 +}
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java
@@ -926,8 +1452,296 @@ index c3b15a4f33..424e790984 100644
 +        sResolved = null;
      }
  }
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayoutUnitTest.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayoutUnitTest.java
+new file mode 100644
+index 0000000000..f62e0f8788
+--- /dev/null
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayoutUnitTest.java
+@@ -0,0 +1,282 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.ui.bottombar;
++
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertFalse;
++import static org.junit.Assert.assertNotEquals;
++import static org.junit.Assert.assertTrue;
++
++import org.junit.After;
++import org.junit.Before;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++
++import org.chromium.base.shared_preferences.SharedPreferencesManager;
++import org.chromium.base.test.BaseRobolectricTestRunner;
++import org.chromium.chrome.browser.preferences.ChromePreferenceKeys;
++import org.chromium.chrome.browser.preferences.ChromeSharedPreferences;
++import org.chromium.chrome.browser.ui.actions.ActionId;
++
++/** Unit tests for {@link BareToolbarLayout} and the arrangement it resolves. */
++@RunWith(BaseRobolectricTestRunner.class)
++public class BareToolbarLayoutUnitTest {
++
++    private SharedPreferencesManager mPrefs;
++
++    @Before
++    public void setUp() {
++        mPrefs = ChromeSharedPreferences.getInstance();
++        clearStored();
++    }
++
++    @After
++    public void tearDown() {
++        clearStored();
++    }
++
++    private void clearStored() {
++        for (int slot = 0; slot < BareToolbarSlot.COUNT; slot++) {
++            mPrefs.removeKey(key(slot));
++        }
++        BareToolbarLayout.invalidate();
++    }
++
++    private static String key(@BareToolbarSlot int slot) {
++        return ChromePreferenceKeys.BOTTOM_BAR_SLOT_PRIMARY_ACTION.createKey(slot);
++    }
++
++    /** Stores an arrangement and forgets whatever was resolved from the previous one. */
++    private void store(int home, int extra, int appMenu) {
++        if (home != UNSET) mPrefs.writeInt(key(BareToolbarSlot.HOME), home);
++        if (extra != UNSET) mPrefs.writeInt(key(BareToolbarSlot.EXTRA), extra);
++        if (appMenu != UNSET) mPrefs.writeInt(key(BareToolbarSlot.APP_MENU), appMenu);
++        BareToolbarLayout.invalidate();
++    }
++
++    private static final int UNSET = -1;
++
++    /** Asserts the three configurable positions, and that the two fixed ones did not move. */
++    private void assertBar(int home, int extra, int appMenu) {
++        assertEquals("home slot", home, BareToolbarLayout.actionForSlot(BareToolbarSlot.HOME));
++        assertEquals("extra slot", extra, BareToolbarLayout.actionForSlot(BareToolbarSlot.EXTRA));
++        assertEquals(
++                "app menu slot", appMenu, BareToolbarLayout.actionForSlot(BareToolbarSlot.APP_MENU));
++        assertEquals(
++                "new tab is fixed",
++                ActionId.NEW_TAB,
++                BareToolbarLayout.actionForSlot(BareToolbarSlot.NEW_TAB));
++        assertEquals(
++                "tab switcher is fixed",
++                ActionId.TAB_SWITCHER,
++                BareToolbarLayout.actionForSlot(BareToolbarSlot.TAB_SWITCHER));
++        assertDistinct(home, extra, appMenu);
++    }
++
++    /** The bar holds buttons in a map keyed by action, so a repeat is unrenderable, not just odd. */
++    private void assertDistinct(int home, int extra, int appMenu) {
++        assertNotEquals("home and extra hold the same action", home, extra);
++        assertNotEquals("home and app menu hold the same action", home, appMenu);
++        assertNotEquals("extra and app menu hold the same action", extra, appMenu);
++        for (int action : new int[] {home, extra, appMenu}) {
++            assertTrue(
++                    "resolved action " + action + " is not one Bare offers",
++                    BareToolbarDefaults.isConfigurableAction(action));
++        }
++    }
++
++    @Test
++    public void testNoPreferences_resolvesToTheArrangementBareShipped() {
++        assertBar(ActionId.HOME_BUTTON, ActionId.INCOGNITO, ActionId.APP_MENU);
++    }
++
++    @Test
++    public void testResolvingDoesNotWriteAnything() {
++        BareToolbarLayout.actionForSlot(BareToolbarSlot.HOME);
++        BareToolbarLayout.actionForSlot(BareToolbarSlot.EXTRA);
++        BareToolbarLayout.actionForSlot(BareToolbarSlot.APP_MENU);
++
++        for (int slot = 0; slot < BareToolbarSlot.COUNT; slot++) {
++            assertFalse(
++                    "resolving slot " + slot + " wrote a preference",
++                    mPrefs.contains(key(slot)));
++            assertFalse(BareToolbarPrefs.hasPrimaryAction(slot));
++        }
++    }
++
++    @Test
++    public void testResetRemovesKeysRatherThanRecordingTodaysDefaults() {
++        store(ActionId.SHARE, ActionId.TRANSLATE, ActionId.BOOKMARK);
++        assertTrue(BareToolbarPrefs.hasPrimaryAction(BareToolbarSlot.HOME));
++
++        BareToolbarPrefs.resetAll();
++        BareToolbarLayout.invalidate();
++
++        for (int slot = 0; slot < BareToolbarSlot.COUNT; slot++) {
++            assertFalse("reset left a key behind for slot " + slot, mPrefs.contains(key(slot)));
++        }
++        assertBar(ActionId.HOME_BUTTON, ActionId.INCOGNITO, ActionId.APP_MENU);
++    }
++
++    @Test
++    public void testConfigurationA_bookmarkIncognitoShare() {
++        store(ActionId.BOOKMARK, ActionId.INCOGNITO, ActionId.SHARE);
++        assertBar(ActionId.BOOKMARK, ActionId.INCOGNITO, ActionId.SHARE);
++    }
++
++    @Test
++    public void testConfigurationB_translateShareBookmark() {
++        store(ActionId.TRANSLATE, ActionId.SHARE, ActionId.BOOKMARK);
++        assertBar(ActionId.TRANSLATE, ActionId.SHARE, ActionId.BOOKMARK);
++    }
++
++    @Test
++    public void testConfigurationC_appMenuBookmarkHome() {
++        store(ActionId.APP_MENU, ActionId.BOOKMARK, ActionId.HOME_BUTTON);
++        assertBar(ActionId.APP_MENU, ActionId.BOOKMARK, ActionId.HOME_BUTTON);
++    }
++
++    @Test
++    public void testConfigurationD_shareTranslateIncognito() {
++        store(ActionId.SHARE, ActionId.TRANSLATE, ActionId.INCOGNITO);
++        assertBar(ActionId.SHARE, ActionId.TRANSLATE, ActionId.INCOGNITO);
++    }
++
++    @Test
++    public void testShareInEveryConfigurablePosition() {
++        store(ActionId.SHARE, UNSET, UNSET);
++        assertEquals(ActionId.SHARE, BareToolbarLayout.actionForSlot(BareToolbarSlot.HOME));
++        assertEquals(BareToolbarSlot.HOME, BareToolbarLayout.slotForAction(ActionId.SHARE));
++
++        clearStored();
++        store(UNSET, ActionId.SHARE, UNSET);
++        assertEquals(ActionId.SHARE, BareToolbarLayout.actionForSlot(BareToolbarSlot.EXTRA));
++        assertEquals(BareToolbarSlot.EXTRA, BareToolbarLayout.slotForAction(ActionId.SHARE));
++
++        clearStored();
++        store(UNSET, UNSET, ActionId.SHARE);
++        assertEquals(ActionId.SHARE, BareToolbarLayout.actionForSlot(BareToolbarSlot.APP_MENU));
++        assertEquals(BareToolbarSlot.APP_MENU, BareToolbarLayout.slotForAction(ActionId.SHARE));
++    }
++
++    @Test
++    public void testInvalidStoredActionFallsBackToTheSlotDefault() {
++        store(99, ActionId.INCOGNITO, ActionId.APP_MENU);
++        assertBar(ActionId.HOME_BUTTON, ActionId.INCOGNITO, ActionId.APP_MENU);
++    }
++
++    @Test
++    public void testActionThisBuildDoesNotOfferIsNotHonoured() {
++        // GLIC exists as an action but is not one Bare offers as a choice. A preference naming it,
++        // whether written by another build or by hand, must not put it on the bar.
++        store(ActionId.GLIC, ActionId.AI_MODE, ActionId.APP_MENU);
++        assertBar(ActionId.HOME_BUTTON, ActionId.INCOGNITO, ActionId.APP_MENU);
++    }
++
++    @Test
++    public void testDuplicate_earlierSlotKeepsItAndLaterFallsBackToItsDefault() {
++        store(ActionId.SHARE, ActionId.SHARE, ActionId.APP_MENU);
++        assertBar(ActionId.SHARE, ActionId.INCOGNITO, ActionId.APP_MENU);
++    }
++
++    @Test
++    public void testTripleDuplicate_resolvesToThreeDistinctActions() {
++        store(ActionId.BOOKMARK, ActionId.BOOKMARK, ActionId.BOOKMARK);
++        assertBar(ActionId.BOOKMARK, ActionId.INCOGNITO, ActionId.APP_MENU);
++    }
++
++    @Test
++    public void testDuplicate_whenTheSlotDefaultIsAlsoTakenTheCatalogueDecides() {
++        // Incognito is both what is stored for the first slot and what the second falls back to,
++        // so the second has to look further: the first action in the catalogue nothing is using.
++        store(ActionId.INCOGNITO, ActionId.INCOGNITO, ActionId.APP_MENU);
++        assertBar(ActionId.INCOGNITO, ActionId.HOME_BUTTON, ActionId.APP_MENU);
++    }
++
++    @Test
++    public void testOnlyHomeStored() {
++        store(ActionId.TRANSLATE, UNSET, UNSET);
++        assertBar(ActionId.TRANSLATE, ActionId.INCOGNITO, ActionId.APP_MENU);
++    }
++
++    @Test
++    public void testOnlyExtraStored() {
++        store(UNSET, ActionId.SHARE, UNSET);
++        assertBar(ActionId.HOME_BUTTON, ActionId.SHARE, ActionId.APP_MENU);
++    }
++
++    @Test
++    public void testOnlyAppMenuStored() {
++        store(UNSET, UNSET, ActionId.BOOKMARK);
++        assertBar(ActionId.HOME_BUTTON, ActionId.INCOGNITO, ActionId.BOOKMARK);
++    }
++
++    @Test
++    public void testTwoStored() {
++        store(ActionId.TRANSLATE, UNSET, ActionId.BOOKMARK);
++        assertBar(ActionId.TRANSLATE, ActionId.INCOGNITO, ActionId.BOOKMARK);
++    }
++
++    @Test
++    public void testPartialStore_whereTheMissingSlotDefaultIsAlreadyTaken() {
++        // Nothing is stored for the spare slot, and what it does by default has been taken by the
++        // slot before it, so it too has to fall through to the catalogue.
++        store(ActionId.INCOGNITO, UNSET, UNSET);
++        assertBar(ActionId.INCOGNITO, ActionId.HOME_BUTTON, ActionId.APP_MENU);
++    }
++
++    @Test
++    public void testResolutionIsDeterministic() {
++        store(ActionId.BOOKMARK, ActionId.BOOKMARK, ActionId.BOOKMARK);
++        int home = BareToolbarLayout.actionForSlot(BareToolbarSlot.HOME);
++        int extra = BareToolbarLayout.actionForSlot(BareToolbarSlot.EXTRA);
++        int appMenu = BareToolbarLayout.actionForSlot(BareToolbarSlot.APP_MENU);
++
++        for (int i = 0; i < 5; i++) {
++            BareToolbarLayout.invalidate();
++            assertEquals(home, BareToolbarLayout.actionForSlot(BareToolbarSlot.HOME));
++            assertEquals(extra, BareToolbarLayout.actionForSlot(BareToolbarSlot.EXTRA));
++            assertEquals(appMenu, BareToolbarLayout.actionForSlot(BareToolbarSlot.APP_MENU));
++        }
++    }
++
++    @Test
++    public void testFixedSlotsNeverConsultStorage() {
++        // A preference for a slot the user cannot configure is ignored rather than obeyed, so a
++        // value left by a build that allowed more of them cannot resurface.
++        mPrefs.writeInt(key(BareToolbarSlot.NEW_TAB), ActionId.SHARE);
++        mPrefs.writeInt(key(BareToolbarSlot.TAB_SWITCHER), ActionId.BOOKMARK);
++        BareToolbarLayout.invalidate();
++
++        assertEquals(
++                ActionId.NEW_TAB, BareToolbarLayout.actionForSlot(BareToolbarSlot.NEW_TAB));
++        assertEquals(
++                ActionId.TAB_SWITCHER,
++                BareToolbarLayout.actionForSlot(BareToolbarSlot.TAB_SWITCHER));
++        assertFalse(BareToolbarPrefs.hasPrimaryAction(BareToolbarSlot.NEW_TAB));
++    }
++
++    @Test
++    public void testActionNotOnTheBarHasNoPosition() {
++        // Nothing should resolve to a container merely because it once lived there.
++        assertEquals(BareToolbarSlot.NONE, BareToolbarLayout.slotForAction(ActionId.GLIC));
++        assertEquals(BareToolbarSlot.NONE, BareToolbarLayout.slotForAction(ActionId.AI_MODE));
++        assertEquals(BareToolbarSlot.NONE, BareToolbarLayout.slotForAction(ActionId.SHARE));
++        assertFalse(BareToolbarLayout.isPlaced(ActionId.SHARE));
++
++        store(UNSET, ActionId.SHARE, UNSET);
++        assertEquals(BareToolbarSlot.EXTRA, BareToolbarLayout.slotForAction(ActionId.SHARE));
++        assertTrue(BareToolbarLayout.isPlaced(ActionId.SHARE));
++        assertFalse(
++                "incognito was displaced and is no longer on the bar",
++                BareToolbarLayout.isPlaced(ActionId.INCOGNITO));
++    }
++
++    @Test
++    public void testUnknownActionHasNoPosition() {
++        assertEquals(BareToolbarSlot.NONE, BareToolbarLayout.slotForAction(99));
++        assertFalse(BareToolbarLayout.isPlaced(99));
++    }
++}
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java
-index 87ba261f02..f610cb06bd 100644
+index 87ba261f02..c5a1233689 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java
 +++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java
 @@ -41,7 +41,7 @@ public final class BareToolbarPrefs {
@@ -939,15 +1753,35 @@ index 87ba261f02..f610cb06bd 100644
              return BareToolbarDefaults.actionFor(slot);
          }
          return stored;
-@@ -59,7 +59,7 @@ public final class BareToolbarPrefs {
+@@ -54,13 +54,17 @@ public final class BareToolbarPrefs {
+     }
+ 
+     /**
+-     * Records the action for a slot. Nothing calls this yet; the settings screen that will is a
+-     * later patch.
++     * Records the action for a slot, and forgets the arrangement resolved from the old one.
++     *
++     * <p>Nothing calls this yet; the settings screen that will is a later patch. It invalidates
++     * because a write that left the resolved bar in place would be a write nobody could see, and
++     * the next thing to ask about a slot would get the previous answer.
       */
      public static void setPrimaryAction(@BareToolbarSlot int slot, @ActionId int actionId) {
          if (!BareToolbarDefaults.isConfigurable(slot)) return;
 -        if (!BareToolbarDefaults.isKnownAction(actionId)) return;
 +        if (!BareToolbarDefaults.isConfigurableAction(actionId)) return;
          ChromeSharedPreferences.getInstance().writeInt(primaryKey(slot), actionId);
++        BareToolbarLayout.invalidate();
      }
  
+     /**
+@@ -75,6 +79,7 @@ public final class BareToolbarPrefs {
+             if (!BareToolbarDefaults.isConfigurable(slot)) continue;
+             ChromeSharedPreferences.getInstance().removeKey(primaryKey(slot));
+         }
++        BareToolbarLayout.invalidate();
+     }
+ 
+     private static String primaryKey(@BareToolbarSlot int slot) {
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
 index 2e7a75329b..c482975df4 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
@@ -1113,6 +1947,105 @@ index 2e7a75329b..c482975df4 100644
          }
  
          return configs;
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinatorUnitTest.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinatorUnitTest.java
+index 1af648ac23..1b4c405a64 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinatorUnitTest.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinatorUnitTest.java
+@@ -54,7 +54,6 @@ import org.chromium.chrome.browser.theme.ThemeColorProvider;
+ import org.chromium.chrome.browser.ui.actions.ActionId;
+ import org.chromium.chrome.browser.ui.actions.ActionProperties;
+ import org.chromium.chrome.browser.ui.actions.ActionRegistry;
+-import org.chromium.chrome.browser.ui.actions.glic.GlicActionProperties;
+ import org.chromium.chrome.browser.ui.theme.BrandedColorScheme;
+ import org.chromium.components.feature_engagement.FeatureConstants;
+ import org.chromium.components.feature_engagement.Tracker;
+@@ -101,6 +100,8 @@ public class BottomBarCoordinatorUnitTest {
+             ObservableSuppliers.createNullable();
+     private final SettableNullableObservableSupplier<PropertyModel> mAiModeActionSupplier =
+             ObservableSuppliers.createNullable();
++    private final SettableNullableObservableSupplier<PropertyModel> mIncognitoActionSupplier =
++            ObservableSuppliers.createNullable();
+     private final SettableNullableObservableSupplier<Profile> mProfileSupplier =
+             ObservableSuppliers.createNullable();
+ 
+@@ -122,6 +123,7 @@ public class BottomBarCoordinatorUnitTest {
+         when(mActionRegistry.get(ActionId.TAB_SWITCHER)).thenReturn(mTabSwitcherActionSupplier);
+         when(mActionRegistry.get(ActionId.GLIC)).thenReturn(mGlicActionSupplier);
+         when(mActionRegistry.get(ActionId.AI_MODE)).thenReturn(mAiModeActionSupplier);
++        when(mActionRegistry.get(ActionId.INCOGNITO)).thenReturn(mIncognitoActionSupplier);
+ 
+         mActivityScenarioRule.getScenario().onActivity(this::onActivity);
+     }
+@@ -219,51 +221,33 @@ public class BottomBarCoordinatorUnitTest {
+     }
+ 
+     @Test
+-    public void testExtraButton_bindsEligibleActionTooltipAndLongPress_withoutClobbering() {
+-        GlicEnabling.Natives glicEnablingMock = mock(GlicEnabling.Natives.class);
+-        GlicEnablingJni.setInstanceForTesting(glicEnablingMock);
+-        when(glicEnablingMock.isEnabledForProfile(any())).thenReturn(true);
+-        when(mProfile.getOriginalProfile()).thenReturn(mProfile);
+-
+-        AtomicBoolean glicLongClicked = new AtomicBoolean(false);
+-        AtomicBoolean aiModeLongClicked = new AtomicBoolean(false);
+-
+-        PropertyModel glicModel =
+-                new PropertyModel.Builder(GlicActionProperties.ALL_KEYS)
+-                        .with(
+-                                ActionProperties.TOOLTIP_TEXT_RESOLVER,
+-                                context -> "Ask Gemini Tooltip")
+-                        .with(
+-                                ActionProperties.ON_LONG_PRESS_CALLBACK,
+-                                (v) -> glicLongClicked.set(true))
+-                        .build();
++    public void testTheSpareSlotBindsTheActionItActuallyHolds() {
++        // This used to check that GLIC and AI Mode did not clobber each other in a container they
++        // shared. Neither is offered here and the container holds one action, so what is worth
++        // protecting now is that the action the bar resolved is the one that gets bound, and that
++        // its own long press survives.
++        AtomicBoolean longClicked = new AtomicBoolean(false);
+ 
+-        PropertyModel aiModeModel =
++        PropertyModel incognitoModel =
+                 new PropertyModel.Builder(ActionProperties.BASE_KEYS)
+-                        .with(
+-                                ActionProperties.TOOLTIP_TEXT_RESOLVER,
+-                                context -> "Ask AI Mode Tooltip")
+-                        .with(
+-                                ActionProperties.ON_LONG_PRESS_CALLBACK,
+-                                (v) -> aiModeLongClicked.set(true))
++                        .with(ActionProperties.ON_LONG_PRESS_CALLBACK, (v) -> longClicked.set(true))
+                         .build();
++        mIncognitoActionSupplier.set(incognitoModel);
+ 
+-        // Supply both models (simulating ActionUtils registration).
+-        mGlicActionSupplier.set(glicModel);
+-        mAiModeActionSupplier.set(aiModeModel);
+-
+-        // Trigger profile update so mediator resolves GLIC as eligible candidate.
++        // Trigger the profile update the shared slot waits for.
+         mProfileSupplier.set(null);
+         mProfileSupplier.set(mProfile);
+ 
+-        View extraButton = mCoordinator.getView().findViewById(R.id.extra_button);
+-        assertNotNull(extraButton);
++        assertEquals(
++                ActionId.INCOGNITO, BareToolbarLayout.actionForSlot(BareToolbarSlot.EXTRA));
+ 
+-        assertEquals("Ask Gemini Tooltip", extraButton.getTooltipText());
++        BottomBarButtonContainer container =
++                ((BottomBarView) mCoordinator.getView())
++                        .getContainerForSlot(BareToolbarSlot.EXTRA);
++        assertNotNull(container);
+ 
+-        extraButton.performLongClick();
+-        assertTrue(glicLongClicked.get());
+-        assertFalse(aiModeLongClicked.get());
++        container.getTargetView().performLongClick();
++        assertTrue("the configured action's own long press should have run", longClicked.get());
+     }
+ 
+     @Test
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
 index 2b5c853229..21b47b3f7b 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
@@ -1159,6 +2092,52 @@ index 2b5c853229..21b47b3f7b 100644
              setButtonVisibility(action, action == eligibleAction);
          }
      }
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediatorUnitTest.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediatorUnitTest.java
+index 3128f1cc51..ef8ca05d3d 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediatorUnitTest.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediatorUnitTest.java
+@@ -614,7 +614,7 @@ public class BottomBarMediatorUnitTest {
+     }
+ 
+     @Test
+-    public void testDseChangedDynamically() {
++    public void testDseChangedDynamically_ReResolvesTheSharedSlot() {
+         createMediator(/* shouldIncludeHomeButton= */ false);
+ 
+         // Capture the registered TemplateUrlServiceObserver.
+@@ -622,9 +622,12 @@ public class BottomBarMediatorUnitTest {
+         TemplateUrlServiceObserver observer = mTemplateUrlObserverCaptor.getValue();
+         assertNotNull(observer);
+ 
+-        // Trigger the DSE change observer and verify it updates GLIC/fallback visibility.
++        // The shared slot is re-resolved. Which action that touches is whichever of the shared
++        // actions the bar is showing, not GLIC by name: naming it here was the same assumption
++        // that stopped the slot holding anything else.
+         observer.onTemplateURLServiceChanged();
+-        verify(mButtonManager, times(2)).setButtonVisibility(ActionId.GLIC, false);
++        verify(mButtonManager, times(2)).setButtonVisibility(ActionId.INCOGNITO, true);
++        verify(mButtonManager, never()).setButtonVisibility(ActionId.GLIC, false);
+     }
+ 
+     @Test
+@@ -660,14 +663,15 @@ public class BottomBarMediatorUnitTest {
+     }
+ 
+     @Test
+-    public void testOnSharedPreferenceChanged_TogglesGlicVisibility() {
++    public void testOnSharedPreferenceChanged_ReResolvesTheSharedSlot() {
+         createMediator(/* shouldIncludeHomeButton= */ false);
+ 
+         assertNotNull(mMediator);
+         mMediator.onSharedPreferenceChanged(
+                 ContextUtils.getAppSharedPreferences(),
+                 ChromePreferenceKeys.BOTTOM_BAR_GLIC_BUTTON_ENABLED);
+-        verify(mButtonManager, times(2)).setButtonVisibility(ActionId.GLIC, false);
++        verify(mButtonManager, times(2)).setButtonVisibility(ActionId.INCOGNITO, true);
++        verify(mButtonManager, never()).setButtonVisibility(ActionId.GLIC, false);
+     }
+ 
+     private void createMediator(boolean shouldIncludeHomeButton) {
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarProperties.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarProperties.java
 index 8d6bbbfeb0..17be3799c8 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarProperties.java
@@ -1279,6 +2258,102 @@ index a6815d258b..e720563bbe 100644
          }
      }
  }
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarViewBinderUnitTest.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarViewBinderUnitTest.java
+index bc1687b95d..2fe021270a 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarViewBinderUnitTest.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarViewBinderUnitTest.java
+@@ -7,6 +7,7 @@ package org.chromium.chrome.browser.ui.bottombar;
+ import static org.junit.Assert.assertEquals;
+ import static org.junit.Assert.assertNotEquals;
+ import static org.junit.Assert.assertNotNull;
++import static org.junit.Assert.assertNull;
+ 
+ import android.app.Activity;
+ import android.content.res.ColorStateList;
+@@ -52,9 +53,11 @@ public class BottomBarViewBinderUnitTest {
+                         LayoutInflater.from(mActivity)
+                                 .inflate(R.layout.bottom_bar_layout, null, false);
+ 
+-        mBottomBarView.getContainerForAction(ActionId.HOME_BUTTON).inflateStub();
+-        mBottomBarView.getContainerForAction(ActionId.GLIC).inflateStub();
+-        mBottomBarView.getContainerForAction(ActionId.APP_MENU).inflateStub();
++        // Inflated by position. Asking for a container by naming an action only answers for
++        // actions the bar is actually showing, and which ones those are is a preference away.
++        mBottomBarView.getContainerForSlot(BareToolbarSlot.HOME).inflateStub();
++        mBottomBarView.getContainerForSlot(BareToolbarSlot.EXTRA).inflateStub();
++        mBottomBarView.getContainerForSlot(BareToolbarSlot.APP_MENU).inflateStub();
+ 
+         mModel = new PropertyModel.Builder(BottomBarProperties.ALL_KEYS).build();
+         PropertyModelChangeProcessor.create(mModel, mBottomBarView, BottomBarViewBinder::bind);
+@@ -85,29 +88,48 @@ public class BottomBarViewBinderUnitTest {
+     }
+ 
+     @Test
+-    public void testButtonVisibilitiesProperty() {
+-        verifyButtonVisibility(BottomBarProperties.IS_HOME_BUTTON_VISIBLE, ActionId.HOME_BUTTON);
+-        verifyButtonVisibility(BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE, ActionId.GLIC);
+-        verifyButtonVisibility(BottomBarProperties.IS_NEW_TAB_BUTTON_VISIBLE, ActionId.NEW_TAB);
+-        verifyButtonVisibility(
+-                BottomBarProperties.IS_TAB_SWITCHER_BUTTON_VISIBLE, ActionId.TAB_SWITCHER);
+-        verifyButtonVisibility(BottomBarProperties.IS_APP_MENU_BUTTON_VISIBLE, ActionId.APP_MENU);
+-    }
+-
+-    private void verifyButtonVisibility(
+-            PropertyModel.WritableBooleanPropertyKey property, @ActionId int actionId) {
+-        View container = mBottomBarView.getContainerForAction(actionId);
+-        assertNotNull("Container should not be null for actionId: " + actionId, container);
+-
+-        if (property == BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE) {
+-            mModel.set(BottomBarProperties.EXTRA_BUTTON_ACTION_ID, actionId);
++    public void testEachPositionIsShownAndHiddenByItsOwnKey() {
++        for (int slot = 0; slot < BareToolbarSlot.COUNT; slot++) {
++            View container = mBottomBarView.getContainerForSlot(slot);
++            assertNotNull("no container for slot " + slot, container);
++            PropertyModel.WritableBooleanPropertyKey key =
++                    BottomBarProperties.visibilityKeyForSlot(slot);
++
++            mModel.set(key, true);
++            assertEquals("slot " + slot + " should be visible", View.VISIBLE,
++                    container.getVisibility());
++
++            mModel.set(key, false);
++            assertEquals("slot " + slot + " should be gone", View.GONE,
++                    container.getVisibility());
+         }
++    }
+ 
+-        mModel.set(property, true);
+-        assertEquals(View.VISIBLE, container.getVisibility());
++    @Test
++    public void testAnActionTheBarIsNotShowingHasNoContainer() {
++        // The old answer was that an action belonged to the container it had historically lived
++        // in, which is exactly the assumption that stopped the bar being rearranged. GLIC is not
++        // one of the actions Bare offers, so nothing on the bar is its.
++        assertNull(mBottomBarView.getContainerForAction(ActionId.GLIC));
++        assertNull(mBottomBarView.getContainerForAction(ActionId.AI_MODE));
++
++        // With nothing stored, these three are the arrangement Bare ships.
++        assertNotNull(mBottomBarView.getContainerForAction(ActionId.HOME_BUTTON));
++        assertNotNull(mBottomBarView.getContainerForAction(ActionId.INCOGNITO));
++        assertNotNull(mBottomBarView.getContainerForAction(ActionId.APP_MENU));
++    }
+ 
+-        mModel.set(property, false);
+-        assertEquals(View.GONE, container.getVisibility());
++    @Test
++    public void testAPositionAnswersForWhicheverActionItHolds() {
++        assertEquals(
++                mBottomBarView.getContainerForSlot(BareToolbarSlot.EXTRA),
++                mBottomBarView.getContainerForAction(ActionId.INCOGNITO));
++        assertEquals(
++                mBottomBarView.getContainerForSlot(BareToolbarSlot.HOME),
++                mBottomBarView.getContainerForAction(ActionId.HOME_BUTTON));
++        assertEquals(
++                mBottomBarView.getContainerForSlot(BareToolbarSlot.APP_MENU),
++                mBottomBarView.getContainerForAction(ActionId.APP_MENU));
+     }
+ 
+     @Test
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java
 index 14d5105a4d..97378874ca 100644
 --- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java
