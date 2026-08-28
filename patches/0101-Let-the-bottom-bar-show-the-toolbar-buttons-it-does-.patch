@@ -1,4 +1,4 @@
-From 0a146f253ef930044bd0eafc10ae9b223c4ceb3c Mon Sep 17 00:00:00 2001
+From 6c289a5e07ebd3ce9c39b72b17d98796493d4f6b Mon Sep 17 00:00:00 2001
 From: Bare <57wsdx6b8d@privaterelay.appleid.com>
 Date: Fri, 28 Aug 2026 18:49:21 +0000
 Subject: [PATCH] Let the bottom bar show the toolbar buttons it does not have
@@ -20,45 +20,74 @@ it behaves changes by being read a second time.
 Reaching the provider needs an accessor, since the controller keeps its
 providers to itself. AdaptiveToolbarButtonController, AdaptiveToolbarUi-
 Coordinator and RootUiCoordinator each gain one lookup by variant, returning
-null when that variant was never built, which is the normal case for the
-variants Bare disables.
+null when that variant was never built.
 
 Providers hold the active tab as a plain supplier and never watch it, leaving
 that to whatever displays the button. The adapter therefore observes the
 activity tab itself and re-asks the provider on every change, including the
 tab that is already in front when it starts.
 
-Three actions go through it: Share, Translate and Bookmark. They were chosen
-because they answer different questions about whether one adapter is enough.
-Share is always applicable. Translate applies only to some pages, so its
-provider reports nothing to show on a new tab page and the action goes quiet.
-Bookmark carries state, and it turns out to carry it by swapping its whole
-ButtonSpec between an outline star reading "Bookmark this page" and a filled
-one reading "Edit Bookmark", rather than through the spec's own selected or
-checked flags, which it never sets. Copying the icon and the description
-therefore carries the bookmark state without the adapter knowing what a
-bookmark is. All three work through one adapter with no per-action code.
+Three actions go through it: Share, Translate and Bookmark. Share is always
+applicable, Translate only on some pages, and Bookmark carries state, so
+between them they ask the adapter every question a page action can ask. Of the
+two similar flags on the spec only isSelected is copied, because it is the one
+that means what IS_SELECTED means here; isChecked drives a contextual page
+action appearance the bottom bar has no equivalent for. Bookmark turns out to
+carry its state by swapping its whole ButtonSpec between an outline star
+reading "Bookmark this page" and a filled one reading "Edit Bookmark", so
+copying the icon and the description carries it without the adapter knowing
+what a bookmark is.
 
-Of the two similar flags on the spec only isSelected is copied. It becomes
-View.setSelected on the optional button, which is what IS_SELECTED becomes
-here. isChecked drives the checked appearance of a contextual page action,
-which the bottom bar has no equivalent for and which only price tracking
-sets; folding the two together would draw a price-tracked page as selected.
+The provider builds each icon once and the top toolbar is already showing it,
+so the adapter hands the bar a copy. Handing over the same Drawable would have
+been handing it over rather than sharing it: setting an image tint mutates the
+Drawable, and a Drawable reports back to only one view, so the two surfaces
+would have fought over the colour and one would have stopped redrawing.
 
-No button moves and no layout changes: the adapted actions are registered but
-not yet placed in a slot.
+The bar itself can now put any of these anywhere. Three of its five positions
+are the user's to arrange, and the whole bar is resolved at once rather than a
+position at a time, because the buttons are held in a map keyed by action and
+the same action twice is impossible rather than merely odd. Slots resolve left
+to right and an earlier one wins; a slot that cannot keep what is stored falls
+back to what it does by default, and then to the first action in the catalogue
+nothing else is using. Stored rubbish, a stale action from another build, and
+the same action in every slot all resolve to a usable bar.
+
+What made a position special has moved to the action that position used to
+hold. The view an action is drawn into, the binder it is drawn through and the
+id that view carries are all chosen from the action now, so Home takes its long
+press menu wherever it goes, the app menu takes its update badge, and neither
+leaves anything behind for whatever replaces it. Home is still hidden when the
+homepage is off and the shared slot is still shown only where it applies, but
+both now follow the action rather than the position, so an ordinary action in
+the first position does not vanish with the homepage and Home does not become
+permanent by being moved out of it.
+
+Nothing writes a preference, so a profile that has never been customised
+resolves to the arrangement Bare shipped.
 ---
  chrome/android/chrome_java_sources.gni        |   2 +
- .../bare/BareButtonDataActionAdapter.java     | 168 ++++++++++++++++++
- .../bare/BareToolbarActionCatalogue.java      |  98 ++++++++++
- .../tabbed_mode/TabbedRootUiCoordinator.java  |  15 ++
+ .../bare/BareButtonDataActionAdapter.java     | 212 ++++++++++++++++++
+ .../bare/BareToolbarActionCatalogue.java      | 106 +++++++++
+ .../tabbed_mode/TabbedRootUiCoordinator.java  |  18 ++
  .../ui/AdaptiveToolbarUiCoordinator.java      |   8 +
  .../chrome/browser/ui/RootUiCoordinator.java  |  13 ++
  .../chrome/browser/ui/actions/ActionId.java   |   6 +
- .../AdaptiveToolbarButtonController.java      |  12 ++
- 8 files changed, 322 insertions(+)
+ chrome/browser/ui/android/bottombar/BUILD.gn  |   1 +
+ .../bottombar/BareToolbarActionRendering.java | 122 ++++++++++
+ .../ui/bottombar/BareToolbarDefaults.java     |  45 ++--
+ .../ui/bottombar/BareToolbarLayout.java       | 131 +++++++++--
+ .../ui/bottombar/BareToolbarPrefs.java        |   4 +-
+ .../ui/bottombar/BottomBarCoordinator.java    | 123 ++++------
+ .../ui/bottombar/BottomBarMediator.java       |  20 +-
+ .../ui/bottombar/BottomBarProperties.java     |  30 +++
+ .../browser/ui/bottombar/BottomBarView.java   |  17 ++
+ .../ui/bottombar/BottomBarViewBinder.java     |  31 +--
+ .../AdaptiveToolbarButtonController.java      |  12 +
+ 18 files changed, 754 insertions(+), 147 deletions(-)
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
+ create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRendering.java
 
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
 index ddaf9410ae..99811d6743 100644
@@ -75,16 +104,19 @@ index ddaf9410ae..99811d6743 100644
    "java/src/org/chromium/chrome/browser/background_sync/BackgroundSyncBackgroundTask.java",
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
 new file mode 100644
-index 0000000000..af05e7da7b
+index 0000000000..06c8f8123c
 --- /dev/null
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
-@@ -0,0 +1,168 @@
+@@ -0,0 +1,212 @@
 +// Copyright 2026 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
 +
 +package org.chromium.chrome.browser.bare;
 +
++import android.content.Context;
++import android.content.res.Resources;
++import android.graphics.drawable.Drawable;
 +import android.view.View;
 +import android.view.View.OnClickListener;
 +
@@ -101,6 +133,9 @@ index 0000000000..af05e7da7b
 +import org.chromium.chrome.browser.ui.actions.ActionProperties;
 +import org.chromium.chrome.browser.ui.actions.ActionRegistry;
 +import org.chromium.ui.modelutil.PropertyModel;
++
++import java.util.HashMap;
++import java.util.Map;
 +
 +/**
 + * Presents an existing toolbar {@link ButtonDataProvider} as a bottom bar action.
@@ -127,6 +162,15 @@ index 0000000000..af05e7da7b
 +    private final ButtonDataProvider mProvider;
 +    private final ActionRegistry mRegistry;
 +    private final PropertyModel mModel;
++    private final Resources mResources;
++
++    /**
++     * Copies of the provider's icons, kept so a redraw does not make a new one each time.
++     *
++     * <p>Small and bounded: a provider hands out the same few Drawable objects for the states it
++     * has, two in Bookmark's case and one for everything else so far.
++     */
++    private final Map<Drawable, Drawable> mIconCopies = new HashMap<>();
 +
 +    /**
 +     * Watches whichever tab is in front. Chromium's own observer for the activity tab, which moves
@@ -148,15 +192,18 @@ index 0000000000..af05e7da7b
 +     * @param provider The existing provider to read. Not owned.
 +     * @param tabProvider The activity tab, observed so the provider can be re-asked.
 +     * @param registry The registry to publish the model to.
++     * @param context Used to copy the provider's icons.
 +     */
 +    public BareButtonDataActionAdapter(
 +            @ActionId int actionId,
 +            ButtonDataProvider provider,
 +            ActivityTabProvider tabProvider,
-+            ActionRegistry registry) {
++            ActionRegistry registry,
++            Context context) {
 +        mActionId = actionId;
 +        mProvider = provider;
 +        mRegistry = registry;
++        mResources = context.getResources();
 +        mModel = new PropertyModel.Builder(ActionProperties.BASE_KEYS).build();
 +
 +        mProvider.addObserver(this);
@@ -204,7 +251,7 @@ index 0000000000..af05e7da7b
 +
 +        ButtonSpec spec = data.getButtonSpec();
 +
-+        mModel.set(ActionProperties.ICON_DRAWABLE, spec.getDrawable());
++        mModel.set(ActionProperties.ICON_DRAWABLE, copyOf(spec.getDrawable()));
 +        mModel.set(
 +                ActionProperties.CONTENT_DESCRIPTION_RESOLVER,
 +                context -> spec.getContentDescription());
@@ -227,6 +274,31 @@ index 0000000000..af05e7da7b
 +    }
 +
 +    /**
++     * A private copy of one of the provider's icons.
++     *
++     * <p>The provider builds its Drawable once and hands out the same object every time, and the
++     * top toolbar is already showing it. Handing that same object to a second ImageView takes it
++     * over: setting an image tint mutates the Drawable itself rather than the view, and a Drawable
++     * only reports back to one view, so the two surfaces would fight over the colour and the one
++     * that lost would stop redrawing. Neither surface is wrong to tint what it was given, so each
++     * gets something of its own to tint.
++     *
++     * <p>The copy shares the underlying artwork through the constant state and only separates the
++     * parts that can be changed, so this costs a wrapper rather than a second bitmap.
++     */
++    private @Nullable Drawable copyOf(@Nullable Drawable source) {
++        if (source == null) return null;
++        @Nullable Drawable existing = mIconCopies.get(source);
++        if (existing != null) return existing;
++        Drawable.@Nullable ConstantState state = source.getConstantState();
++        // A Drawable with no constant state cannot be copied. None of the providers produce one,
++        // and sharing is still better than showing nothing.
++        Drawable copy = state == null ? source : state.newDrawable(mResources).mutate();
++        mIconCopies.put(source, copy);
++        return copy;
++    }
++
++    /**
 +     * Runs the provider's own click handling.
 +     *
 +     * <p>Kept as its own method so that a later patch can offer the same action as the long press
@@ -242,6 +314,7 @@ index 0000000000..af05e7da7b
 +        mDestroyed = true;
 +        mOnClick = null;
 +        mTab = null;
++        mIconCopies.clear();
 +        mProvider.removeObserver(this);
 +        mTabObserver.destroy();
 +        mRegistry.unregister(mActionId);
@@ -249,15 +322,17 @@ index 0000000000..af05e7da7b
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
 new file mode 100644
-index 0000000000..05f378bc61
+index 0000000000..813e156836
 --- /dev/null
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
-@@ -0,0 +1,98 @@
+@@ -0,0 +1,106 @@
 +// Copyright 2026 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
 +
 +package org.chromium.chrome.browser.bare;
++
++import android.content.Context;
 +
 +import org.chromium.base.lifetime.Destroyable;
 +import org.chromium.build.annotations.NullMarked;
@@ -301,22 +376,26 @@ index 0000000000..05f378bc61
 +     * @param source Where existing providers come from.
 +     * @param tabProvider The activity tab.
 +     * @param registry The registry to publish to.
++     * @param context Used to copy provider icons.
 +     */
 +    public BareToolbarActionCatalogue(
 +            ProviderSource source,
 +            ActivityTabProvider tabProvider,
-+            ActionRegistry registry) {
-+        adapt(source, tabProvider, registry, ActionId.SHARE, AdaptiveToolbarButtonVariant.SHARE);
++            ActionRegistry registry,
++            Context context) {
++        adapt(source, tabProvider, registry, context, ActionId.SHARE, AdaptiveToolbarButtonVariant.SHARE);
 +        adapt(
 +                source,
 +                tabProvider,
 +                registry,
++                context,
 +                ActionId.TRANSLATE,
 +                AdaptiveToolbarButtonVariant.TRANSLATE);
 +        adapt(
 +                source,
 +                tabProvider,
 +                registry,
++                context,
 +                ActionId.BOOKMARK,
 +                AdaptiveToolbarButtonVariant.ADD_TO_BOOKMARKS);
 +    }
@@ -333,12 +412,14 @@ index 0000000000..05f378bc61
 +            ProviderSource source,
 +            ActivityTabProvider tabProvider,
 +            ActionRegistry registry,
++            Context context,
 +            @ActionId int actionId,
 +            @AdaptiveToolbarButtonVariant int variant) {
 +        @Nullable ButtonDataProvider provider = source.getButtonDataProvider(variant);
 +        if (provider == null) return;
 +        mAdapters.add(
-+                new BareButtonDataActionAdapter(actionId, provider, tabProvider, registry));
++                new BareButtonDataActionAdapter(
++                        actionId, provider, tabProvider, registry, context));
 +    }
 +
 +    @Override
@@ -352,7 +433,7 @@ index 0000000000..05f378bc61
 +    }
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java
-index e3db0a7b8a..264ef558e6 100644
+index e3db0a7b8a..f6fe74aefa 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java
 @@ -66,6 +66,7 @@ import org.chromium.chrome.browser.accessibility.PageZoomIphController;
@@ -382,7 +463,7 @@ index e3db0a7b8a..264ef558e6 100644
          if (mVerticalTabsPreferenceListener != null) {
              ContextUtils.getAppSharedPreferences()
                      .unregisterOnSharedPreferenceChangeListener(mVerticalTabsPreferenceListener);
-@@ -1053,6 +1059,15 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
+@@ -1053,6 +1059,18 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                  || VerticalTabUtils.isVerticalTabsEligible(mActivity)) {
              mToolbarManager.setSideUiStateProviderSupplier(mSideUiStateProviderSupplier);
          }
@@ -393,7 +474,10 @@ index e3db0a7b8a..264ef558e6 100644
 +        if (mActionRegistry != null) {
 +            mBareToolbarActionCatalogue =
 +                    new BareToolbarActionCatalogue(
-+                            this::getButtonDataProvider, mActivityTabProvider, mActionRegistry);
++                            this::getButtonDataProvider,
++                            mActivityTabProvider,
++                            mActionRegistry,
++                            mActivity);
 +        }
      }
  
@@ -469,6 +553,731 @@ index 1c341a1f5d..2064a652f2 100644
 +    int SHARE = 8;
 +    int TRANSLATE = 9;
 +    int BOOKMARK = 10;
+ }
+diff --git a/chrome/browser/ui/android/bottombar/BUILD.gn b/chrome/browser/ui/android/bottombar/BUILD.gn
+index 4b6726fc0f..191b896b5b 100644
+--- a/chrome/browser/ui/android/bottombar/BUILD.gn
++++ b/chrome/browser/ui/android/bottombar/BUILD.gn
+@@ -60,6 +60,7 @@ android_library("java") {
+   sources = [
+     "java/src/org/chromium/chrome/browser/ui/bottombar/AiModeActionCoordinator.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/AppMenuActionButtonBinder.java",
++    "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRendering.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayout.java",
+     "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java",
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRendering.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRendering.java
+new file mode 100644
+index 0000000000..081f17e236
+--- /dev/null
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRendering.java
+@@ -0,0 +1,122 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.ui.bottombar;
++
++import android.view.View;
++
++import org.chromium.build.annotations.NullMarked;
++import org.chromium.chrome.browser.ui.actions.ActionButtonBinder;
++import org.chromium.chrome.browser.ui.actions.ActionId;
++import org.chromium.chrome.browser.ui.actions.HomeActionButtonBinder;
++import org.chromium.chrome.browser.ui.actions.glic.GlicActionButtonBinder;
++import org.chromium.chrome.browser.ui.actions.tabswitcher.TabSwitcherActionButtonBinder;
++import org.chromium.ui.modelutil.PropertyKey;
++import org.chromium.ui.modelutil.PropertyModel;
++import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
++
++/**
++ * Says how an action should be drawn, wherever it happens to be.
++ *
++ * <p>All three facts here used to be properties of a position. The bar inflated a list menu button
++ * in the first position and a plain image everywhere else, chose a binder per position, and let the
++ * layout name the inflated views. That was consistent only because each position did one thing
++ * forever. Once a position can hold any action, an action that needs a list menu has to get one
++ * wherever it lands, and an action that does not must not be handed the app menu's view class just
++ * because it was put on the right-hand end.
++ *
++ * <p>So each is answered from the action instead. The bar asks these three questions while it is
++ * being built, once per slot, and the position is not part of any of them.
++ */
++@NullMarked
++public final class BareToolbarActionRendering {
++    private BareToolbarActionRendering() {}
++
++    /**
++     * The view an action needs.
++     *
++     * <p>Home offers a menu on long press and needs a view that can show one. The app menu carries
++     * the update badge, which is a second view stacked on the button, so it needs the template that
++     * has one; without the badge it is an ordinary image like everything else. Every other action
++     * is an icon that responds to a press, which the generic template already is.
++     */
++    public static int templateForAction(@ActionId int actionId) {
++        if (actionId == ActionId.HOME_BUTTON) {
++            return R.layout.bottom_bar_list_menu_template;
++        }
++        if (actionId == ActionId.APP_MENU && BottomBarConfigUtils.shouldShowAppMenuUpdateBadge()) {
++            return R.layout.bottom_bar_app_menu_template;
++        }
++        return R.layout.bottom_bar_generic_template;
++    }
++
++    /**
++     * The binder an action is rendered through.
++     *
++     * <p>Follows the action rather than the position, so moving Home does not leave its long press
++     * behind and does not hand it to whatever took its place. The two general binders fall through
++     * to {@link ActionButtonBinder} for every property they do not handle themselves, so an action
++     * placed in a position that used to be special is drawn exactly as it would be anywhere else.
++     */
++    public static PropertyModelChangeProcessor.ViewBinder<PropertyModel, View, PropertyKey>
++            binderForAction(@ActionId int actionId) {
++        switch (actionId) {
++            case ActionId.HOME_BUTTON:
++                return HomeActionButtonBinder::bind;
++            case ActionId.APP_MENU:
++                return AppMenuActionButtonBinder::bind;
++            case ActionId.TAB_SWITCHER:
++                return TabSwitcherActionButtonBinder::bind;
++            case ActionId.GLIC:
++                return GlicActionButtonBinder::bind;
++            default:
++                return ActionButtonBinder::bind;
++        }
++    }
++
++    /**
++     * The id the inflated view should carry, or {@link View#NO_ID}.
++     *
++     * <p>The layout gives each stub an inflated id naming the action that used to live there, and
++     * code elsewhere in the browser looks two of them up across the whole activity rather than
++     * within the bar. Left alone, moving the app menu would leave its name on whichever button
++     * took its old position, and a search for the menu button would find, say, Share. Naming the
++     * view after the action it ended up holding keeps those searches finding the button they mean.
++     */
++    public static int viewIdForAction(@ActionId int actionId) {
++        switch (actionId) {
++            case ActionId.HOME_BUTTON:
++                return R.id.home_button;
++            case ActionId.APP_MENU:
++                return R.id.menu_button;
++            default:
++                return View.NO_ID;
++        }
++    }
++
++    /**
++     * The actions of the shared slot upstream ships, which are shown only where they apply.
++     *
++     * <p>Kept as a list because the question "is this one showable here" belongs to these three
++     * and to nothing else. Bare offers only the last of them, and offers it everywhere, but the
++     * question is still asked the same way.
++     */
++    public static final @ActionId int[] SHARED_SLOT_ACTIONS = {
++        ActionId.GLIC, ActionId.AI_MODE, ActionId.INCOGNITO,
++    };
++
++    /**
++     * Whether an action decides its own visibility rather than simply being shown.
++     *
++     * <p>Home is hidden when the homepage is turned off, and the shared slot's Google surfaces are
++     * shown only where they apply. Both are answered elsewhere and arrive later, so these start
++     * hidden and wait. Everything else is on the bar because the user put it there.
++     */
++    public static boolean hasManagedVisibility(@ActionId int actionId) {
++        return actionId == ActionId.HOME_BUTTON
++                || actionId == ActionId.GLIC
++                || actionId == ActionId.AI_MODE
++                || actionId == ActionId.INCOGNITO;
++    }
++}
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java
+index 7bb3489928..28995e1218 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java
+@@ -59,28 +59,32 @@ public final class BareToolbarDefaults {
+     }
+ 
+     /**
+-     * The actions a slot is able to hold.
++     * Every action the user may put in a configurable slot, in the order the bar offers them.
+      *
+-     * <p>This is what the bar could put in a position, not what it currently does. The spare slot
+-     * has always been shared: upstream fills it with one of two Google surfaces depending on the
+-     * profile and the country, and Bare fills it with incognito. Only one of them is ever visible,
+-     * so anything asking about that slot has to ask about all of them.
++     * <p>The order is also the tie-break when a stored arrangement cannot be honoured, so it has
++     * to be fixed rather than incidental: the same stored preferences must always produce the same
++     * toolbar. It reads as the bar's own list, the three positions Bare shipped first and then the
++     * page actions borrowed from the top toolbar.
++     *
++     * <p>GLIC and AI Mode are deliberately absent. They still exist as actions, because the shared
++     * slot they came from is upstream code this build keeps in step with, but they are Google
++     * surfaces that do nothing here and offering them as choices would be offering nothing.
+      */
+-    public static @ActionId int[] candidatesFor(@BareToolbarSlot int slot) {
+-        switch (slot) {
+-            case BareToolbarSlot.HOME:
+-                return new int[] {ActionId.HOME_BUTTON};
+-            case BareToolbarSlot.EXTRA:
+-                return new int[] {ActionId.GLIC, ActionId.AI_MODE, ActionId.INCOGNITO};
+-            case BareToolbarSlot.NEW_TAB:
+-                return new int[] {ActionId.NEW_TAB};
+-            case BareToolbarSlot.TAB_SWITCHER:
+-                return new int[] {ActionId.TAB_SWITCHER};
+-            case BareToolbarSlot.APP_MENU:
+-                return new int[] {ActionId.APP_MENU};
+-            default:
+-                return new int[] {};
++    public static final @ActionId int[] CATALOGUE = {
++        ActionId.HOME_BUTTON,
++        ActionId.INCOGNITO,
++        ActionId.APP_MENU,
++        ActionId.SHARE,
++        ActionId.TRANSLATE,
++        ActionId.BOOKMARK,
++    };
++
++    /** Whether an action is one the user is allowed to put in a configurable slot. */
++    public static boolean isConfigurableAction(int actionId) {
++        for (@ActionId int candidate : CATALOGUE) {
++            if (candidate == actionId) return true;
+         }
++        return false;
+     }
+ 
+     /**
+@@ -101,6 +105,9 @@ public final class BareToolbarDefaults {
+             case ActionId.GLIC:
+             case ActionId.AI_MODE:
+             case ActionId.INCOGNITO:
++            case ActionId.SHARE:
++            case ActionId.TRANSLATE:
++            case ActionId.BOOKMARK:
+                 return true;
+             default:
+                 return false;
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayout.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayout.java
+index c3b15a4f33..424e790984 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayout.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayout.java
+@@ -5,50 +5,141 @@
+ package org.chromium.chrome.browser.ui.bottombar;
+ 
+ import org.chromium.build.annotations.NullMarked;
++import org.chromium.build.annotations.Nullable;
+ import org.chromium.chrome.browser.ui.actions.ActionId;
+ 
+ /**
+- * Answers where an action lives in the bottom bar, and what a position in the bar is for.
++ * Answers what each position in the bottom bar does, and where a given action currently sits.
+  *
+  * <p>This is the piece that replaces asking an action which container it belongs to. That question
+- * could only ever have one answer, which is why the bar could not be rearranged. Asking a slot
+- * what it holds, and looking an action up by finding the slot holding it, is the same question
+- * with the dependency the other way round.
++ * could only ever have one answer, which is why the bar could not be rearranged. Asking a position
++ * what it holds, and finding an action by searching the positions, is the same question with the
++ * dependency the other way round.
+  *
+- * <p>With no preferences stored this resolves to exactly the arrangement Bare shipped.
++ * <p>The whole bar is resolved at once rather than a slot at a time. Slots are not independent:
++ * the buttons are held in a map keyed by action, so the same action twice is not a strange
++ * arrangement but an impossible one, and a rule that looked at one slot in isolation could not see
++ * the clash. Resolving together also makes the result total — every configurable slot ends up
++ * holding exactly one action, whatever is in storage.
++ *
++ * <p>With nothing stored this resolves to exactly the arrangement Bare shipped.
+  */
+ @NullMarked
+ public final class BareToolbarLayout {
+     private BareToolbarLayout() {}
+ 
++    /**
++     * The resolved bar, indexed by slot.
++     *
++     * <p>Held rather than recomputed because two callers have to agree: the coordinator decides
++     * which container to inflate for which action while the bar is being built, and the view
++     * resolves the same question again whenever a button is shown or hidden. Reading storage twice
++     * would let them disagree if anything wrote a preference in between, and disagreement here
++     * means an action bound to one view and made visible in another.
++     */
++    private static int @Nullable [] sResolved;
++
+     /** The action a slot currently performs. */
+     public static @ActionId int actionForSlot(@BareToolbarSlot int slot) {
+-        return BareToolbarPrefs.getPrimaryAction(slot);
++        return resolved()[slot];
+     }
+ 
+     /**
+-     * The slot an action is currently shown in, or {@link BareToolbarSlot#NONE} if the bar has
+-     * nowhere to put it.
++     * The slot an action is currently shown in, or {@link BareToolbarSlot#NONE} if the bar is not
++     * showing it anywhere.
+      *
+-     * <p>A slot is matched either because it is set to that action or because the action is one of
+-     * the alternatives it can hold. The second case is what keeps the shared slot working: only
+-     * one of its actions is chosen at a time, but the others still have to resolve to it so that
+-     * whichever becomes eligible is hidden or shown in the right place.
++     * <p>An action the user has not placed has no position, which is the honest answer: it is not
++     * on the bar. Earlier this fell back to asking which slots could hold the action, which was
++     * needed while one container was shared between several actions and only one of them was ever
++     * chosen. Each container now holds exactly one action, so there is nothing left to disambiguate
++     * and the fallback would only report a position for a button that is not there.
+      */
+     public static @BareToolbarSlot int slotForAction(@ActionId int actionId) {
++        int[] resolved = resolved();
+         for (int slot = 0; slot < BareToolbarSlot.COUNT; slot++) {
+-            if (actionForSlot(slot) == actionId) return slot;
++            if (resolved[slot] == actionId) return slot;
+         }
++        return BareToolbarSlot.NONE;
++    }
++
++    /** Whether the bar is showing the given action at all. */
++    public static boolean isPlaced(@ActionId int actionId) {
++        return slotForAction(actionId) != BareToolbarSlot.NONE;
++    }
++
++    /**
++     * Reads the stored arrangement and turns it into one the bar can actually build.
++     *
++     * <p>Storage holds a preference per slot and knows nothing about the others, so what comes back
++     * may name an action this build does not have, or name the same action for two slots. Neither
++     * can be rendered, and neither should cost the user their toolbar, so each is resolved rather
++     * than rejected.
++     *
++     * <p>Slots are resolved left to right, and an earlier slot wins. That is the rule a person
++     * would apply reading the bar themselves, and it means the fix for a clash is always the one
++     * further right, which is the one the user is more likely to have just changed.
++     *
++     * <p>A slot that cannot keep its stored action falls back to what it does by default, and if
++     * that is taken too, to the first action in the catalogue nothing else is using. The catalogue
++     * has a fixed order and the fixed slots are claimed before any of this begins, so the result
++     * depends only on what is stored: the same preferences always produce the same bar.
++     */
++    private static int[] resolve() {
++        int[] resolved = new int[BareToolbarSlot.COUNT];
++        boolean[] used = new boolean[BareToolbarDefaults.CATALOGUE.length + 1];
++
+         for (int slot = 0; slot < BareToolbarSlot.COUNT; slot++) {
+-            for (int candidate : BareToolbarDefaults.candidatesFor(slot)) {
+-                if (candidate == actionId) return slot;
+-            }
++            if (BareToolbarDefaults.isConfigurable(slot)) continue;
++            resolved[slot] = BareToolbarDefaults.actionFor(slot);
+         }
+-        return BareToolbarSlot.NONE;
++
++        for (int slot = 0; slot < BareToolbarSlot.COUNT; slot++) {
++            if (!BareToolbarDefaults.isConfigurable(slot)) continue;
++
++            @ActionId int action = BareToolbarPrefs.getPrimaryAction(slot);
++            if (isTaken(used, action)) action = BareToolbarDefaults.actionFor(slot);
++            if (isTaken(used, action)) action = firstUnused(used);
++
++            resolved[slot] = action;
++            take(used, action);
++        }
++        return resolved;
++    }
++
++    /** The first catalogue action nothing has claimed. */
++    private static @ActionId int firstUnused(boolean[] used) {
++        for (@ActionId int action : BareToolbarDefaults.CATALOGUE) {
++            if (!isTaken(used, action)) return action;
++        }
++        // Unreachable: the catalogue is longer than the number of configurable slots.
++        assert false : "no unused action left for a slot";
++        return ActionId.APP_MENU;
++    }
++
++    private static boolean isTaken(boolean[] used, @ActionId int action) {
++        int index = catalogueIndex(action);
++        return index >= 0 && used[index];
++    }
++
++    private static void take(boolean[] used, @ActionId int action) {
++        int index = catalogueIndex(action);
++        if (index >= 0) used[index] = true;
++    }
++
++    private static int catalogueIndex(@ActionId int action) {
++        for (int i = 0; i < BareToolbarDefaults.CATALOGUE.length; i++) {
++            if (BareToolbarDefaults.CATALOGUE[i] == action) return i;
++        }
++        return -1;
++    }
++
++    private static int[] resolved() {
++        if (sResolved == null) sResolved = resolve();
++        return sResolved;
+     }
+ 
+-    /** Every action the given slot is able to hold, whichever one it is set to. */
+-    public static @ActionId int[] candidatesForSlot(@BareToolbarSlot int slot) {
+-        return BareToolbarDefaults.candidatesFor(slot);
++    /** Forgets the resolved bar so the next read picks up changed preferences. */
++    public static void invalidate() {
++        sResolved = null;
+     }
+ }
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java
+index 87ba261f02..f610cb06bd 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java
+@@ -41,7 +41,7 @@ public final class BareToolbarPrefs {
+             return BareToolbarDefaults.actionFor(slot);
+         }
+         int stored = ChromeSharedPreferences.getInstance().readInt(primaryKey(slot), UNSET);
+-        if (stored == UNSET || !BareToolbarDefaults.isKnownAction(stored)) {
++        if (stored == UNSET || !BareToolbarDefaults.isConfigurableAction(stored)) {
+             return BareToolbarDefaults.actionFor(slot);
+         }
+         return stored;
+@@ -59,7 +59,7 @@ public final class BareToolbarPrefs {
+      */
+     public static void setPrimaryAction(@BareToolbarSlot int slot, @ActionId int actionId) {
+         if (!BareToolbarDefaults.isConfigurable(slot)) return;
+-        if (!BareToolbarDefaults.isKnownAction(actionId)) return;
++        if (!BareToolbarDefaults.isConfigurableAction(actionId)) return;
+         ChromeSharedPreferences.getInstance().writeInt(primaryKey(slot), actionId);
+     }
+ 
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
+index 2e7a75329b..c482975df4 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
+@@ -19,12 +19,8 @@ import org.chromium.chrome.browser.layouts.LayoutStateProvider;
+ import org.chromium.chrome.browser.profiles.Profile;
+ import org.chromium.chrome.browser.tab.Tab;
+ import org.chromium.chrome.browser.theme.ThemeColorProvider;
+-import org.chromium.chrome.browser.ui.actions.ActionButtonBinder;
+ import org.chromium.chrome.browser.ui.actions.ActionId;
+ import org.chromium.chrome.browser.ui.actions.ActionRegistry;
+-import org.chromium.chrome.browser.ui.actions.HomeActionButtonBinder;
+-import org.chromium.chrome.browser.ui.actions.glic.GlicActionButtonBinder;
+-import org.chromium.chrome.browser.ui.actions.tabswitcher.TabSwitcherActionButtonBinder;
+ import org.chromium.chrome.browser.ui.bottombar.BottomBarButtonManager.ActionConfig;
+ import org.chromium.chrome.browser.ui.bottombar.BottomBarHostManager.Host;
+ import org.chromium.components.embedder_support.util.UrlUtilities;
+@@ -78,6 +74,13 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
+         boolean shouldIncludeHomeButton = BottomBarConfigUtils.shouldIncludeHomeButtonIfEnabled();
+         List<ActionConfig> configs = createActionConfigs(mView, shouldIncludeHomeButton);
+ 
++        // Whether anything is watching the homepage setting follows the home button itself. Asked
++        // of the position, the answer was wrong in both directions once the button could move:
++        // nothing would hide it where it had gone, and whatever took its place would be hidden
++        // instead.
++        boolean homeButtonPlaced =
++                shouldIncludeHomeButton && BareToolbarLayout.isPlaced(ActionId.HOME_BUTTON);
++
+         mModel = new PropertyModel.Builder(BottomBarProperties.ALL_KEYS).build();
+ 
+         mButtonManager =
+@@ -95,7 +98,7 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
+                         tabSupplier,
+                         homepageEnabledSupplier,
+                         visibilityDelegate,
+-                        shouldIncludeHomeButton,
++                        homeButtonPlaced,
+                         profileSupplier,
+                         omniboxFocusStateSupplier,
+                         mPromoDialogCoordinator,
+@@ -107,84 +110,54 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
+         mMcp = PropertyModelChangeProcessor.create(mModel, mView, BottomBarViewBinder::bind);
+     }
+ 
++    /**
++     * Describes each position on the bar: what it holds, what that thing needs, and how it is
++     * shown.
++     *
++     * <p>This used to name the actions one at a time, which is what fixed them in place. It now
++     * walks the positions and asks the resolved arrangement what each one holds, so an action that
++     * has moved takes its view, its binder and its behaviour with it. The two positions the user
++     * cannot change resolve to the same answers they always did.
++     *
++     * <p>Order matters and is the order of the slots themselves: the manager works out which side
++     * of the centre button each control sits on from the order it is given them.
++     */
+     private List<ActionConfig> createActionConfigs(
+             BottomBarView view, boolean shouldIncludeHomeButton) {
+         List<ActionConfig> configs = new ArrayList<>();
+ 
+-        if (shouldIncludeHomeButton) {
+-            BottomBarButtonContainer homeContainer =
+-                    view.getContainerForAction(ActionId.HOME_BUTTON);
+-            assert homeContainer != null : "Home button container not found";
+-            homeContainer.inflateStub();
+-            configs.add(
+-                    new ActionConfig(
+-                            ActionId.HOME_BUTTON,
+-                            homeContainer,
+-                            HomeActionButtonBinder::bind,
+-                            BottomBarProperties.IS_HOME_BUTTON_VISIBLE,
+-                            /* initiallyVisible= */ true));
+-        }
++        for (int slot = 0; slot < BareToolbarSlot.COUNT; slot++) {
++            if (slot == BareToolbarSlot.HOME && !shouldIncludeHomeButton) continue;
++            if (slot == BareToolbarSlot.APP_MENU
++                    && !BottomBarConfigUtils.shouldIncludeAppMenuButton()) {
++                continue;
++            }
+ 
+-        BottomBarButtonContainer extraContainer = view.getContainerForAction(ActionId.GLIC);
+-        assert extraContainer != null : "Extra button container not found";
+-        configs.add(
+-                new ActionConfig(
+-                        ActionId.GLIC,
+-                        extraContainer,
+-                        GlicActionButtonBinder::bind,
+-                        BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE,
+-                        /* initiallyVisible= */ false));
+-        configs.add(
+-                new ActionConfig(
+-                        ActionId.AI_MODE,
+-                        extraContainer,
+-                        ActionButtonBinder::bind,
+-                        BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE,
+-                        /* initiallyVisible= */ false));
+-        configs.add(
+-                new ActionConfig(
+-                        ActionId.INCOGNITO,
+-                        extraContainer,
+-                        ActionButtonBinder::bind,
+-                        BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE,
+-                        /* initiallyVisible= */ false));
+-
+-        BottomBarButtonContainer newTabContainer = view.getContainerForAction(ActionId.NEW_TAB);
+-        assert newTabContainer != null : "New tab container not found";
+-        configs.add(
+-                new ActionConfig(
+-                        ActionId.NEW_TAB,
+-                        newTabContainer,
+-                        ActionButtonBinder::bind,
+-                        BottomBarProperties.IS_NEW_TAB_BUTTON_VISIBLE,
+-                        /* initiallyVisible= */ true));
+-
+-        BottomBarButtonContainer tabSwitcherContainer =
+-                view.getContainerForAction(ActionId.TAB_SWITCHER);
+-        assert tabSwitcherContainer != null : "Tab switcher container not found";
+-        configs.add(
+-                new ActionConfig(
+-                        ActionId.TAB_SWITCHER,
+-                        tabSwitcherContainer,
+-                        TabSwitcherActionButtonBinder::bind,
+-                        BottomBarProperties.IS_TAB_SWITCHER_BUTTON_VISIBLE,
+-                        /* initiallyVisible= */ true));
+-
+-        if (BottomBarConfigUtils.shouldIncludeAppMenuButton()) {
+-            BottomBarButtonContainer menuContainer = view.getContainerForAction(ActionId.APP_MENU);
+-            assert menuContainer != null : "App menu container not found";
+-            if (BottomBarConfigUtils.shouldShowAppMenuUpdateBadge()) {
+-                menuContainer.setStubLayoutResource(R.layout.bottom_bar_app_menu_template);
++            @ActionId int actionId = BareToolbarLayout.actionForSlot(slot);
++            BottomBarButtonContainer container = view.getContainerForSlot(slot);
++            boolean managed = BareToolbarActionRendering.hasManagedVisibility(actionId);
++
++            if (BareToolbarDefaults.isConfigurable(slot)) {
++                // Inflated here rather than on first use, because the view an action needs depends
++                // on the action and the container would otherwise inflate the layout the position
++                // was written with.
++                if (!container.hasTargetView()) {
++                    container.setStubLayoutResource(
++                            BareToolbarActionRendering.templateForAction(actionId));
++                    container.inflateStub();
++                    int viewId = BareToolbarActionRendering.viewIdForAction(actionId);
++                    container.getTargetView().setId(viewId);
++                }
++                if (!managed) container.setVisibility(View.VISIBLE);
+             }
+-            menuContainer.inflateStub();
+-            menuContainer.setVisibility(View.VISIBLE);
++
+             configs.add(
+                     new ActionConfig(
+-                            ActionId.APP_MENU,
+-                            menuContainer,
+-                            AppMenuActionButtonBinder::bind,
+-                            BottomBarProperties.IS_APP_MENU_BUTTON_VISIBLE,
+-                            /* initiallyVisible= */ true));
++                            actionId,
++                            container,
++                            BareToolbarActionRendering.binderForAction(actionId),
++                            BottomBarProperties.visibilityKeyForSlot(slot),
++                            /* initiallyVisible= */ !managed));
+         }
+ 
+         return configs;
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
+index 2b5c853229..21b47b3f7b 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
+@@ -290,10 +290,16 @@ public class BottomBarMediator
+         // Manage observers for dynamic updates.
+         updateObservers(originalProfile);
+ 
++        // Asked of the actions rather than of the position they used to occupy. Whether one of
++        // these applies is a fact about the action, so it has to be answered wherever the user has
++        // put it; asked of the slot instead, an action moved out of it was never shown at all, and
++        // whatever moved in was judged by a rule that was never about it.
++        //
++        // An action that is not one of these is not asked. It is on the bar because the user put
++        // it there, and it is made visible when the bar is built.
+         if (profile == null) {
+-            for (@ActionId int action :
+-                    BareToolbarLayout.candidatesForSlot(BareToolbarSlot.EXTRA)) {
+-                setButtonVisibility(action, false);
++            for (@ActionId int action : BareToolbarActionRendering.SHARED_SLOT_ACTIONS) {
++                if (BareToolbarLayout.isPlaced(action)) setButtonVisibility(action, false);
+             }
+             return;
+         }
+@@ -307,7 +313,6 @@ public class BottomBarMediator
+         BottomBarMetrics.recordGlicVisibilityDecisionTime(decisionDuration);
+ 
+         boolean showGlic = eligibleAction == ActionId.GLIC;
+-        boolean showAiMode = eligibleAction == ActionId.AI_MODE;
+ 
+         if (showGlic && !mGlicWasVisible) {
+             mGlicAppearedTimeMs = SystemClock.uptimeMillis();
+@@ -319,11 +324,8 @@ public class BottomBarMediator
+         }
+         mGlicWasVisible = showGlic;
+ 
+-        // Each action the shared slot can hold is asked about, rather than the three that
+-        // happened to exist being named one by one. Naming them was what left the slot empty for
+-        // any other action however correctly it was registered, and it would have had to be
+-        // extended again for every action the slot learns to hold.
+-        for (@ActionId int action : BareToolbarLayout.candidatesForSlot(BareToolbarSlot.EXTRA)) {
++        for (@ActionId int action : BareToolbarActionRendering.SHARED_SLOT_ACTIONS) {
++            if (!BareToolbarLayout.isPlaced(action)) continue;
+             setButtonVisibility(action, action == eligibleAction);
+         }
+     }
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarProperties.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarProperties.java
+index 8d6bbbfeb0..17be3799c8 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarProperties.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarProperties.java
+@@ -29,6 +29,36 @@ public class BottomBarProperties {
+     public static final WritableBooleanPropertyKey IS_APP_MENU_BUTTON_VISIBLE =
+             new WritableBooleanPropertyKey();
+ 
++    /**
++     * The key carrying whether a position on the bar is showing anything.
++     *
++     * <p>The keys are named after the actions that used to occupy each position, from when the two
++     * were the same idea. They are positions: whichever action a slot ends up holding, that slot's
++     * key is the one that shows and hides it.
++     */
++    public static WritableBooleanPropertyKey visibilityKeyForSlot(@BareToolbarSlot int slot) {
++        switch (slot) {
++            case BareToolbarSlot.HOME:
++                return IS_HOME_BUTTON_VISIBLE;
++            case BareToolbarSlot.EXTRA:
++                return IS_EXTRA_BUTTON_VISIBLE;
++            case BareToolbarSlot.NEW_TAB:
++                return IS_NEW_TAB_BUTTON_VISIBLE;
++            case BareToolbarSlot.TAB_SWITCHER:
++                return IS_TAB_SWITCHER_BUTTON_VISIBLE;
++            default:
++                return IS_APP_MENU_BUTTON_VISIBLE;
++        }
++    }
++
++    /** The position a visibility key belongs to. */
++    public static @BareToolbarSlot int slotForVisibilityKey(PropertyKey key) {
++        for (int slot = 0; slot < BareToolbarSlot.COUNT; slot++) {
++            if (visibilityKeyForSlot(slot) == key) return slot;
++        }
++        return BareToolbarSlot.NONE;
++    }
++
+     public static final PropertyKey[] ALL_KEYS =
+             new PropertyKey[] {
+                 IS_VISIBLE,
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarView.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarView.java
+index 2bde67c5ac..711f57a7e0 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarView.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarView.java
+@@ -169,6 +169,23 @@ public class BottomBarView extends LinearLayout {
+         }
+     }
+ 
++    /**
++     * Shows or hides one position on the bar.
++     *
++     * <p>Addressed by position rather than by action because that is what the caller knows: the
++     * model carries a key per position, and the action occupying it is the bar's business, not the
++     * binder's.
++     */
++    void setSlotVisibility(@BareToolbarSlot int slot, boolean visible) {
++        if (slot == BareToolbarSlot.NONE) return;
++        mSlotContainers[slot].setVisibility(visible ? View.VISIBLE : View.GONE);
++    }
++
++    /** The container at the given position. */
++    BottomBarButtonContainer getContainerForSlot(@BareToolbarSlot int slot) {
++        return mSlotContainers[slot];
++    }
++
+     @Nullable BottomBarButtonContainer getContainerForAction(@ActionId int actionId) {
+         // Was a switch naming each action's container, which is the reason the bar could not be
+         // rearranged: an action and the place it appeared were the same fact. Ask which position
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarViewBinder.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarViewBinder.java
+index a6815d258b..e720563bbe 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarViewBinder.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarViewBinder.java
+@@ -7,9 +7,9 @@ package org.chromium.chrome.browser.ui.bottombar;
+ import android.view.View;
+ 
+ import org.chromium.build.annotations.NullMarked;
+-import org.chromium.chrome.browser.ui.actions.ActionId;
+ import org.chromium.ui.modelutil.PropertyKey;
+ import org.chromium.ui.modelutil.PropertyModel;
++import org.chromium.ui.modelutil.PropertyModel.WritableBooleanPropertyKey;
+ 
+ /** View binder for the bottom bar. */
+ @NullMarked
+@@ -24,27 +24,14 @@ public class BottomBarViewBinder {
+         } else if (BottomBarProperties.IS_NEW_TAB_BACKGROUND_VISIBLE == propertyKey) {
+             view.setNewTabBackgroundVisible(
+                     model.get(BottomBarProperties.IS_NEW_TAB_BACKGROUND_VISIBLE));
+-        } else if (BottomBarProperties.IS_HOME_BUTTON_VISIBLE == propertyKey) {
+-            view.setButtonVisibility(
+-                    ActionId.HOME_BUTTON, model.get(BottomBarProperties.IS_HOME_BUTTON_VISIBLE));
+-        } else if (BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE == propertyKey
+-                || BottomBarProperties.EXTRA_BUTTON_ACTION_ID == propertyKey) {
+-            // NOTE: EXTRA_BUTTON_ACTION_ID must always be set in the model BEFORE updating
+-            // IS_EXTRA_BUTTON_VISIBLE, so that the view binder can query and resolve the correct
+-            // active action ID when the visibility property change event is dispatched.
+-            int activeActionId = model.get(BottomBarProperties.EXTRA_BUTTON_ACTION_ID);
+-            view.setButtonVisibility(
+-                    activeActionId, model.get(BottomBarProperties.IS_EXTRA_BUTTON_VISIBLE));
+-        } else if (BottomBarProperties.IS_NEW_TAB_BUTTON_VISIBLE == propertyKey) {
+-            view.setButtonVisibility(
+-                    ActionId.NEW_TAB, model.get(BottomBarProperties.IS_NEW_TAB_BUTTON_VISIBLE));
+-        } else if (BottomBarProperties.IS_TAB_SWITCHER_BUTTON_VISIBLE == propertyKey) {
+-            view.setButtonVisibility(
+-                    ActionId.TAB_SWITCHER,
+-                    model.get(BottomBarProperties.IS_TAB_SWITCHER_BUTTON_VISIBLE));
+-        } else if (BottomBarProperties.IS_APP_MENU_BUTTON_VISIBLE == propertyKey) {
+-            view.setButtonVisibility(
+-                    ActionId.APP_MENU, model.get(BottomBarProperties.IS_APP_MENU_BUTTON_VISIBLE));
++        } else {
++            // Every remaining key is one position's visibility. Which action is drawn there was
++            // decided when the bar was built; a binder that named actions here would be a second
++            // place the arrangement had to be written down, and the two could disagree.
++            @BareToolbarSlot int slot = BottomBarProperties.slotForVisibilityKey(propertyKey);
++            if (slot != BareToolbarSlot.NONE) {
++                view.setSlotVisibility(slot, model.get((WritableBooleanPropertyKey) propertyKey));
++            }
+         }
+     }
  }
 diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java
 index 14d5105a4d..97378874ca 100644
