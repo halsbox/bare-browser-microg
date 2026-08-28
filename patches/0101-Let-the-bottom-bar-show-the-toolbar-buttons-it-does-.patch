@@ -1,0 +1,460 @@
+From 529588aa28d0aebc132905b019ef75ba68e0d98c Mon Sep 17 00:00:00 2001
+From: Bare <57wsdx6b8d@privaterelay.appleid.com>
+Date: Fri, 28 Aug 2026 18:49:21 +0000
+Subject: [PATCH] Let the bottom bar show the toolbar buttons it does not have
+
+The top toolbar can offer Share, Translate, Bookmark and others through its
+adaptive optional button, but only ever one at a time, and only at the top.
+The bottom bar has room for several and is where the thumb already is. The
+actions themselves are not the problem; the two surfaces just describe a
+button differently. The optional button hands out a ButtonData when asked,
+while a bottom bar action publishes a PropertyModel that its binder observes.
+
+Rather than write a second Share that would slowly drift from the first, this
+reads one and writes the other. BareButtonDataActionAdapter subscribes to an
+existing provider, asks it about the current tab, and copies the answer into a
+model registered under a new ActionId. The provider keeps its owner: the
+adaptive toolbar still builds it and still destroys it, and nothing about how
+it behaves changes by being read a second time.
+
+Reaching the provider needs an accessor, since the controller keeps its
+providers to itself. AdaptiveToolbarButtonController, AdaptiveToolbarUi-
+Coordinator and RootUiCoordinator each gain one lookup by variant, returning
+null when that variant was never built, which is the normal case for the
+variants Bare disables.
+
+Providers hold the active tab as a plain supplier and never watch it, leaving
+that to whatever displays the button. The adapter therefore observes the
+activity tab itself and re-asks the provider on every change, including the
+tab that is already in front when it starts.
+
+Only Share is adapted here, to keep the first use of the bridge to one action.
+The catalogue skips any variant whose provider is absent, so adding the rest
+later is a line each.
+
+No button moves and no layout changes: the adapted action is registered but
+not yet placed in a slot.
+---
+ chrome/android/chrome_java_sources.gni        |   2 +
+ .../bare/BareButtonDataActionAdapter.java     | 162 ++++++++++++++++++
+ .../bare/BareToolbarActionCatalogue.java      |  86 ++++++++++
+ .../tabbed_mode/TabbedRootUiCoordinator.java  |  15 ++
+ .../ui/AdaptiveToolbarUiCoordinator.java      |   8 +
+ .../chrome/browser/ui/RootUiCoordinator.java  |  13 ++
+ .../chrome/browser/ui/actions/ActionId.java   |   2 +
+ .../AdaptiveToolbarButtonController.java      |  12 ++
+ 8 files changed, 300 insertions(+)
+ create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
+ create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
+
+diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
+index ddaf9410ae..99811d6743 100644
+--- a/chrome/android/chrome_java_sources.gni
++++ b/chrome/android/chrome_java_sources.gni
+@@ -219,6 +219,8 @@ chrome_java_sources = [
+   "java/src/org/chromium/chrome/browser/automotivetoolbar/AutomotiveBackButtonToolbarCoordinator.java",
+   "java/src/org/chromium/chrome/browser/automotivetoolbar/EdgeSwipeGestureDetector.java",
+   "java/src/org/chromium/chrome/browser/bare/BareMediaRegistryBridge.java",
++  "java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java",
++  "java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java",
+   "java/src/org/chromium/chrome/browser/bare/BareUpdateCheck.java",
+   "java/src/org/chromium/chrome/browser/bare/BareWelcomeOverlay.java",
+   "java/src/org/chromium/chrome/browser/background_sync/BackgroundSyncBackgroundTask.java",
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
+new file mode 100644
+index 0000000000..67c49bb4a1
+--- /dev/null
++++ b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
+@@ -0,0 +1,162 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.bare;
++
++import android.view.View;
++import android.view.View.OnClickListener;
++
++import org.chromium.base.Callback;
++import org.chromium.base.lifetime.Destroyable;
++import org.chromium.build.annotations.NullMarked;
++import org.chromium.build.annotations.Nullable;
++import org.chromium.chrome.browser.ActivityTabProvider;
++import org.chromium.chrome.browser.tab.Tab;
++import org.chromium.chrome.browser.toolbar.optional_button.ButtonData;
++import org.chromium.chrome.browser.toolbar.optional_button.ButtonData.ButtonSpec;
++import org.chromium.chrome.browser.toolbar.optional_button.ButtonDataProvider;
++import org.chromium.chrome.browser.ui.actions.ActionId;
++import org.chromium.chrome.browser.ui.actions.ActionProperties;
++import org.chromium.chrome.browser.ui.actions.ActionRegistry;
++import org.chromium.ui.modelutil.PropertyModel;
++
++/**
++ * Presents an existing toolbar {@link ButtonDataProvider} as a bottom bar action.
++ *
++ * <p>The optional button at the top of the screen and the buttons along the bottom describe
++ * themselves in different terms: one hands out {@link ButtonData} when asked, the other publishes a
++ * {@link PropertyModel} that surfaces observe. The two carry nearly the same facts, so rather than
++ * write a second Share or Translate that would drift from the first, this reads one and writes the
++ * other.
++ *
++ * <p>The provider is not owned here. It belongs to the adaptive toolbar, which built it and will
++ * destroy it; this only subscribes. Nothing about its behaviour, construction or lifetime changes
++ * by being read.
++ *
++ * <p>Providers hold the active tab as a plain supplier and do not watch it, leaving that to
++ * whoever is displaying the button, so the tab is observed here and the provider asked again
++ * whenever it changes.
++ */
++@NullMarked
++public class BareButtonDataActionAdapter
++        implements ButtonDataProvider.ButtonDataObserver, Destroyable {
++
++    private final @ActionId int mActionId;
++    private final ButtonDataProvider mProvider;
++    private final ActionRegistry mRegistry;
++    private final PropertyModel mModel;
++
++    /**
++     * Watches whichever tab is in front. Chromium's own observer for the activity tab, which moves
++     * itself as the front tab changes and also reports what happens inside that tab, so a provider
++     * whose answer depends on the page is asked again when the page changes.
++     */
++    private final ActivityTabProvider.ActivityTabTabObserver mTabObserver;
++
++    /** The tab the observer is currently reporting on. */
++    private @Nullable Tab mTab;
++
++    /** The provider's current click handling, refreshed with the rest of the model. */
++    private @Nullable OnClickListener mOnClick;
++
++    private boolean mDestroyed;
++
++    /**
++     * @param actionId The action this provider will appear as.
++     * @param provider The existing provider to read. Not owned.
++     * @param tabProvider The activity tab, observed so the provider can be re-asked.
++     * @param registry The registry to publish the model to.
++     */
++    public BareButtonDataActionAdapter(
++            @ActionId int actionId,
++            ButtonDataProvider provider,
++            ActivityTabProvider tabProvider,
++            ActionRegistry registry) {
++        mActionId = actionId;
++        mProvider = provider;
++        mRegistry = registry;
++        mModel = new PropertyModel.Builder(ActionProperties.BASE_KEYS).build();
++
++        mProvider.addObserver(this);
++
++        // Built last of the three, and after the model exists. Asking to be told about the tab
++        // that is already in front means the callback arrives from inside this constructor, so
++        // anything it touches has to be ready before the observer is made.
++        mTabObserver =
++                new ActivityTabProvider.ActivityTabTabObserver(
++                        tabProvider, /* shouldTrigger= */ true) {
++                    @Override
++                    protected void onObservingDifferentTab(@Nullable Tab tab) {
++                        mTab = tab;
++                        refresh();
++                    }
++                };
++
++        mRegistry.register(mActionId, mModel);
++    }
++
++    /** The provider notified that something about the button changed. */
++    @Override
++    public void buttonDataChanged(boolean canShowHint) {
++        refresh();
++    }
++
++    /**
++     * Asks the provider about the current tab and copies the answer into the model.
++     *
++     * <p>An action that cannot run right now keeps its place and stops responding rather than
++     * disappearing. A button that moves or vanishes under the finger is worse than one that is
++     * plainly unavailable, and a slot the user chose should stay where they put it. Leaving the
++     * press callback null is what expresses that: the binder reads the absent callback as nothing
++     * to press and disables the view, which draws it in the disabled tint.
++     */
++    private void refresh() {
++        if (mDestroyed) return;
++
++        @Nullable ButtonData data = mProvider.get(mTab);
++        if (data == null) {
++            mOnClick = null;
++            mModel.set(ActionProperties.ON_PRESS_CALLBACK, null);
++            return;
++        }
++
++        ButtonSpec spec = data.getButtonSpec();
++
++        mModel.set(ActionProperties.ICON_DRAWABLE, spec.getDrawable());
++        mModel.set(
++                ActionProperties.CONTENT_DESCRIPTION_RESOLVER,
++                context -> spec.getContentDescription());
++        mModel.set(ActionProperties.IS_SELECTED, spec.isSelected() || spec.isChecked());
++
++        mOnClick = spec.getOnClickListener();
++        boolean usable = data.canShow() && data.isEnabled() && mOnClick != null;
++        // BUTTON_STATE is deliberately not set: it is not one of BASE_KEYS, and the binder
++        // already reads an absent state as the default one. Whether the button responds is
++        // carried by the press callback alone, which the binder turns into the enabled state.
++        mModel.set(
++                ActionProperties.ON_PRESS_CALLBACK,
++                usable ? (Callback<View>) this::onPress : null);
++    }
++
++    /**
++     * Runs the provider's own click handling.
++     *
++     * <p>Kept as its own method so that a later patch can offer the same action as the long press
++     * of a different slot without a second copy of what pressing it means.
++     */
++    private void onPress(View view) {
++        if (mOnClick != null) mOnClick.onClick(view);
++    }
++
++    @Override
++    public void destroy() {
++        if (mDestroyed) return;
++        mDestroyed = true;
++        mOnClick = null;
++        mTab = null;
++        mProvider.removeObserver(this);
++        mTabObserver.destroy();
++        mRegistry.unregister(mActionId);
++    }
++}
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
+new file mode 100644
+index 0000000000..da0bdf8817
+--- /dev/null
++++ b/chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
+@@ -0,0 +1,86 @@
++// Copyright 2026 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.bare;
++
++import org.chromium.base.lifetime.Destroyable;
++import org.chromium.build.annotations.NullMarked;
++import org.chromium.build.annotations.Nullable;
++import org.chromium.chrome.browser.ActivityTabProvider;
++import org.chromium.chrome.browser.toolbar.adaptive.AdaptiveToolbarButtonVariant;
++import org.chromium.chrome.browser.toolbar.optional_button.ButtonDataProvider;
++import org.chromium.chrome.browser.ui.actions.ActionId;
++import org.chromium.chrome.browser.ui.actions.ActionRegistry;
++
++import java.util.ArrayList;
++import java.util.List;
++
++/**
++ * Publishes the toolbar actions Bare offers beyond the ones the bottom bar ships with.
++ *
++ * <p>This does not implement any of them. Each action already exists somewhere in Chromium, with
++ * its own idea of when it applies and what pressing it does, and that implementation stays where
++ * it is; the work here is only to say which of them Bare offers and to point an adapter at the
++ * instance that already exists.
++ *
++ * <p>Attached after the toolbar has been built, because the providers do not exist before then.
++ * The registry publishes actions through suppliers, so a surface that asked for one earlier simply
++ * receives it when it arrives.
++ */
++@NullMarked
++public class BareToolbarActionCatalogue implements Destroyable {
++
++    /** Looks up an existing provider without owning or creating one. */
++    public interface ProviderSource {
++        @Nullable ButtonDataProvider getButtonDataProvider(
++                @AdaptiveToolbarButtonVariant int variant);
++    }
++
++    private final List<Destroyable> mAdapters = new ArrayList<>();
++    private boolean mDestroyed;
++
++    /**
++     * Adapts the providers Bare offers, skipping any the toolbar did not build.
++     *
++     * @param source Where existing providers come from.
++     * @param tabProvider The activity tab.
++     * @param registry The registry to publish to.
++     */
++    public BareToolbarActionCatalogue(
++            ProviderSource source,
++            ActivityTabProvider tabProvider,
++            ActionRegistry registry) {
++        adapt(source, tabProvider, registry, ActionId.SHARE, AdaptiveToolbarButtonVariant.SHARE);
++    }
++
++    /**
++     * Publishes one action, if the provider behind it exists.
++     *
++     * <p>A provider can be absent: the adaptive toolbar decides which ones it builds, and that is
++     * its decision to make. An action with nothing behind it is left unregistered rather than
++     * registered as something that cannot work, and the registry treats an unregistered action as
++     * one that is simply not there.
++     */
++    private void adapt(
++            ProviderSource source,
++            ActivityTabProvider tabProvider,
++            ActionRegistry registry,
++            @ActionId int actionId,
++            @AdaptiveToolbarButtonVariant int variant) {
++        @Nullable ButtonDataProvider provider = source.getButtonDataProvider(variant);
++        if (provider == null) return;
++        mAdapters.add(
++                new BareButtonDataActionAdapter(actionId, provider, tabProvider, registry));
++    }
++
++    @Override
++    public void destroy() {
++        if (mDestroyed) return;
++        mDestroyed = true;
++        for (Destroyable adapter : mAdapters) {
++            adapter.destroy();
++        }
++        mAdapters.clear();
++    }
++}
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java
+index e3db0a7b8a..264ef558e6 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java
+@@ -66,6 +66,7 @@ import org.chromium.chrome.browser.accessibility.PageZoomIphController;
+ import org.chromium.chrome.browser.actor.ui.ActorOverlayCoordinator;
+ import org.chromium.chrome.browser.app.tabwindow.TabWindowManagerSingleton;
+ import org.chromium.chrome.browser.back_press.BackPressManager;
++import org.chromium.chrome.browser.bare.BareToolbarActionCatalogue;
+ import org.chromium.chrome.browser.bookmarks.BookmarkManagerOpener;
+ import org.chromium.chrome.browser.bookmarks.BookmarkManagerOpenerImpl;
+ import org.chromium.chrome.browser.bookmarks.BookmarkModel;
+@@ -335,6 +336,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
+     private @Nullable PrefChangeRegistrar mPrefChangeRegistrar;
+     private @Nullable OnSharedPreferenceChangeListener mVerticalTabsPreferenceListener;
+     private @Nullable TabbedSystemUiCoordinator mSystemUiCoordinator;
++    private @Nullable BareToolbarActionCatalogue mBareToolbarActionCatalogue;
+     private @Nullable TabGroupSyncController mTabGroupSyncController;
+     private final OneshotSupplierImpl<TabGroupUiActionHandler> mTabGroupUiActionHandlerSupplier =
+             new OneshotSupplierImpl<>();
+@@ -794,6 +796,10 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
+     @Override
+     @SuppressWarnings({"NullAway", "UseSharedPreferencesManagerFromChromeCheck"})
+     public void onDestroy() {
++        if (mBareToolbarActionCatalogue != null) {
++            mBareToolbarActionCatalogue.destroy();
++            mBareToolbarActionCatalogue = null;
++        }
+         if (mVerticalTabsPreferenceListener != null) {
+             ContextUtils.getAppSharedPreferences()
+                     .unregisterOnSharedPreferenceChangeListener(mVerticalTabsPreferenceListener);
+@@ -1053,6 +1059,15 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
+                 || VerticalTabUtils.isVerticalTabsEligible(mActivity)) {
+             mToolbarManager.setSideUiStateProviderSupplier(mSideUiStateProviderSupplier);
+         }
++
++        // The providers behind the actions Bare offers are built by the toolbar above, so this
++        // cannot run any earlier. The registry hands actions out through suppliers, so a surface
++        // that already asked for one simply receives it when it arrives.
++        if (mActionRegistry != null) {
++            mBareToolbarActionCatalogue =
++                    new BareToolbarActionCatalogue(
++                            this::getButtonDataProvider, mActivityTabProvider, mActionRegistry);
++        }
+     }
+ 
+     @Override
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java
+index 2337a3df2e..00b7beb7e9 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ui/AdaptiveToolbarUiCoordinator.java
+@@ -400,6 +400,14 @@ public class AdaptiveToolbarUiCoordinator {
+         return mCommerceBottomSheetContentCoordinator;
+     }
+ 
++    /** Returns the provider registered for the given variant, or null when none is. */
++    public @Nullable ButtonDataProvider getButtonDataProvider(
++            @AdaptiveToolbarButtonVariant int variant) {
++        return mAdaptiveToolbarButtonController == null
++                ? null
++                : mAdaptiveToolbarButtonController.getButtonDataProvider(variant);
++    }
++
+     public AdaptiveToolbarButtonController getAdaptiveToolbarButtonControllerForTesting() {
+         return mAdaptiveToolbarButtonController;
+     }
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ui/RootUiCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/ui/RootUiCoordinator.java
+index b383dd73f2..210011856d 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/ui/RootUiCoordinator.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/ui/RootUiCoordinator.java
+@@ -181,6 +181,8 @@ import org.chromium.chrome.browser.theme.TopUiThemeColorProvider;
+ import org.chromium.chrome.browser.toolbar.ToolbarIntentMetadata;
+ import org.chromium.chrome.browser.toolbar.ToolbarManager;
+ import org.chromium.chrome.browser.toolbar.adaptive.AdaptiveToolbarBehavior;
++import org.chromium.chrome.browser.toolbar.adaptive.AdaptiveToolbarButtonVariant;
++import org.chromium.chrome.browser.toolbar.optional_button.ButtonDataProvider;
+ import org.chromium.chrome.browser.toolbar.menu_button.MenuButtonCoordinator.VisibilityDelegate;
+ import org.chromium.chrome.browser.toolbar.top.ToolbarActionModeCallback;
+ import org.chromium.chrome.browser.toolbar.top.ToolbarControlContainer;
+@@ -2866,6 +2868,17 @@ public class RootUiCoordinator
+         return mBottomControlsStacker;
+     }
+ 
++    /**
++     * Returns the provider registered for the given variant, or null when the toolbar has not been
++     * built yet, has been destroyed, or never registered that variant.
++     */
++    public @Nullable ButtonDataProvider getButtonDataProvider(
++            @AdaptiveToolbarButtonVariant int variant) {
++        return mAdaptiveToolbarUiCoordinator == null
++                ? null
++                : mAdaptiveToolbarUiCoordinator.getButtonDataProvider(variant);
++    }
++
+     public @Nullable AdaptiveToolbarUiCoordinator getAdaptiveToolbarUiCoordinatorForTesting() {
+         return mAdaptiveToolbarUiCoordinator;
+     }
+diff --git a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
+index 1c341a1f5d..c7b6462256 100644
+--- a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
++++ b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
+@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
+     ActionId.GLIC,
+     ActionId.AI_MODE,
+     ActionId.INCOGNITO,
++    ActionId.SHARE,
+ })
+ @Retention(RetentionPolicy.SOURCE)
+ @Target(ElementType.TYPE_USE)
+@@ -36,4 +37,5 @@ public @interface ActionId {
+     int GLIC = 5;
+     int AI_MODE = 6;
+     int INCOGNITO = 7;
++    int SHARE = 8;
+ }
+diff --git a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java
+index 14d5105a4d..97378874ca 100644
+--- a/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java
++++ b/chrome/browser/ui/android/toolbar/java/src/org/chromium/chrome/browser/toolbar/adaptive/AdaptiveToolbarButtonController.java
+@@ -425,6 +425,18 @@ public class AdaptiveToolbarButtonController
+     }
+ 
+     /** Returns the {@link ButtonDataProvider} used in a single-variant mode. */
++    /**
++     * Returns the provider registered for the given variant, or null when none is.
++     *
++     * <p>Read-only lookup into the registered providers. The map itself is not exposed and
++     * ownership does not change: the provider returned is still built, kept and destroyed by this
++     * controller.
++     */
++    public @Nullable ButtonDataProvider getButtonDataProvider(
++            @AdaptiveToolbarButtonVariant int variant) {
++        return mButtonDataProviderMap.get(variant);
++    }
++
+     public @Nullable ButtonDataProvider getSingleProviderForTesting() {
+         return mSingleProvider;
+     }
