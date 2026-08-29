@@ -1,4 +1,4 @@
-From bbdd078b2be1ff42da4124e4e299dc979450971d Mon Sep 17 00:00:00 2001
+From 8e0684ea4fb15262bcf0c8f7fbf4e1e85b441c72 Mon Sep 17 00:00:00 2001
 From: Bare <57wsdx6b8d@privaterelay.appleid.com>
 Date: Sat, 29 Aug 2026 06:40:40 +0000
 Subject: [PATCH] Let a button do a second thing when it is held
@@ -26,9 +26,15 @@ model the action already publishes is used, so holding a button to bookmark
 bookmarks the page exactly as pressing a bookmark button would, down to the
 same listener.
 
-Nothing is written to a position that has not been given a hold. Some buttons
-already do something when held, the home button offers its homepage menu, and
-clearing a callback nobody set would be taking that away.
+Choosing nothing means the button keeps whatever it already did when held. For
+most of them that is Bare swallowing the gesture so it does not arrive late as
+a tap; for the home button it is the homepage menu, which is not a callback on
+the model but a delegate the generic binder cannot see. So the home button's
+own binder decides that case: whenever something re-decides what a long press
+does, it puts the menu back unless a second action has been chosen to run
+instead. The menu is a property of the home button rather than of the order its
+properties happened to arrive in, and choosing nothing gives it back at once
+rather than leaving the button silent until the bar is next rebuilt.
 
 One touch does one thing. Holding still long enough runs the second action and
 the bar then leaves the rest of that touch alone, so sliding away afterwards
@@ -43,7 +49,9 @@ have.
 ---
  .../settings/BareToolbarSettingsFragment.java |  83 ++++-
  .../preferences/ChromePreferenceKeys.java     |   8 +
+ .../ui/actions/HomeActionButtonBinder.java    |  57 +++-
  chrome/browser/ui/android/bottombar/BUILD.gn  |   2 +
+ .../BareToolbarActionRenderingUnitTest.java   |  59 ++++
  .../ui/bottombar/BareToolbarDefaults.java     |  11 +
  .../ui/bottombar/BareToolbarPrefs.java        |  43 +++
  .../BareToolbarSecondaryActions.java          | 161 ++++++++++
@@ -51,7 +59,7 @@ have.
  .../ui/bottombar/BottomBarCoordinator.java    |  21 +-
  .../browser/ui/bottombar/BottomBarView.java   |  10 +
  .../strings/android_chrome_strings.grd        |  12 +
- 10 files changed, 634 insertions(+), 5 deletions(-)
+ 12 files changed, 739 insertions(+), 16 deletions(-)
  create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarSecondaryActions.java
  create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarSecondaryActionsUnitTest.java
 
@@ -195,6 +203,84 @@ index 904b0d3e75..810a99401a 100644
                  BOTTOM_BAR_SWIPE_ACTION,
                  CLIPBOARD_SHARED_URI,
                  CLIPBOARD_SHARED_URI_TIMESTAMP,
+diff --git a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/HomeActionButtonBinder.java b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/HomeActionButtonBinder.java
+index 171a3b2391..233affbf00 100644
+--- a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/HomeActionButtonBinder.java
++++ b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/HomeActionButtonBinder.java
+@@ -17,17 +17,7 @@ import org.chromium.ui.util.ClickWithMetaStateCallback;
+ public class HomeActionButtonBinder {
+     public static void bind(PropertyModel model, View view, PropertyKey propertyKey) {
+         if (propertyKey == HomeActionProperties.LONG_PRESS_MENU_DELEGATE) {
+-            ListMenuButton listMenuButton = resolveListMenuButton(view);
+-            listMenuButton.setDelegate(
+-                    model.get(HomeActionProperties.LONG_PRESS_MENU_DELEGATE), false);
+-            listMenuButton.setOnLongClickListener(
+-                    v -> {
+-                        if (listMenuButton.getVisibility() != View.VISIBLE) {
+-                            return false;
+-                        }
+-                        listMenuButton.showMenu();
+-                        return true;
+-                    });
++            bindMenu(model, view);
+         } else if (propertyKey == HomeActionProperties.CLICK_WITH_META_CALLBACK) {
+             ListMenuButton listMenuButton = resolveListMenuButton(view);
+             ClickWithMetaStateCallback callback =
+@@ -35,9 +25,54 @@ public class HomeActionButtonBinder {
+             listMenuButton.setClickCallback(callback);
+         } else {
+             ActionButtonBinder.bind(model, view, propertyKey);
++            // The generic binder decides what a long press does from the press callbacks alone,
++            // and settles on swallowing it when nothing has claimed one. The home button has
++            // claimed one: its menu is not a callback on the model but a delegate the generic
++            // binder cannot see, so it has to be put back whenever that decision is made again.
++            //
++            // This is what makes the menu a property of the home button rather than of the order
++            // its properties happened to arrive in, and it is why choosing no second action gives
++            // the menu straight back instead of leaving the button doing nothing until the bar is
++            // next rebuilt.
++            if (touchesLongPress(propertyKey) && ownsLongPress(model)) {
++                bindMenu(model, view);
++            }
+         }
+     }
+ 
++    /** Whether binding this property re-decides what a long press does. */
++    private static boolean touchesLongPress(PropertyKey propertyKey) {
++        return propertyKey == ActionProperties.ON_PRESS_CALLBACK
++                || propertyKey == ActionProperties.BUTTON_STATE
++                || propertyKey == ActionProperties.ON_LONG_PRESS_CALLBACK;
++    }
++
++    /**
++     * Whether the home button's own menu is what a long press should do.
++     *
++     * <p>It is, unless something has been put on the model to run instead. A second action chosen
++     * for this position is exactly that, and it wins for as long as it is set.
++     */
++    private static boolean ownsLongPress(PropertyModel model) {
++        if (!model.containsKey(HomeActionProperties.LONG_PRESS_MENU_DELEGATE)) return false;
++        if (model.get(HomeActionProperties.LONG_PRESS_MENU_DELEGATE) == null) return false;
++        return !model.containsKey(ActionProperties.ON_LONG_PRESS_CALLBACK)
++                || model.get(ActionProperties.ON_LONG_PRESS_CALLBACK) == null;
++    }
++
++    private static void bindMenu(PropertyModel model, View view) {
++        ListMenuButton listMenuButton = resolveListMenuButton(view);
++        listMenuButton.setDelegate(model.get(HomeActionProperties.LONG_PRESS_MENU_DELEGATE), false);
++        listMenuButton.setOnLongClickListener(
++                v -> {
++                    if (listMenuButton.getVisibility() != View.VISIBLE) {
++                        return false;
++                    }
++                    listMenuButton.showMenu();
++                    return true;
++                });
++    }
++
+     private static ListMenuButton resolveListMenuButton(View view) {
+         View targetView = ActionButtonBinder.resolveView(view);
+         assert targetView instanceof ListMenuButton : "View must be a ListMenuButton";
 diff --git a/chrome/browser/ui/android/bottombar/BUILD.gn b/chrome/browser/ui/android/bottombar/BUILD.gn
 index b6b5750f8d..67edac2e59 100644
 --- a/chrome/browser/ui/android/bottombar/BUILD.gn
@@ -215,6 +301,91 @@ index b6b5750f8d..67edac2e59 100644
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarSwipeGestureUnitTest.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarActionEligibilityUnitTest.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarButtonContainerUnitTest.java",
+diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java
+index 196ca093cc..2865b92465 100644
+--- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java
++++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java
+@@ -23,14 +23,19 @@ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ import org.robolectric.annotation.Config;
+ 
++import org.chromium.base.Callback;
+ import org.chromium.base.test.BaseRobolectricTestRunner;
++import org.chromium.chrome.browser.ui.actions.ActionButtonBinder;
+ import org.chromium.chrome.browser.ui.actions.ActionId;
++import org.chromium.chrome.browser.ui.actions.ActionProperties;
++import org.chromium.chrome.browser.ui.actions.HomeActionButtonBinder;
+ import org.chromium.chrome.browser.ui.actions.HomeActionProperties;
+ import org.chromium.chrome.browser.ui.actions.appmenu.AppMenuActionProperties;
+ import org.chromium.ui.base.TestActivity;
+ import org.chromium.ui.listmenu.ListMenuDelegate;
+ import org.chromium.ui.modelutil.PropertyKey;
+ import org.chromium.ui.modelutil.PropertyModel;
++import org.chromium.ui.modelutil.PropertyModelChangeProcessor;
+ import org.chromium.ui.modelutil.PropertyModelChangeProcessor.ViewBinder;
+ 
+ /**
+@@ -181,6 +186,60 @@ public class BareToolbarActionRenderingUnitTest {
+                 badge.getVisibility());
+     }
+ 
++    /**
++     * Whether the home button gets its own long press back when nothing else wants it.
++     *
++     * <p>The three listeners that can end up on this button answer a long press differently, which
++     * is what lets the test tell them apart: the home button's own menu declines when the button
++     * is not visible, while both the generic swallow and a configured second action consume it. So
++     * the button is hidden and asked, and the answer says which one is in charge.
++     */
++    @Test
++    public void testHomeGetsItsOwnLongPressBackWhenNothingElseClaimsIt() {
++        View view = inflate(R.layout.bottom_bar_list_menu_template);
++        view.setVisibility(View.GONE);
++        // A parent, because a long press the listener declines falls through to the context menu,
++        // which asks the parent for one.
++        new android.widget.FrameLayout(mActivity).addView(view);
++
++        PropertyModel model = new PropertyModel.Builder(HomeActionProperties.ALL_KEYS).build();
++        model.set(HomeActionProperties.LONG_PRESS_MENU_DELEGATE, mock(ListMenuDelegate.class));
++        PropertyModelChangeProcessor.create(model, view, HomeActionButtonBinder::bind);
++
++        assertFalse(
++                "with nothing configured the home button's own menu should own the hold",
++                view.performLongClick());
++
++        int[] ran = new int[1];
++        model.set(ActionProperties.ON_PRESS_CALLBACK, (Callback<View>) v -> {});
++        assertFalse(
++                "binding the tap must not quietly take the hold away from home",
++                view.performLongClick());
++
++        model.set(ActionProperties.ON_LONG_PRESS_CALLBACK, (Callback<View>) v -> ran[0]++);
++        assertTrue("a configured second action should take the hold", view.performLongClick());
++        assertEquals(1, ran[0]);
++
++        model.set(ActionProperties.ON_LONG_PRESS_CALLBACK, null);
++        assertFalse(
++                "removing it should give the menu back, not leave the button swallowing",
++                view.performLongClick());
++        assertEquals("and the removed action should not run again", 1, ran[0]);
++    }
++
++    @Test
++    public void testAnOrdinaryActionStillSwallowsAHoldItHasNoUseFor() {
++        // The safeguard that stops a held button firing its tap late when the finger lifts.
++        View view = inflate(R.layout.bottom_bar_generic_template);
++        view.setVisibility(View.GONE);
++
++        PropertyModel model = new PropertyModel.Builder(ActionProperties.BASE_KEYS).build();
++        PropertyModelChangeProcessor.create(model, view, ActionButtonBinder::bind);
++        model.set(ActionProperties.ON_PRESS_CALLBACK, (Callback<View>) v -> {});
++
++        assertTrue("an ordinary action should swallow the hold", view.performLongClick());
++    }
++
+     // ---- who decides its own visibility ------------------------------------------------------
+ 
+     @Test
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java
 index 28995e1218..b293908bec 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java
