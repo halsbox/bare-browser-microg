@@ -1,0 +1,79 @@
+From c4e23fd827a155ed82e2a251c9c15ce176428242 Mon Sep 17 00:00:00 2001
+From: Bare <git@barebrowser.org>
+Date: Mon, 7 Sep 2026 07:19:57 +0000
+Subject: [PATCH] Do not offer AI Mode, whatever the search engine is
+
+Upstream ships kOmniboxMultimodalInput enabled and leaves the AI Mode entry
+points to decide for themselves, and every one of them decides by asking whether
+the default search engine is Google. With DuckDuckGo nothing appears, which is
+why none of this is visible today, but the protection is a user setting rather
+than a decision this browser has made. Changing the search engine back to Google
+removes all of it at once.
+
+There is also a path that does not involve Google at all. omnibox_field_trial.cc
+offers the entrypoint to a third party engine on the strength of kAim3pEntrypoint
+and the policy checks alone, so a non-Google engine is not on its own a reason
+the feature stays away.
+
+Both defaults go to disabled. That covers the five callers of
+OmniboxFeatures.isMultimodalInputEnabled: the fusebox coordinator and its NTP
+plus button stop being built, the composeplate button falls through to its URL
+instead of asking for AI mode, ToolbarPhone returns to the optional button
+behaviour it had before the fusebox, and the scrim call is behind a tablet check
+that a phone never passes.
+
+The Java cached flag has to say the same thing. It answers from its own default
+until the native value has been cached, so leaving it enabled would have left the
+first run after an install uncovered.
+
+This is the same answer 0019 and 0025 already gave for the AI Mode bottom bar
+button.
+---
+ .../chromium/components/omnibox/OmniboxFeatures.java  |  5 ++++-
+ components/omnibox/common/omnibox_features.cc         | 11 +++++++++--
+ 2 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/components/omnibox/common/android/java/src/org/chromium/components/omnibox/OmniboxFeatures.java b/components/omnibox/common/android/java/src/org/chromium/components/omnibox/OmniboxFeatures.java
+index 73260d7eec..e15c9c7423 100644
+--- a/components/omnibox/common/android/java/src/org/chromium/components/omnibox/OmniboxFeatures.java
++++ b/components/omnibox/common/android/java/src/org/chromium/components/omnibox/OmniboxFeatures.java
+@@ -148,8 +148,11 @@ public class OmniboxFeatures {
+                     OmniboxFeatureList.OMNIBOX_SESSIONLESS_VOICE_SEARCH,
+                     FeatureState.ENABLED_IN_PROD);
+ 
++    // Held off in Java as well as in omnibox_features.cc: this cached flag answers
++    // from its Java default until the native value has been cached, so a native
++    // change on its own would leave the first run after an install uncovered.
+     private static final CachedFlag sOmniboxMultimodalInput =
+-            newFlag(OmniboxFeatureList.OMNIBOX_MULTIMODAL_INPUT, FeatureState.ENABLED_IN_PROD);
++            newFlag(OmniboxFeatureList.OMNIBOX_MULTIMODAL_INPUT, FeatureState.DISABLED);
+ 
+     public static final BooleanCachedFeatureParam sMultiattachmentFusebox =
+             newBooleanParam(sOmniboxMultimodalInput, "multi_context", true);
+diff --git a/components/omnibox/common/omnibox_features.cc b/components/omnibox/common/omnibox_features.cc
+index 5bd6f9dfda..f94403d4cf 100644
+--- a/components/omnibox/common/omnibox_features.cc
++++ b/components/omnibox/common/omnibox_features.cc
+@@ -192,13 +192,20 @@ BASE_FEATURE(kHideAimEntrypointOnUserInput,
+ BASE_FEATURE(kHideAimEntrypointForUrlSuggestions, DISABLED);
+ 
+ // When enabled, the multimodal input button is shown in the Omnibox.
+-BASE_FEATURE(kOmniboxMultimodalInput, ENABLED);
++// Bare turns this off. Upstream enables it and leaves it to the entry points to
++// ask whether the default search engine is Google, which means the feature is
++// only ever one settings change away from appearing. This is the same answer
++// patches 0019 and 0025 gave for the AI Mode bottom bar button.
++BASE_FEATURE(kOmniboxMultimodalInput, DISABLED);
+ 
+ // An additional gate to the behavior of OmniboxMultimodalInput on desktop.
+ BASE_FEATURE(kAndroidDesktopAimGate, ENABLED);
+ 
+ // Enables the AIM entrypoint for third party search engines.
+-BASE_FEATURE(kAim3pEntrypoint, ENABLED);
++// Bare turns this off too. With it enabled, omnibox_field_trial.cc offers the
++// entrypoint to a non-Google engine on the strength of the flag and the policy
++// checks alone, so DuckDuckGo is not the protection it looks like.
++BASE_FEATURE(kAim3pEntrypoint, DISABLED);
+ const base::FeatureParam<bool> kAim3pEntrypointDebug{
+     &kAim3pEntrypoint, "Aim3pEntrypointDebug", false};
+ 
