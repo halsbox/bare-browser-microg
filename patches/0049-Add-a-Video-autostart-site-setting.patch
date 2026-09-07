@@ -1,4 +1,4 @@
-From 2d98476d98186b652cdae9b6e10ac902674f02c4 Mon Sep 17 00:00:00 2001
+From fd480af0e9152a423d72adf1866d0e347bcc4e23 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 03:01:42 +0000
 Subject: [PATCH] Add a Video autostart site setting
@@ -36,10 +36,10 @@ rejects it and allowed does not.
  7 files changed, 66 insertions(+), 2 deletions(-)
 
 diff --git a/chrome/browser/chrome_content_browser_client.cc b/chrome/browser/chrome_content_browser_client.cc
-index 335be40e0a..09c84438bf 100644
+index 06bef2cf88..901fe066a0 100644
 --- a/chrome/browser/chrome_content_browser_client.cc
 +++ b/chrome/browser/chrome_content_browser_client.cc
-@@ -1082,7 +1082,37 @@ blink::mojom::AutoplayPolicy GetAutoplayPolicyForWebContents(
+@@ -1089,7 +1089,37 @@ blink::mojom::AutoplayPolicy GetAutoplayPolicyForWebContents(
      NOTREACHED();
    }
  

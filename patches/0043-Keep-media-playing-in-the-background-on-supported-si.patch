@@ -1,4 +1,4 @@
-From d3e7ee48f95e8e03feafe696fcf83dd1aba770e5 Mon Sep 17 00:00:00 2001
+From 3fd3a526663e9b6a04b84a13042c8bc4aa605838 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 01:39:43 +0000
 Subject: [PATCH] Keep media playing in the background on supported sites
@@ -52,10 +52,10 @@ from the internal one.
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/media/settings/MediaSettingsFragment.java
 
 diff --git a/chrome/android/chrome_java_resources.gni b/chrome/android/chrome_java_resources.gni
-index 22b8055ac3..448abd5498 100644
+index 290c2c8671..a1ed2e5758 100644
 --- a/chrome/android/chrome_java_resources.gni
 +++ b/chrome/android/chrome_java_resources.gni
-@@ -678,6 +678,7 @@ chrome_java_resources = [
+@@ -682,6 +682,7 @@ chrome_java_resources = [
    "java/res/xml/homepage_preferences.xml",
    "java/res/xml/legal_information_preferences.xml",
    "java/res/xml/main_preferences.xml",
@@ -64,7 +64,7 @@ index 22b8055ac3..448abd5498 100644
    "java/res/xml/privacy_preferences.xml",
    "java/res/xml/search_widget_info.xml",
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index 29a282ded1..359f565d3d 100644
+index a1df914488..b3c00da261 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
 @@ -812,6 +812,7 @@ chrome_java_sources = [
@@ -76,10 +76,10 @@ index 29a282ded1..359f565d3d 100644
    "java/src/org/chromium/chrome/browser/media/ui/ChromeMediaNotificationManager.java",
    "java/src/org/chromium/chrome/browser/media/ui/MediaSessionTabHelper.java",
 diff --git a/chrome/android/java/res/xml/main_preferences.xml b/chrome/android/java/res/xml/main_preferences.xml
-index 33897a181a..e20dc531db 100644
+index 4a0b91a69e..e9c82691cf 100644
 --- a/chrome/android/java/res/xml/main_preferences.xml
 +++ b/chrome/android/java/res/xml/main_preferences.xml
-@@ -106,6 +106,11 @@ found in the LICENSE file.
+@@ -107,6 +107,11 @@ found in the LICENSE file.
          android:key="appearance"
          android:order="23"
          android:title="@string/appearance_settings" />
@@ -189,10 +189,10 @@ index 0000000000..a099607fa5
 +    }
 +}
 diff --git a/chrome/browser/chrome_content_browser_client.cc b/chrome/browser/chrome_content_browser_client.cc
-index 36fea37bd5..335be40e0a 100644
+index e30528ed87..06bef2cf88 100644
 --- a/chrome/browser/chrome_content_browser_client.cc
 +++ b/chrome/browser/chrome_content_browser_client.cc
-@@ -4582,6 +4582,59 @@ content::TtsPlatform* ChromeContentBrowserClient::GetTtsPlatform() {
+@@ -4581,6 +4581,59 @@ content::TtsPlatform* ChromeContentBrowserClient::GetTtsPlatform() {
  #endif
  }
  
@@ -252,7 +252,7 @@ index 36fea37bd5..335be40e0a 100644
  void ChromeContentBrowserClient::OverrideWebPreferences(
      WebContents* web_contents,
      content::SiteInstance& main_frame_site,
-@@ -4590,6 +4643,11 @@ void ChromeContentBrowserClient::OverrideWebPreferences(
+@@ -4589,6 +4642,11 @@ void ChromeContentBrowserClient::OverrideWebPreferences(
        Profile::FromBrowserContext(web_contents->GetBrowserContext());
    PrefService* prefs = profile->GetPrefs();
  
@@ -264,7 +264,7 @@ index 36fea37bd5..335be40e0a 100644
  // Fill font preferences. These are not registered on Android unless we're built
  // with extensions (the chrome.fontSettings API can change these).
  // - http://crbug.com/40337093, http://crbug.com/41304476.
-@@ -4951,6 +5009,18 @@ bool ChromeContentBrowserClient::OverrideWebPreferencesAfterNavigation(
+@@ -4950,6 +5008,18 @@ bool ChromeContentBrowserClient::OverrideWebPreferencesAfterNavigation(
    prefs_changed |= (web_prefs->autoplay_policy != autoplay_policy);
    web_prefs->autoplay_policy = autoplay_policy;
  
@@ -284,10 +284,10 @@ index 36fea37bd5..335be40e0a 100644
    const bool require_transient_activation_for_get_display_media =
        capture_policy::IsTransientActivationRequiredForGetDisplayMedia(
 diff --git a/chrome/browser/prefs/browser_prefs.cc b/chrome/browser/prefs/browser_prefs.cc
-index 6974114f16..c4550b91a3 100644
+index b0923f5e9c..8492c0747c 100644
 --- a/chrome/browser/prefs/browser_prefs.cc
 +++ b/chrome/browser/prefs/browser_prefs.cc
-@@ -2240,6 +2240,9 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
+@@ -2261,6 +2261,9 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
    registry->RegisterIntegerPref(prefs::kLensOverlayStartCount, 0);
  
    registry->RegisterBooleanPref(prefs::kViewSourceLineWrappingEnabled, false);
@@ -298,10 +298,10 @@ index 6974114f16..c4550b91a3 100644
    // TODO(crbug.com/442891187): Move these to appropriate manager files when
    // the policies logic is implemented.
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index 35db5fcb8d..20c5512fb7 100644
+index feb94a0043..0f61e716f2 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -2167,6 +2167,15 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -2170,6 +2170,15 @@ Your Google account may have other forms of browsing history like searches and a
        <message name="IDS_PREFS_ABOUT_CHROME" desc="Title for the About Chrome page. [CHAR_LIMIT=32]">
          About Bare
        </message>
@@ -318,7 +318,7 @@ index 35db5fcb8d..20c5512fb7 100644
          Copyright <ph name="year">%1$d<ex>2014</ex></ph> Google LLC. All rights reserved.
        </message>
 diff --git a/chrome/common/pref_names.h b/chrome/common/pref_names.h
-index 39a7f40a0f..dbe2d8bc1c 100644
+index 03d2b7db06..79fea1f27e 100644
 --- a/chrome/common/pref_names.h
 +++ b/chrome/common/pref_names.h
 @@ -334,6 +334,13 @@ inline constexpr char kWebKitPasswordEchoEnabledTouch[] =
@@ -366,7 +366,7 @@ index b042d68a4d..fe9dd9af84 100644
    // scale limits. These are set directly on the WebView so there's no analogue
    // in WebSettings.
 diff --git a/third_party/blink/public/common/web_preferences/web_preferences_mojom_traits.h b/third_party/blink/public/common/web_preferences/web_preferences_mojom_traits.h
-index 735a8ca355..9b93d89cdd 100644
+index 91593851bc..7a1ae52c2a 100644
 --- a/third_party/blink/public/common/web_preferences/web_preferences_mojom_traits.h
 +++ b/third_party/blink/public/common/web_preferences/web_preferences_mojom_traits.h
 @@ -690,6 +690,11 @@ struct BLINK_COMMON_EXPORT StructTraits<blink::mojom::WebPreferencesDataView,
@@ -408,10 +408,10 @@ index 5d61a18001..1be2d3e3b0 100644
    virtual void SetIsForcedColorsDisabled(bool) = 0;
    virtual void SetPreferredRootScrollbarColorScheme(
 diff --git a/third_party/blink/renderer/core/dom/document.cc b/third_party/blink/renderer/core/dom/document.cc
-index 2de9bf2170..ab85788d5e 100644
+index 77adfc5415..e6a4fe120d 100644
 --- a/third_party/blink/renderer/core/dom/document.cc
 +++ b/third_party/blink/renderer/core/dom/document.cc
-@@ -2277,8 +2277,23 @@ bool Document::IsPrefetchOnly() const {
+@@ -2276,8 +2276,23 @@ bool Document::IsPrefetchOnly() const {
    return no_state_prefetch_client && no_state_prefetch_client->IsPrefetchOnly();
  }
  
@@ -436,7 +436,7 @@ index 2de9bf2170..ab85788d5e 100644
      return V8VisibilityState(V8VisibilityState::Enum::kHidden);
    } else {
      return V8VisibilityState(V8VisibilityState::Enum::kVisible);
-@@ -2313,10 +2328,15 @@ void Document::DidChangeVisibilityState() {
+@@ -2312,10 +2327,15 @@ void Document::DidChangeVisibilityState() {
      // tab and update the visibility state.
      return;
    }
@@ -457,7 +457,7 @@ index 2de9bf2170..ab85788d5e 100644
    if (IsPageVisible())
      GetDocumentAnimations().MarkAnimationsCompositorPending();
 diff --git a/third_party/blink/renderer/core/dom/document.h b/third_party/blink/renderer/core/dom/document.h
-index 0434392de5..f11572a4c5 100644
+index 08062fc56a..5a7e9e0e46 100644
 --- a/third_party/blink/renderer/core/dom/document.h
 +++ b/third_party/blink/renderer/core/dom/document.h
 @@ -599,6 +599,8 @@ class CORE_EXPORT Document : public ContainerNode,
@@ -497,7 +497,7 @@ index 2bb646bc6a..ed460cfe77 100644
    void SetIsForcedColorsDisabled(bool) override;
    void SetPreferredRootScrollbarColorScheme(
 diff --git a/third_party/blink/renderer/core/exported/web_view_impl.cc b/third_party/blink/renderer/core/exported/web_view_impl.cc
-index 6c785d94a4..342387cd1f 100644
+index 0426141ab1..a6a8f01218 100644
 --- a/third_party/blink/renderer/core/exported/web_view_impl.cc
 +++ b/third_party/blink/renderer/core/exported/web_view_impl.cc
 @@ -1862,6 +1862,8 @@ void WebView::ApplyWebPreferences(const web_pref::WebPreferences& prefs,

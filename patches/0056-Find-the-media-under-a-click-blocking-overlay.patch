@@ -1,4 +1,4 @@
-From ed2221823bab87887cb35b0e4472c1a22d80eff6 Mon Sep 17 00:00:00 2001
+From 26c548d3bd739495ead23fa7a1ff36d5e2806b5b Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 07:36:56 +0000
 Subject: [PATCH] Find the media under a click-blocking overlay
@@ -28,10 +28,10 @@ rather than media deliberately hidden behind nothing.
  2 files changed, 76 insertions(+), 4 deletions(-)
 
 diff --git a/third_party/blink/renderer/core/page/context_menu_controller.cc b/third_party/blink/renderer/core/page/context_menu_controller.cc
-index 9fe27d9e1a..af3a6f2b8e 100644
+index bc886f9d2b..a679f4aca1 100644
 --- a/third_party/blink/renderer/core/page/context_menu_controller.cc
 +++ b/third_party/blink/renderer/core/page/context_menu_controller.cc
-@@ -258,6 +258,42 @@ void ContextMenuController::CustomContextMenuItemSelected(unsigned action) {
+@@ -259,6 +259,42 @@ void ContextMenuController::CustomContextMenuItemSelected(unsigned action) {
    ClearContextMenu();
  }
  
@@ -74,7 +74,7 @@ index 9fe27d9e1a..af3a6f2b8e 100644
  Node* ContextMenuController::GetContextMenuNodeWithImageContents() {
    uint32_t outcome = 0;
    uint32_t hit_test_depth = 0;
-@@ -328,9 +364,24 @@ Node* ContextMenuController::GetContextMenuNodeWithImageContents() {
+@@ -329,9 +365,24 @@ Node* ContextMenuController::GetContextMenuNodeWithImageContents() {
      }
    }
    // If there is anything preventing this image selection, return nullptr.
@@ -100,7 +100,7 @@ index 9fe27d9e1a..af3a6f2b8e 100644
    if (outcome & blocking_image_selection_mask) {
      return nullptr;
    }
-@@ -552,15 +603,31 @@ bool ContextMenuController::ShowContextMenu(
+@@ -553,15 +604,31 @@ bool ContextMenuController::ShowContextMenu(
      }
    }
  

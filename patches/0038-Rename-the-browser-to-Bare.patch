@@ -1,4 +1,4 @@
-From a65af6ca0bdde89938ebd20d8ce748c1b6f66c47 Mon Sep 17 00:00:00 2001
+From 7a9dba272be583a75f859f8305c1cdd0b7eef956 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 18 Aug 2026 20:21:16 +0000
 Subject: [PATCH] Rename the browser to Bare
@@ -45,10 +45,10 @@ index cc1f2a30cb..b8760a5ae2 100644
 +    <string name="bare_welcome_footer" translatable="false">Made with \u2764\uFE0F in San Francisco</string>
  </resources>
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index fa8fe01efb..35db5fcb8d 100644
+index 26a2580e88..feb94a0043 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -2165,7 +2165,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -2168,7 +2168,7 @@ Your Google account may have other forms of browsing history like searches and a
  
        <!-- About Chrome preferences -->
        <message name="IDS_PREFS_ABOUT_CHROME" desc="Title for the About Chrome page. [CHAR_LIMIT=32]">
@@ -57,7 +57,7 @@ index fa8fe01efb..35db5fcb8d 100644
        </message>
        <message name="IDS_LEGAL_INFORMATION_SUMMARY" desc="Summary for legal information" meaning="Android">
          Copyright <ph name="year">%1$d<ex>2014</ex></ph> Google LLC. All rights reserved.
-@@ -4447,7 +4447,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4525,7 +4525,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Bookmark all tabs
        </message>
        <message name="IDS_MENU_ABOUT_CHROME" desc="Menu item for opening the 'About Chrome' page in the settings. [CHAR_LIMIT=27]">
@@ -66,7 +66,7 @@ index fa8fe01efb..35db5fcb8d 100644
        </message>
        <message name="IDS_MENU_HELP_CENTER" desc="Menu item for opening the help center. [CHAR_LIMIT=27]">
          Help center
-@@ -6773,7 +6773,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -6862,7 +6862,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Something went wrong. Try again.
        </message>
        <message name="IDS_ACCESSIBILITY_CUSTOM_TAB_MENU_WITH_DOT" desc="Content description for the menu with a dot indicating the fallback UI for contextual page action is highlighted.">

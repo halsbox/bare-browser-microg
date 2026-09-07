@@ -1,4 +1,4 @@
-From d97d4f18df99b09b000e46c55e452ff6eccc7097 Mon Sep 17 00:00:00 2001
+From 691060a4277a2216eda15b4901980987781b16cd Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 23 Aug 2026 17:30:36 +0000
 Subject: [PATCH] Register twelve fewer components with update.googleapis.com

@@ -1,4 +1,4 @@
-From e57d8477fc818076ffc759ea58d5e90dd4e3e574 Mon Sep 17 00:00:00 2001
+From 4818a5e04ff5ce9e2f9db9e9ba0d3533846fad0f Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Mon, 31 Aug 2026 03:43:53 +0000
 Subject: [PATCH] Let bookmarks be carried in and out as a file
@@ -165,7 +165,7 @@ index edd4475ea0..4d79a2a96a 100644
    if (is_android) {
      sources += [ "android/bookmark_bridge_unittest.cc" ]
 diff --git a/chrome/browser/bookmarks/android/BUILD.gn b/chrome/browser/bookmarks/android/BUILD.gn
-index 8b6096209f..2219baafc3 100644
+index fc84c72b46..5e9239376c 100644
 --- a/chrome/browser/bookmarks/android/BUILD.gn
 +++ b/chrome/browser/bookmarks/android/BUILD.gn
 @@ -24,10 +24,14 @@ source_set("android") {
@@ -194,8 +194,8 @@ index 8b6096209f..2219baafc3 100644
    ]
  }
  
-@@ -59,6 +66,8 @@ android_library("java") {
-     "java/src/org/chromium/chrome/browser/bookmarks/BookmarkDesktopNavigationViewBinder.java",
+@@ -58,6 +65,8 @@ android_library("java") {
+     "java/src/org/chromium/chrome/browser/bookmarks/BookmarkDesktopNavigationProperties.java",
      "java/src/org/chromium/chrome/browser/bookmarks/BookmarkFolderPickerProperties.java",
      "java/src/org/chromium/chrome/browser/bookmarks/BookmarkFolderPickerViewBinder.java",
 +    "java/src/org/chromium/chrome/browser/bookmarks/BookmarkHtmlBridge.java",
@@ -634,10 +634,10 @@ index 0000000000..ba2f74a29d
 +    }
 +}
 diff --git a/chrome/browser/bookmarks/android/java/src/org/chromium/chrome/browser/bookmarks/BookmarkManagerCoordinator.java b/chrome/browser/bookmarks/android/java/src/org/chromium/chrome/browser/bookmarks/BookmarkManagerCoordinator.java
-index ea09555207..356f809a4a 100644
+index 62a746a9e9..56e25ffd8f 100644
 --- a/chrome/browser/bookmarks/android/java/src/org/chromium/chrome/browser/bookmarks/BookmarkManagerCoordinator.java
 +++ b/chrome/browser/bookmarks/android/java/src/org/chromium/chrome/browser/bookmarks/BookmarkManagerCoordinator.java
-@@ -262,6 +262,7 @@ public class BookmarkManagerCoordinator
+@@ -265,6 +265,7 @@ public class BookmarkManagerCoordinator
                  new BookmarkToolbarCoordinator(
                          activity,
                          mProfile,
@@ -1671,10 +1671,10 @@ index 35842f390f..9974544586 100644
  
  void ProfileWriter::AddFavicons(
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index 4019cd41c3..b8a39fe183 100644
+index 222119b2fb..cce99572a3 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -4233,6 +4233,36 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4308,6 +4308,36 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
        <message name="IDS_BARE_TOOLBAR_POSITION_FIXED_DESCRIPTION" desc="Accessibility description of a toolbar position that cannot be changed.">
          <ph name="ACTION">%1$s<ex>New tab</ex></ph>, cannot be changed
        </message>

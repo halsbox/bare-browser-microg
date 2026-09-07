@@ -1,4 +1,4 @@
-From 4550e610f9bf3bdc4d914a95c8de70e33d8bc2b1 Mon Sep 17 00:00:00 2001
+From 399084ad2cc6a6434b42cae0cce0b7afd0c04b38 Mon Sep 17 00:00:00 2001
 From: Bare <57wsdx6b8d@privaterelay.appleid.com>
 Date: Fri, 28 Aug 2026 22:43:11 +0000
 Subject: [PATCH] Let a sideways drag along the bar change brightness or volume
@@ -176,10 +176,10 @@ index 3b4ef3689c..87517aa1c8 100644
       * Offers the buttons that can go in a position, with the one already there marked.
       *
 diff --git a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
-index f14f882bb2..904b0d3e75 100644
+index c69642c41d..4aec85765e 100644
 --- a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 +++ b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
-@@ -153,6 +153,12 @@ public final class ChromePreferenceKeys {
+@@ -149,6 +149,12 @@ public final class ChromePreferenceKeys {
      public static final KeyPrefix BOTTOM_BAR_SLOT_PRIMARY_ACTION =
              new KeyPrefix("Chrome.BottomBar.SlotPrimaryAction.*");
  
@@ -192,7 +192,7 @@ index f14f882bb2..904b0d3e75 100644
      /** Whether Chrome is set as the default browser. Default value is false. */
      public static final String CHROME_DEFAULT_BROWSER = "applink.chrome_default_browser";
  
-@@ -1287,6 +1293,7 @@ public final class ChromePreferenceKeys {
+@@ -1285,6 +1291,7 @@ public final class ChromePreferenceKeys {
                  BOOKMARKS_VISUALS_PREF,
                  BOTTOM_BAR_GLIC_BUTTON_ENABLED,
                  BOTTOM_BAR_SLOT_PRIMARY_ACTION.pattern(),
@@ -201,7 +201,7 @@ index f14f882bb2..904b0d3e75 100644
                  CLIPBOARD_SHARED_URI_TIMESTAMP,
                  CLOUD_MANAGEMENT_CLIENT_ID,
 diff --git a/chrome/browser/ui/android/bottombar/BUILD.gn b/chrome/browser/ui/android/bottombar/BUILD.gn
-index 13491e39ca..b6b5750f8d 100644
+index bba5dca080..7c05b19532 100644
 --- a/chrome/browser/ui/android/bottombar/BUILD.gn
 +++ b/chrome/browser/ui/android/bottombar/BUILD.gn
 @@ -65,6 +65,10 @@ android_library("java") {
@@ -215,7 +215,7 @@ index 13491e39ca..b6b5750f8d 100644
      "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBar.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarActionEligibility.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarAppMenu.java",
-@@ -132,6 +136,7 @@ robolectric_library("junit") {
+@@ -133,6 +137,7 @@ robolectric_library("junit") {
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayoutUnitTest.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefsUnitTest.java",
@@ -867,10 +867,10 @@ index 0000000000..5067aed839
 +    }
 +}
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
-index 55f3c292db..6dc247d779 100644
+index bd8a37a9fa..722e0c14fc 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
 +++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
-@@ -115,6 +115,11 @@ public class BottomBarCoordinator
+@@ -120,6 +120,11 @@ public class BottomBarCoordinator
          mTabSupplier = tabSupplier;
          mMcp = PropertyModelChangeProcessor.create(mModel, mView, BottomBarViewBinder::bind);
  
@@ -1113,10 +1113,10 @@ index 2fe021270a..1d1e76d070 100644
      }
  }
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index 2d84150338..1de3f92497 100644
+index b25ecaad9d..d3bcd10f6b 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -4182,6 +4182,18 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4257,6 +4257,18 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
        <message name="IDS_BARE_TOOLBAR_SETTINGS_RESET" desc="Button that puts the toolbar back to its original arrangement.">
          Reset toolbar
        </message>

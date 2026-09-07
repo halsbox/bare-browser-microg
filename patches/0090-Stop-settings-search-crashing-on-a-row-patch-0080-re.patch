@@ -1,4 +1,4 @@
-From 7c50864d44afadba845688638094241e3e09e2eb Mon Sep 17 00:00:00 2001
+From f2710284afe7c5d6d16a9eac3863672930d21398 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 25 Aug 2026 00:55:40 +0000
 Subject: [PATCH] Stop settings search crashing on a row patch 0080 removed

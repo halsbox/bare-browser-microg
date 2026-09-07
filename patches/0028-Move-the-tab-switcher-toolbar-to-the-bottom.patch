@@ -1,4 +1,4 @@
-From a327e2ddc1ae5de4882a5eff2d0d7c6f04f0f506 Mon Sep 17 00:00:00 2001
+From 889d75d4fd907dedb46057e6ff90340d969a82b1 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 18 Aug 2026 04:23:14 +0000
 Subject: [PATCH] Move the tab switcher toolbar to the bottom
@@ -25,23 +25,23 @@ does not return, which was the risk in enabling this subsystem.
  2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/chrome/browser/flags/android/chrome_feature_list.cc b/chrome/browser/flags/android/chrome_feature_list.cc
-index 0b99265877..f47ccb7573 100644
+index 719403bb92..228c9bf33f 100644
 --- a/chrome/browser/flags/android/chrome_feature_list.cc
 +++ b/chrome/browser/flags/android/chrome_feature_list.cc
-@@ -621,7 +621,7 @@ BASE_FEATURE(kAndroidActorTaskTimeout, base::FEATURE_ENABLED_BY_DEFAULT);
- BASE_FEATURE(kAndroidAppIntegrationMultiDataSource, base::FEATURE_ENABLED_BY_DEFAULT);
+@@ -636,7 +636,7 @@ BASE_FEATURE(kAndroidAppIntegrationMultiDataSource, base::FEATURE_ENABLED_BY_DEF
  BASE_FEATURE(kAndroidAppRatingPrompt, base::FEATURE_DISABLED_BY_DEFAULT);
  BASE_FEATURE(kAndroidAtomsLogging, base::FEATURE_DISABLED_BY_DEFAULT);
+ BASE_FEATURE(kAndroidAutofillPrefObserver, base::FEATURE_DISABLED_BY_DEFAULT);
 -BASE_FEATURE(kAndroidBottomBar, base::FEATURE_DISABLED_BY_DEFAULT);
 +BASE_FEATURE(kAndroidBottomBar, base::FEATURE_ENABLED_BY_DEFAULT);
  BASE_FEATURE(kAndroidBottomBarAim, base::FEATURE_DISABLED_BY_DEFAULT);
  BASE_FEATURE(kAndroidBricksNativePage, base::FEATURE_DISABLED_BY_DEFAULT);
  BASE_FEATURE(kAndroidContextMenuDisabledMenuItems, base::FEATURE_DISABLED_BY_DEFAULT);
 diff --git a/chrome/browser/flags/android/java/src/org/chromium/chrome/browser/flags/ChromeFeatureList.java b/chrome/browser/flags/android/java/src/org/chromium/chrome/browser/flags/ChromeFeatureList.java
-index 8a7683ef7d..11cab7259b 100644
+index c738c7ac45..6b3a1cea0c 100644
 --- a/chrome/browser/flags/android/java/src/org/chromium/chrome/browser/flags/ChromeFeatureList.java
 +++ b/chrome/browser/flags/android/java/src/org/chromium/chrome/browser/flags/ChromeFeatureList.java
-@@ -801,7 +801,7 @@ public abstract class ChromeFeatureList {
+@@ -910,7 +910,7 @@ public abstract class ChromeFeatureList {
      public static final CachedFlag sAndroidAutoMintedTwa =
              newCachedFlag(ANDROID_AUTO_MINTED_TWA, false);
      public static final CachedFlag sAndroidBottomBar =
@@ -50,7 +50,7 @@ index 8a7683ef7d..11cab7259b 100644
      public static final CachedFlag sAndroidBottomBarAim =
              newCachedFlag(ANDROID_BOTTOM_BAR_AIM, false);
      public static final CachedFlag sAndroidElegantTextHeight =
-@@ -1692,7 +1692,7 @@ public abstract class ChromeFeatureList {
+@@ -1874,7 +1874,7 @@ public abstract class ChromeFeatureList {
      public static final BooleanCachedFeatureParam sAndroidBottomBarNtpScrollOffEnabled =
              newBooleanCachedFeatureParam(ANDROID_BOTTOM_BAR, "ntp_scroll_off_enabled", true);
      public static final BooleanCachedFeatureParam sAndroidBottomBarShowBottomBarOnGts =

@@ -1,4 +1,4 @@
-From 9beb2210b46b37449045d1289fe968071d06d4b7 Mon Sep 17 00:00:00 2001
+From 719acaac9abc8449340c39451c89805aad698dd5 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Thu, 20 Aug 2026 10:29:58 +0000
 Subject: [PATCH] Offer a download for streamed video, not just linked video
@@ -74,10 +74,10 @@ Pairing and remuxing come next.
  create mode 100644 chrome/browser/ui/android/bare_media_registry.h
 
 diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
-index 652377805f..38f3e0b494 100644
+index c2ed6a95e7..bd3a80dc9b 100644
 --- a/chrome/android/BUILD.gn
 +++ b/chrome/android/BUILD.gn
-@@ -3048,6 +3048,7 @@ if (_is_default_toolchain) {
+@@ -3055,6 +3055,7 @@ if (_is_default_toolchain) {
        "java/src/org/chromium/chrome/browser/backup/ChromeBackupAgentImpl.java",
        "java/src/org/chromium/chrome/browser/backup/ChromeBackupWatcher.java",
        "java/src/org/chromium/chrome/browser/backup/DictPrefBackupSerializer.java",
@@ -86,7 +86,7 @@ index 652377805f..38f3e0b494 100644
        "java/src/org/chromium/chrome/browser/browserservices/permissiondelegation/InstalledWebappBridge.java",
        "java/src/org/chromium/chrome/browser/browserservices/permissiondelegation/InstalledWebappGeolocationBridge.java",
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index 359f565d3d..43e242d208 100644
+index b3c00da261..f1b0b1297e 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
 @@ -218,6 +218,7 @@ chrome_java_sources = [
@@ -98,7 +98,7 @@ index 359f565d3d..43e242d208 100644
    "java/src/org/chromium/chrome/browser/background_sync/BackgroundSyncBackgroundTask.java",
    "java/src/org/chromium/chrome/browser/background_sync/BackgroundSyncBackgroundTaskScheduler.java",
 diff --git a/chrome/android/java/res/values/ids.xml b/chrome/android/java/res/values/ids.xml
-index 501cdf9851..a264fe0f50 100644
+index 79f16a2d3d..36c09cbf4d 100644
 --- a/chrome/android/java/res/values/ids.xml
 +++ b/chrome/android/java/res/values/ids.xml
 @@ -140,6 +140,7 @@ found in the LICENSE file.
@@ -629,10 +629,10 @@ index 0000000000..e13e52f943
 +
 +#endif  // CHROME_BROWSER_UI_ANDROID_BARE_MEDIA_REGISTRY_H_
 diff --git a/chrome/browser/ui/tab_helpers.cc b/chrome/browser/ui/tab_helpers.cc
-index da9cca9433..65964883e2 100644
+index 446351a9d0..1bb1a34ad0 100644
 --- a/chrome/browser/ui/tab_helpers.cc
 +++ b/chrome/browser/ui/tab_helpers.cc
-@@ -174,6 +174,7 @@
+@@ -179,6 +179,7 @@
  #include "chrome/browser/flags/android/chrome_feature_list.h"
  #include "chrome/browser/loader/from_gws_navigation_and_keep_alive_request_tab_helper.h"
  #include "chrome/browser/plugins/plugin_observer_android.h"
@@ -640,7 +640,7 @@ index da9cca9433..65964883e2 100644
  #include "chrome/browser/ui/android/context_menu_helper.h"
  #include "chrome/browser/ui/javascript_dialogs/javascript_tab_modal_dialog_manager_delegate_android.h"
  #include "components/content_capture/common/content_capture_features.h"
-@@ -664,6 +665,9 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
+@@ -679,6 +680,9 @@ void TabHelpers::AttachTabHelpers(WebContents* web_contents,
                            *web_contents));
    }
    ContextMenuHelper::CreateForWebContents(web_contents);

@@ -1,4 +1,4 @@
-From 185a2901d297b0763c515ce1401c301d525a06ee Mon Sep 17 00:00:00 2001
+From 9ce337f85a263d23503c8dcf865ee4b85e94bc89 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 16 Aug 2026 05:31:52 +0000
 Subject: [PATCH] Ship DuckDuckGo as the default search provider
@@ -25,10 +25,10 @@ resolves to duckduckgo.com.
  1 file changed, 30 insertions(+)
 
 diff --git a/components/search_engines/template_url_prepopulate_data.cc b/components/search_engines/template_url_prepopulate_data.cc
-index ac35ec2577..6d3ca93b24 100644
+index fbc685a198..51cbb27a44 100644
 --- a/components/search_engines/template_url_prepopulate_data.cc
 +++ b/components/search_engines/template_url_prepopulate_data.cc
-@@ -278,6 +278,36 @@ std::unique_ptr<TemplateURLData> GetPrepopulatedFallbackSearch(
+@@ -307,6 +307,36 @@ std::unique_ptr<TemplateURLData> GetPrepopulatedFallbackSearch(
      PrefService& prefs,
      const std::vector<raw_ptr<const PrepopulatedEngine>>&
          regional_prepopulated_engines) {

@@ -1,4 +1,4 @@
-From 3686e9ce86c05865307eb9de931e40eeb65820ed Mon Sep 17 00:00:00 2001
+From b63deb575eba8aed7f450887809121e922142cf8 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 16 Aug 2026 08:42:20 +0000
 Subject: [PATCH] Stop offering Gemini as a toolbar shortcut

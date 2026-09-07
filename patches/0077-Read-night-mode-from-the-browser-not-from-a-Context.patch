@@ -1,4 +1,4 @@
-From 6b772dee518c2dcde629514e4a4d4b7d8898b97b Mon Sep 17 00:00:00 2001
+From 344497f1fdc8603eec95744ea6864220bd9ceca8 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 22 Aug 2026 14:49:30 +0000
 Subject: [PATCH] Read night mode from the browser, not from a Context

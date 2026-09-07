@@ -1,4 +1,4 @@
-From f048fe775c27776ce60bef3a10112aa32a92cb78 Mon Sep 17 00:00:00 2001
+From 6e4b02c8416c45d95d41970284a203c09f09fb52 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 18 Aug 2026 05:00:03 +0000
 Subject: [PATCH] Let the user pick which download manager to use
@@ -251,7 +251,7 @@ index b5b7c80b61..b452d01e85 100644
 +    }
  }
 diff --git a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
-index 65f3a08eb5..5ed555756b 100644
+index cc4c317f41..bf7560bb35 100644
 --- a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 +++ b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 @@ -388,6 +388,13 @@ public final class ChromePreferenceKeys {
@@ -268,19 +268,19 @@ index 65f3a08eb5..5ed555756b 100644
      /**
       * De-Googled build: whether downloads are offered to an installed download manager instead of
       * being fetched by the browser. Off by default, so the browser behaves as usual until asked.
-@@ -1208,6 +1215,7 @@ public final class ChromePreferenceKeys {
-                 APPEARANCE_SETTINGS_CLICKED,
-                 APPEARANCE_SETTINGS_VIEW_COUNT,
+@@ -1206,6 +1213,7 @@ public final class ChromePreferenceKeys {
+                 AI_ASSISTANT_AVAILABILITY_CHECK_TIMESTAMP_MS,
+                 AI_ASSISTANT_WEB_SUMMARIZATION_AVAILABILITY,
                  AUTOFILL_ASSISTANT_FIRST_TIME_LITE_SCRIPT_USER,
 +                DOWNLOAD_EXTERNAL_MANAGER_PACKAGE,
                  DOWNLOAD_USE_EXTERNAL_DOWNLOAD_MANAGER,
                  WEBSTORE_DESKTOP_SITE_SEEDED,
                  AUTOFILL_ASSISTANT_PROACTIVE_HELP_ENABLED,
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index b9ca30ce71..21d88260be 100644
+index 354c1e4f1c..7250c406ce 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -2113,6 +2113,15 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -2116,6 +2116,15 @@ Your Google account may have other forms of browsing history like searches and a
        <message name="IDS_OPEN_DOWNLOAD_DIALOG_AUTO_OPEN_TEXT" desc="Text label for the check box on the open download dialog that allows user to auto-open downloaded PDF files in future.">
          Always open downloaded PDFs
        </message>

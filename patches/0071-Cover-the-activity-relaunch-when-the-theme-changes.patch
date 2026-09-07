@@ -1,4 +1,4 @@
-From f90d8310c04569cdcc4393b0fa252463f9057603 Mon Sep 17 00:00:00 2001
+From ef8600e9a9fd9067d456c76d92635cb35ef4ca2a Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 22 Aug 2026 05:13:14 +0000
 Subject: [PATCH] Cover the activity relaunch when the theme changes
@@ -38,7 +38,7 @@ deliberate choice by the user and often an accessibility one.
  create mode 100644 chrome/browser/ui/android/night_mode/java/src/org/chromium/chrome/browser/night_mode/ThemeSwitchOverlay.java
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeBaseAppCompatActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeBaseAppCompatActivity.java
-index ac464602ae..87803c0588 100644
+index b29a0b45ac..1fc57416bf 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeBaseAppCompatActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeBaseAppCompatActivity.java
 @@ -58,6 +58,7 @@ import org.chromium.chrome.browser.language.GlobalAppLocaleController;
@@ -59,7 +59,7 @@ index ac464602ae..87803c0588 100644
  
          if (NtpCustomizationUtils.isNtpThemeCustomizationEnabled()) {
              if (mNtpThemeStateObserver == null) {
-@@ -676,7 +680,9 @@ public class ChromeBaseAppCompatActivity extends AppCompatActivity
+@@ -678,7 +682,9 @@ public class ChromeBaseAppCompatActivity extends AppCompatActivity
      // NightModeStateProvider.Observer implementation.
      @Override
      public void onNightModeStateChanged() {

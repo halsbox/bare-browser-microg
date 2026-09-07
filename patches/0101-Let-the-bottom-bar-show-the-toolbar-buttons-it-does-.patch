@@ -1,4 +1,4 @@
-From 5053967f668f95b5dcd18e2a69eca1a72999b867 Mon Sep 17 00:00:00 2001
+From 97255a07f422c69c1524627f5bdb5c5dd0eb7485 Mon Sep 17 00:00:00 2001
 From: Bare <57wsdx6b8d@privaterelay.appleid.com>
 Date: Fri, 28 Aug 2026 18:49:21 +0000
 Subject: [PATCH] Let the bottom bar show the toolbar buttons it does not have
@@ -77,6 +77,8 @@ way. The resolver, the rendering table and the adapter each get direct
 coverage: every stored arrangement resolving to three valid distinct actions,
 Home and the app menu keeping their own rendering while an ordinary action in
 the same position gets neither, and the model receiving a Drawable of its own.
+
+Migration note (8010.27): the mediator dispatches per resolved candidate, so the loop over the shared actions replaces the else branch of that dispatch. The two BottomBarMediatorUnitTest rewrites are dropped: upstream replaced both tests with per-candidate versions that never reach the incognito branch, so there is nothing left for the rewrite to assert against.
 ---
  chrome/android/chrome_java_sources.gni        |   2 +
  .../bare/BareButtonDataActionAdapter.java     | 212 +++++++++++++
@@ -95,15 +97,14 @@ the same position gets neither, and the model receiving a Drawable of its own.
  .../bottombar/BareToolbarLayoutUnitTest.java  | 282 ++++++++++++++++++
  .../ui/bottombar/BareToolbarPrefs.java        |  13 +-
  .../ui/bottombar/BottomBarCoordinator.java    | 123 +++-----
- .../BottomBarCoordinatorUnitTest.java         |  58 ++--
- .../ui/bottombar/BottomBarMediator.java       |  20 +-
- .../bottombar/BottomBarMediatorUnitTest.java  |  14 +-
+ .../BottomBarCoordinatorUnitTest.java         |  61 ++--
+ .../ui/bottombar/BottomBarMediator.java       |  19 +-
  .../ui/bottombar/BottomBarProperties.java     |  30 ++
  .../browser/ui/bottombar/BottomBarView.java   |  17 ++
  .../ui/bottombar/BottomBarViewBinder.java     |  31 +-
  .../BottomBarViewBinderUnitTest.java          |  68 +++--
  .../AdaptiveToolbarButtonController.java      |  12 +
- 25 files changed, 1592 insertions(+), 214 deletions(-)
+ 24 files changed, 1587 insertions(+), 207 deletions(-)
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapter.java
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareToolbarActionCatalogue.java
  create mode 100644 chrome/android/junit/src/org/chromium/chrome/browser/bare/BareButtonDataActionAdapterUnitTest.java
@@ -112,7 +113,7 @@ the same position gets neither, and the model receiving a Drawable of its own.
  create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayoutUnitTest.java
 
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index ddaf9410ae..99811d6743 100644
+index 4059eefd3a..aebe9532af 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
 @@ -219,6 +219,8 @@ chrome_java_sources = [
@@ -455,10 +456,10 @@ index 0000000000..813e156836
 +    }
 +}
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java
-index e3db0a7b8a..f6fe74aefa 100644
+index 6465694896..b285b25bad 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedRootUiCoordinator.java
-@@ -66,6 +66,7 @@ import org.chromium.chrome.browser.accessibility.PageZoomIphController;
+@@ -68,6 +68,7 @@ import org.chromium.chrome.browser.accessibility.PageZoomIphController;
  import org.chromium.chrome.browser.actor.ui.ActorOverlayCoordinator;
  import org.chromium.chrome.browser.app.tabwindow.TabWindowManagerSingleton;
  import org.chromium.chrome.browser.back_press.BackPressManager;
@@ -466,15 +467,15 @@ index e3db0a7b8a..f6fe74aefa 100644
  import org.chromium.chrome.browser.bookmarks.BookmarkManagerOpener;
  import org.chromium.chrome.browser.bookmarks.BookmarkManagerOpenerImpl;
  import org.chromium.chrome.browser.bookmarks.BookmarkModel;
-@@ -335,6 +336,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
-     private @Nullable PrefChangeRegistrar mPrefChangeRegistrar;
-     private @Nullable OnSharedPreferenceChangeListener mVerticalTabsPreferenceListener;
+@@ -334,6 +335,7 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
+     private @Nullable Callback<Boolean> mVerticalTabsActiveObserver;
+     private @Nullable PauseResumeWithNativeObserver mPendingUnsuppressTabStripObserver;
      private @Nullable TabbedSystemUiCoordinator mSystemUiCoordinator;
 +    private @Nullable BareToolbarActionCatalogue mBareToolbarActionCatalogue;
      private @Nullable TabGroupSyncController mTabGroupSyncController;
      private final OneshotSupplierImpl<TabGroupUiActionHandler> mTabGroupUiActionHandlerSupplier =
              new OneshotSupplierImpl<>();
-@@ -794,6 +796,10 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
+@@ -805,6 +807,10 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
      @Override
      @SuppressWarnings({"NullAway", "UseSharedPreferencesManagerFromChromeCheck"})
      public void onDestroy() {
@@ -485,7 +486,7 @@ index e3db0a7b8a..f6fe74aefa 100644
          if (mVerticalTabsPreferenceListener != null) {
              ContextUtils.getAppSharedPreferences()
                      .unregisterOnSharedPreferenceChangeListener(mVerticalTabsPreferenceListener);
-@@ -1053,6 +1059,18 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
+@@ -1055,6 +1061,18 @@ public class TabbedRootUiCoordinator extends RootUiCoordinator {
                  || VerticalTabUtils.isVerticalTabsEligible(mActivity)) {
              mToolbarManager.setSideUiStateProviderSupplier(mSideUiStateProviderSupplier);
          }
@@ -524,10 +525,10 @@ index 2337a3df2e..00b7beb7e9 100644
          return mAdaptiveToolbarButtonController;
      }
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ui/RootUiCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/ui/RootUiCoordinator.java
-index b383dd73f2..210011856d 100644
+index 7a5061ba01..022f135469 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ui/RootUiCoordinator.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ui/RootUiCoordinator.java
-@@ -181,6 +181,8 @@ import org.chromium.chrome.browser.theme.TopUiThemeColorProvider;
+@@ -184,6 +184,8 @@ import org.chromium.chrome.browser.theme.TopUiThemeColorProvider;
  import org.chromium.chrome.browser.toolbar.ToolbarIntentMetadata;
  import org.chromium.chrome.browser.toolbar.ToolbarManager;
  import org.chromium.chrome.browser.toolbar.adaptive.AdaptiveToolbarBehavior;
@@ -536,7 +537,7 @@ index b383dd73f2..210011856d 100644
  import org.chromium.chrome.browser.toolbar.menu_button.MenuButtonCoordinator.VisibilityDelegate;
  import org.chromium.chrome.browser.toolbar.top.ToolbarActionModeCallback;
  import org.chromium.chrome.browser.toolbar.top.ToolbarControlContainer;
-@@ -2866,6 +2868,17 @@ public class RootUiCoordinator
+@@ -2971,6 +2973,17 @@ public class RootUiCoordinator
          return mBottomControlsStacker;
      }
  
@@ -555,10 +556,10 @@ index b383dd73f2..210011856d 100644
          return mAdaptiveToolbarUiCoordinator;
      }
 diff --git a/chrome/android/junit/BUILD.gn b/chrome/android/junit/BUILD.gn
-index a7b47bd61e..227829c51c 100644
+index 3aab8ac3b7..d0839dcbb4 100644
 --- a/chrome/android/junit/BUILD.gn
 +++ b/chrome/android/junit/BUILD.gn
-@@ -429,6 +429,7 @@ if (is_android) {
+@@ -430,6 +430,7 @@ if (is_android) {
      sources = [
        "//chrome/android/java/src/org/chromium/chrome/browser/bottombar/BottomBarAppMenuUpdateBadgeControllerUnitTest.java",
        "//chrome/android/java/src/org/chromium/chrome/browser/bottombar/BottomBarContainerCoordinatorUnitTest.java",
@@ -839,10 +840,10 @@ index 0000000000..e525215b2b
 +    }
 +}
 diff --git a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
-index 1c341a1f5d..2064a652f2 100644
+index dd1311c13f..2f997bbf54 100644
 --- a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
 +++ b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
-@@ -23,6 +23,9 @@ import java.lang.annotation.Target;
+@@ -24,6 +24,9 @@ import java.lang.annotation.Target;
      ActionId.GLIC,
      ActionId.AI_MODE,
      ActionId.INCOGNITO,
@@ -852,7 +853,7 @@ index 1c341a1f5d..2064a652f2 100644
  })
  @Retention(RetentionPolicy.SOURCE)
  @Target(ElementType.TYPE_USE)
-@@ -36,4 +39,7 @@ public @interface ActionId {
+@@ -38,4 +41,7 @@ public @interface ActionId {
      int GLIC = 5;
      int AI_MODE = 6;
      int INCOGNITO = 7;
@@ -861,7 +862,7 @@ index 1c341a1f5d..2064a652f2 100644
 +    int BOOKMARK = 10;
  }
 diff --git a/chrome/browser/ui/android/bottombar/BUILD.gn b/chrome/browser/ui/android/bottombar/BUILD.gn
-index 4b6726fc0f..1cbfdcf1ad 100644
+index d23df434a7..5402bfd0cf 100644
 --- a/chrome/browser/ui/android/bottombar/BUILD.gn
 +++ b/chrome/browser/ui/android/bottombar/BUILD.gn
 @@ -60,6 +60,7 @@ android_library("java") {
@@ -872,7 +873,7 @@ index 4b6726fc0f..1cbfdcf1ad 100644
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayout.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java",
-@@ -128,6 +129,8 @@ robolectric_library("junit") {
+@@ -129,6 +130,8 @@ robolectric_library("junit") {
    sources = [
      "java/src/org/chromium/chrome/browser/ui/bottombar/AiModeActionCoordinatorUnitTest.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/AppMenuActionButtonBinderUnitTest.java",
@@ -1783,10 +1784,10 @@ index 87ba261f02..c5a1233689 100644
  
      private static String primaryKey(@BareToolbarSlot int slot) {
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
-index 2e7a75329b..c482975df4 100644
+index e9f3736c7d..a86eaa4169 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
 +++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
-@@ -19,12 +19,8 @@ import org.chromium.chrome.browser.layouts.LayoutStateProvider;
+@@ -20,12 +20,8 @@ import org.chromium.chrome.browser.layouts.LayoutStateProvider;
  import org.chromium.chrome.browser.profiles.Profile;
  import org.chromium.chrome.browser.tab.Tab;
  import org.chromium.chrome.browser.theme.ThemeColorProvider;
@@ -1799,7 +1800,7 @@ index 2e7a75329b..c482975df4 100644
  import org.chromium.chrome.browser.ui.bottombar.BottomBarButtonManager.ActionConfig;
  import org.chromium.chrome.browser.ui.bottombar.BottomBarHostManager.Host;
  import org.chromium.components.embedder_support.util.UrlUtilities;
-@@ -78,6 +74,13 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
+@@ -81,6 +77,13 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
          boolean shouldIncludeHomeButton = BottomBarConfigUtils.shouldIncludeHomeButtonIfEnabled();
          List<ActionConfig> configs = createActionConfigs(mView, shouldIncludeHomeButton);
  
@@ -1813,16 +1814,16 @@ index 2e7a75329b..c482975df4 100644
          mModel = new PropertyModel.Builder(BottomBarProperties.ALL_KEYS).build();
  
          mButtonManager =
-@@ -95,7 +98,7 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
+@@ -99,7 +102,7 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
                          tabSupplier,
                          homepageEnabledSupplier,
                          visibilityDelegate,
 -                        shouldIncludeHomeButton,
 +                        homeButtonPlaced,
                          profileSupplier,
+                         countrySupplier,
                          omniboxFocusStateSupplier,
-                         mPromoDialogCoordinator,
-@@ -107,84 +110,54 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
+@@ -112,84 +115,54 @@ public class BottomBarCoordinator implements BottomBar, Destroyable {
          mMcp = PropertyModelChangeProcessor.create(mModel, mView, BottomBarViewBinder::bind);
      }
  
@@ -1948,18 +1949,21 @@ index 2e7a75329b..c482975df4 100644
  
          return configs;
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinatorUnitTest.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinatorUnitTest.java
-index 1af648ac23..1b4c405a64 100644
+index 60432b30d1..52282fac3c 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinatorUnitTest.java
 +++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinatorUnitTest.java
-@@ -54,7 +54,6 @@ import org.chromium.chrome.browser.theme.ThemeColorProvider;
+@@ -54,9 +54,9 @@ import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
+ import org.chromium.chrome.browser.tab.Tab;
+ import org.chromium.chrome.browser.theme.ThemeColorProvider;
  import org.chromium.chrome.browser.ui.actions.ActionId;
++import org.chromium.chrome.browser.ui.actions.glic.GlicActionProperties;
  import org.chromium.chrome.browser.ui.actions.ActionProperties;
  import org.chromium.chrome.browser.ui.actions.ActionRegistry;
 -import org.chromium.chrome.browser.ui.actions.glic.GlicActionProperties;
  import org.chromium.chrome.browser.ui.theme.BrandedColorScheme;
  import org.chromium.components.feature_engagement.FeatureConstants;
  import org.chromium.components.feature_engagement.Tracker;
-@@ -101,6 +100,8 @@ public class BottomBarCoordinatorUnitTest {
+@@ -103,6 +103,8 @@ public class BottomBarCoordinatorUnitTest {
              ObservableSuppliers.createNullable();
      private final SettableNullableObservableSupplier<PropertyModel> mAiModeActionSupplier =
              ObservableSuppliers.createNullable();
@@ -1967,8 +1971,8 @@ index 1af648ac23..1b4c405a64 100644
 +            ObservableSuppliers.createNullable();
      private final SettableNullableObservableSupplier<Profile> mProfileSupplier =
              ObservableSuppliers.createNullable();
- 
-@@ -122,6 +123,7 @@ public class BottomBarCoordinatorUnitTest {
+     private OneshotSupplierImpl<String> mCountrySupplier;
+@@ -124,6 +126,7 @@ public class BottomBarCoordinatorUnitTest {
          when(mActionRegistry.get(ActionId.TAB_SWITCHER)).thenReturn(mTabSwitcherActionSupplier);
          when(mActionRegistry.get(ActionId.GLIC)).thenReturn(mGlicActionSupplier);
          when(mActionRegistry.get(ActionId.AI_MODE)).thenReturn(mAiModeActionSupplier);
@@ -1976,7 +1980,7 @@ index 1af648ac23..1b4c405a64 100644
  
          mActivityScenarioRule.getScenario().onActivity(this::onActivity);
      }
-@@ -219,51 +221,33 @@ public class BottomBarCoordinatorUnitTest {
+@@ -223,51 +226,37 @@ public class BottomBarCoordinatorUnitTest {
      }
  
      @Test
@@ -1984,8 +1988,17 @@ index 1af648ac23..1b4c405a64 100644
 -        GlicEnabling.Natives glicEnablingMock = mock(GlicEnabling.Natives.class);
 -        GlicEnablingJni.setInstanceForTesting(glicEnablingMock);
 -        when(glicEnablingMock.isEnabledForProfile(any())).thenReturn(true);
--        when(mProfile.getOriginalProfile()).thenReturn(mProfile);
--
++    public void testTheSpareSlotBindsTheActionItActuallyHolds() {
++        // This used to check that GLIC and AI Mode did not clobber each other in a container they
++        // shared. Neither is offered here and the container holds one action, so what is worth
++        // protecting now is that the action the bar resolved is the one that gets bound, and that
++        // its own long press survives.
++        //
++        // The mediator resolves the slot from the original profile, which a real profile always
++        // has; the mock has to be told.
+         when(mProfile.getOriginalProfile()).thenReturn(mProfile);
++        AtomicBoolean longClicked = new AtomicBoolean(false);
+ 
 -        AtomicBoolean glicLongClicked = new AtomicBoolean(false);
 -        AtomicBoolean aiModeLongClicked = new AtomicBoolean(false);
 -
@@ -1998,13 +2011,7 @@ index 1af648ac23..1b4c405a64 100644
 -                                ActionProperties.ON_LONG_PRESS_CALLBACK,
 -                                (v) -> glicLongClicked.set(true))
 -                        .build();
-+    public void testTheSpareSlotBindsTheActionItActuallyHolds() {
-+        // This used to check that GLIC and AI Mode did not clobber each other in a container they
-+        // shared. Neither is offered here and the container holds one action, so what is worth
-+        // protecting now is that the action the bar resolved is the one that gets bound, and that
-+        // its own long press survives.
-+        AtomicBoolean longClicked = new AtomicBoolean(false);
- 
+-
 -        PropertyModel aiModeModel =
 +        PropertyModel incognitoModel =
                  new PropertyModel.Builder(ActionProperties.BASE_KEYS)
@@ -2047,20 +2054,12 @@ index 1af648ac23..1b4c405a64 100644
  
      @Test
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
-index 2b5c853229..21b47b3f7b 100644
+index 869d76e694..cbf7287e12 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
 +++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
-@@ -290,10 +290,16 @@ public class BottomBarMediator
-         // Manage observers for dynamic updates.
-         updateObservers(originalProfile);
- 
-+        // Asked of the actions rather than of the position they used to occupy. Whether one of
-+        // these applies is a fact about the action, so it has to be answered wherever the user has
-+        // put it; asked of the slot instead, an action moved out of it was never shown at all, and
-+        // whatever moved in was judged by a rule that was never about it.
-+        //
-+        // An action that is not one of these is not asked. It is on the bar because the user put
-+        // it there, and it is made visible when the bar is built.
+@@ -306,9 +306,8 @@ public class BottomBarMediator
+         if (mDestroyed) return;
+         Profile profile = mProfileSupplier.get();
          if (profile == null) {
 -            for (@ActionId int action :
 -                    BareToolbarLayout.candidatesForSlot(BareToolbarSlot.EXTRA)) {
@@ -2070,74 +2069,27 @@ index 2b5c853229..21b47b3f7b 100644
              }
              return;
          }
-@@ -307,7 +313,6 @@ public class BottomBarMediator
-         BottomBarMetrics.recordGlicVisibilityDecisionTime(decisionDuration);
- 
-         boolean showGlic = eligibleAction == ActionId.GLIC;
--        boolean showAiMode = eligibleAction == ActionId.AI_MODE;
- 
-         if (showGlic && !mGlicWasVisible) {
-             mGlicAppearedTimeMs = SystemClock.uptimeMillis();
-@@ -319,11 +324,8 @@ public class BottomBarMediator
-         }
-         mGlicWasVisible = showGlic;
- 
--        // Each action the shared slot can hold is asked about, rather than the three that
--        // happened to exist being named one by one. Naming them was what left the slot empty for
--        // any other action however correctly it was registered, and it would have had to be
--        // extended again for every action the slot learns to hold.
--        for (@ActionId int action : BareToolbarLayout.candidatesForSlot(BareToolbarSlot.EXTRA)) {
-+        for (@ActionId int action : BareToolbarActionRendering.SHARED_SLOT_ACTIONS) {
-+            if (!BareToolbarLayout.isPlaced(action)) continue;
-             setButtonVisibility(action, action == eligibleAction);
-         }
-     }
-diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediatorUnitTest.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediatorUnitTest.java
-index 3128f1cc51..ef8ca05d3d 100644
---- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediatorUnitTest.java
-+++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediatorUnitTest.java
-@@ -614,7 +614,7 @@ public class BottomBarMediatorUnitTest {
-     }
- 
-     @Test
--    public void testDseChangedDynamically() {
-+    public void testDseChangedDynamically_ReResolvesTheSharedSlot() {
-         createMediator(/* shouldIncludeHomeButton= */ false);
- 
-         // Capture the registered TemplateUrlServiceObserver.
-@@ -622,9 +622,12 @@ public class BottomBarMediatorUnitTest {
-         TemplateUrlServiceObserver observer = mTemplateUrlObserverCaptor.getValue();
-         assertNotNull(observer);
- 
--        // Trigger the DSE change observer and verify it updates GLIC/fallback visibility.
-+        // The shared slot is re-resolved. Which action that touches is whichever of the shared
-+        // actions the bar is showing, not GLIC by name: naming it here was the same assumption
-+        // that stopped the slot holding anything else.
-         observer.onTemplateURLServiceChanged();
--        verify(mButtonManager, times(2)).setButtonVisibility(ActionId.GLIC, false);
-+        verify(mButtonManager, times(2)).setButtonVisibility(ActionId.INCOGNITO, true);
-+        verify(mButtonManager, never()).setButtonVisibility(ActionId.GLIC, false);
-     }
- 
-     @Test
-@@ -660,14 +663,15 @@ public class BottomBarMediatorUnitTest {
-     }
- 
-     @Test
--    public void testOnSharedPreferenceChanged_TogglesGlicVisibility() {
-+    public void testOnSharedPreferenceChanged_ReResolvesTheSharedSlot() {
-         createMediator(/* shouldIncludeHomeButton= */ false);
- 
-         assertNotNull(mMediator);
-         mMediator.onSharedPreferenceChanged(
-                 ContextUtils.getAppSharedPreferences(),
-                 ChromePreferenceKeys.BOTTOM_BAR_GLIC_BUTTON_ENABLED);
--        verify(mButtonManager, times(2)).setButtonVisibility(ActionId.GLIC, false);
-+        verify(mButtonManager, times(2)).setButtonVisibility(ActionId.INCOGNITO, true);
-+        verify(mButtonManager, never()).setButtonVisibility(ActionId.GLIC, false);
-     }
- 
-     private void createMediator(boolean shouldIncludeHomeButton) {
+@@ -352,11 +351,15 @@ public class BottomBarMediator
+         } else if (candidateExtraAction != null && candidateExtraAction == ActionId.AI_MODE) {
+             updateAiModeVisibility();
+         } else {
+-            // Each action the shared slot can hold is asked about, rather than the three that
+-            // happened to exist being named one by one. Naming them was what left the slot empty
+-            // for any other action however correctly it was registered, and it would have had to
+-            // be extended again for every action the slot learns to hold.
+-            for (@ActionId int action : BareToolbarLayout.candidatesForSlot(BareToolbarSlot.EXTRA)) {
++            // Asked of the actions rather than of the position they used to occupy. Whether one of
++            // these applies is a fact about the action, so it has to be answered wherever the user
++            // has put it; asked of the slot instead, an action moved out of it was never shown at
++            // all, and whatever moved in was judged by a rule that was never about it.
++            //
++            // An action that is not one of these is not asked. It is on the bar because the user
++            // put it there, and it is made visible when the bar is built.
++            for (@ActionId int action : BareToolbarActionRendering.SHARED_SLOT_ACTIONS) {
++                if (!BareToolbarLayout.isPlaced(action)) continue;
+                 setButtonVisibility(
+                         action, candidateExtraAction != null && action == candidateExtraAction);
+             }
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarProperties.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarProperties.java
 index 8d6bbbfeb0..17be3799c8 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarProperties.java

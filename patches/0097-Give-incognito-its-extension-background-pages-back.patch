@@ -1,4 +1,4 @@
-From dfcf70bf6b09650357316df996081213b260f170 Mon Sep 17 00:00:00 2001
+From 70a9dd2dc7d39bf9d79937c5c58952234ed75f70 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 26 Aug 2026 17:02:08 +0000
 Subject: [PATCH] Give incognito its extension background pages back

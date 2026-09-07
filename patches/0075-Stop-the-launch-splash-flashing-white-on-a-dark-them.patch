@@ -1,4 +1,4 @@
-From e3b315023d2d35d14ffb1a202031d715c58a4f79 Mon Sep 17 00:00:00 2001
+From da06c7ff7cf5332d34741ad51f5c010edf149960 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 22 Aug 2026 08:30:01 +0000
 Subject: [PATCH] Stop the launch splash flashing white on a dark theme

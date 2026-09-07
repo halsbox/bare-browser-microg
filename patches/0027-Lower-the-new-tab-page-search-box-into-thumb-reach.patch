@@ -1,4 +1,4 @@
-From 0ce5f4cfa7a215fdadf1aaf9990a558765b6afa5 Mon Sep 17 00:00:00 2001
+From 1821aedb8ebbc2a52a1df5f3f0249c74ae4f032b Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 18 Aug 2026 04:04:04 +0000
 Subject: [PATCH] Lower the new tab page search box into thumb reach
@@ -26,10 +26,10 @@ becoming the omnibox with the keyboard up.
  2 files changed, 48 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
-index 8bb1e655df..ac7095a213 100644
+index 9f0ffaf438..d6b2c7d150 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ntp/NewTabPageCoordinator.java
-@@ -893,8 +893,12 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
+@@ -910,8 +910,12 @@ public class NewTabPageCoordinator implements ModuleDelegateHost {
          }
  
          // Translate so that the search box is at the top, but only upwards.

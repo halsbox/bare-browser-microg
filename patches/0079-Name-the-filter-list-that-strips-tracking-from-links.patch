@@ -1,4 +1,4 @@
-From 7ec8f5a656831b2d3fef06ba894f2ad154c96531 Mon Sep 17 00:00:00 2001
+From 1e8f191a29633f8cd9a3aa9f874616d40eb87fde Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 22 Aug 2026 19:11:04 +0000
 Subject: [PATCH] Name the filter list that strips tracking from links
@@ -49,10 +49,10 @@ index b121452ff5..6120bc102a 100644
          android:key="can_make_payment"
          android:title="@string/can_make_payment_title"
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index f96817adaf..cc3a5f5a09 100644
+index 1bfe54f549..c6a430eca7 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -3044,6 +3044,12 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3050,6 +3050,12 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
        <message name="IDS_BARE_WELCOME_VALUE_UPDATE_MANUAL_REMIND" desc="Update setting: manual, with a weekly local reminder that uses no network." translateable="false">
          Manually, remind me weekly
        </message>

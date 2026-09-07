@@ -1,4 +1,4 @@
-From 0b7f4ec06fb67bbbb63e3ec21eb7f7d29b78c73d Mon Sep 17 00:00:00 2001
+From c44bada77ae3165e629159defe3c888ac75fc881 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 22 Aug 2026 05:52:11 +0000
 Subject: [PATCH] Make Google sign-in and sync unreachable
@@ -45,7 +45,7 @@ renaming.
  6 files changed, 51 insertions(+), 108 deletions(-)
 
 diff --git a/chrome/android/java/res/xml/main_preferences.xml b/chrome/android/java/res/xml/main_preferences.xml
-index e20dc531db..0d4a64ba52 100644
+index e9c82691cf..97007db310 100644
 --- a/chrome/android/java/res/xml/main_preferences.xml
 +++ b/chrome/android/java/res/xml/main_preferences.xml
 @@ -11,21 +11,6 @@ found in the LICENSE file.
@@ -156,7 +156,7 @@ index 3aae34cd07..ace65a5d95 100644
      public boolean onPreferenceChange(Preference preference, Object newValue) {
          String key = preference.getKey();
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index 454a4514d1..9a8d9737ab 100644
+index e7086b160e..c625c564de 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 @@ -376,37 +376,45 @@ public class MainSettings extends ChromeBaseSettingsFragment
@@ -235,10 +235,10 @@ index 454a4514d1..9a8d9737ab 100644
          cachePreferences();
          updateAutofillPreferences();
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsFragmentRegistry.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsFragmentRegistry.java
-index 038813fb09..768aa28165 100644
+index 11b718f277..73d6f07ee2 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsFragmentRegistry.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsFragmentRegistry.java
-@@ -41,8 +41,6 @@ import org.chromium.chrome.browser.search_engines.settings.SearchEngineSettings;
+@@ -45,8 +45,6 @@ import org.chromium.chrome.browser.search_engines.settings.SearchEngineSettings;
  import org.chromium.chrome.browser.search_engines.settings.SiteSearchSettings;
  import org.chromium.chrome.browser.settings.search.SearchResultsPreferenceFragment;
  import org.chromium.chrome.browser.ssl.HttpsFirstModeSettingsFragment;
@@ -247,7 +247,7 @@ index 038813fb09..768aa28165 100644
  import org.chromium.chrome.browser.tasks.tab_management.TabArchiveSettingsFragment;
  import org.chromium.chrome.browser.tasks.tab_management.TabsSettings;
  import org.chromium.chrome.browser.toolbar.adaptive.settings.AdaptiveToolbarSettingsFragment;
-@@ -87,8 +85,9 @@ public class SettingsFragmentRegistry {
+@@ -101,8 +99,9 @@ public class SettingsFragmentRegistry {
          //
          // TODO(crbug.com/542745585): Handle /account differently based on local state
          // since it's not a static page which is always available.
@@ -260,7 +260,7 @@ index 038813fb09..768aa28165 100644
          // Basics
          registerMapping("/search", SearchEngineSettings.class);
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsNavigationImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsNavigationImpl.java
-index b6b68e03ae..161d3b3a13 100644
+index fdb209902b..ae2b707a34 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsNavigationImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsNavigationImpl.java
 @@ -57,9 +57,6 @@ import org.chromium.chrome.browser.search_engines.settings.SearchEngineSettings;

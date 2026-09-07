@@ -1,4 +1,4 @@
-From 1c68ecc23e72adf316fb923859130a1b6928c47c Mon Sep 17 00:00:00 2001
+From 7f96e4bcd8219c0fe015f3a0e94e8ee9daa83732 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 18 Aug 2026 20:21:19 +0000
 Subject: [PATCH] Skip the first run experience

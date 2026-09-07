@@ -1,4 +1,4 @@
-From c7416560199eb5e01e18c2eec8bfd8a57df9c9f9 Mon Sep 17 00:00:00 2001
+From 9913358f73b75407a7b7f224319002f5ff7d6796 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Thu, 20 Aug 2026 06:39:35 +0000
 Subject: [PATCH] Use the Bare mark for the launcher icon
@@ -53,7 +53,7 @@ A tintable bitmap gives the same result without fighting the path arithmetic.
  create mode 100644 chrome/android/java/res_chromium_base/mipmap-xxxhdpi/layered_app_icon_monochrome.png
 
 diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
-index b0a896cd12..652377805f 100644
+index 9ee345c96f..c2ed6a95e7 100644
 --- a/chrome/android/BUILD.gn
 +++ b/chrome/android/BUILD.gn
 @@ -148,19 +148,24 @@ if (_is_default_toolchain) {
@@ -81,7 +81,7 @@ index b0a896cd12..652377805f 100644
        "java/res_chromium_base/values/channel_constants.xml",
      ]
    }
-@@ -1795,19 +1800,24 @@ if (_is_default_toolchain) {
+@@ -1798,19 +1803,24 @@ if (_is_default_toolchain) {
        "java/res_chromium_base/mipmap-hdpi/app_icon.png",
        "java/res_chromium_base/mipmap-hdpi/layered_app_icon.png",
        "java/res_chromium_base/mipmap-hdpi/layered_app_icon_background.png",

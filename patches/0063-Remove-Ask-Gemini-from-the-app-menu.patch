@@ -1,4 +1,4 @@
-From fa7ab6202f3784d9ac9a4f5fa6b27a2ac800cd7c Mon Sep 17 00:00:00 2001
+From 8edf46bf072048fe05c1e0dcf61cbc7675786956 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Thu, 20 Aug 2026 06:39:39 +0000
 Subject: [PATCH] Remove Ask Gemini from the app menu
@@ -12,10 +12,10 @@ none, is worse than showing it consistently.
  1 file changed, 8 insertions(+)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index 630653e4a3..c440f15eae 100644
+index e4548b2f1a..44df312983 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-@@ -1644,6 +1644,14 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -1646,6 +1646,14 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
      }
  
      private @Nullable ListItem maybeBuildOpenGlicItem(@Nullable Tab currentTab) {

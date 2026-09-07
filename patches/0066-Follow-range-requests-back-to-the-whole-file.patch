@@ -1,4 +1,4 @@
-From 622b3d1b1d4312a845891b9f48e70cd98ea7af70 Mon Sep 17 00:00:00 2001
+From f98b608711305b0ab110811e393b8a08a4a5cce7 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Thu, 20 Aug 2026 10:41:06 +0000
 Subject: [PATCH] Follow range requests back to the whole file
@@ -48,7 +48,7 @@ sheer number of them could push the video out of a list capped at 64.
  6 files changed, 250 insertions(+), 103 deletions(-)
 
 diff --git a/chrome/android/java/res/values/ids.xml b/chrome/android/java/res/values/ids.xml
-index a264fe0f50..735c5b4c1f 100644
+index 36c09cbf4d..4667c0b2e3 100644
 --- a/chrome/android/java/res/values/ids.xml
 +++ b/chrome/android/java/res/values/ids.xml
 @@ -140,6 +140,7 @@ found in the LICENSE file.

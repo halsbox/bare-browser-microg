@@ -1,4 +1,4 @@
-From e3815686f06a4781d22abfeea742e828d9304ed9 Mon Sep 17 00:00:00 2001
+From d0dc6ab25ea6fdb80d1887a2d401874112b1f785 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 23 Aug 2026 17:26:04 +0000
 Subject: [PATCH] Never show the welcome as a bare circle, and never bank
@@ -173,7 +173,7 @@ index bf22c06ca1..970d4c7fcc 100644
          whenProfileReady(
                  profile -> {
 diff --git a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
-index 685f782ed1..049236c662 100644
+index 51f578a6c7..7386fd9808 100644
 --- a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 +++ b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 @@ -425,6 +425,12 @@ public final class ChromePreferenceKeys {
@@ -189,7 +189,7 @@ index 685f782ed1..049236c662 100644
      public static final String DOWNLOAD_USE_EXTERNAL_DOWNLOAD_MANAGER =
              "Chrome.Download.UseExternalDownloadManager";
  
-@@ -1246,6 +1252,7 @@ public final class ChromePreferenceKeys {
+@@ -1244,6 +1250,7 @@ public final class ChromePreferenceKeys {
                  BARE_UPDATE_LAST_CHECK_MS,
                  BARE_UPDATE_LATEST_TAG,
                  BARE_UPDATE_MODE,

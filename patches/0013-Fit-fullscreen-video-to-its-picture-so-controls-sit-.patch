@@ -1,4 +1,4 @@
-From a9c2d8c6b250e6bf1a4a37daf24697eeceda1449 Mon Sep 17 00:00:00 2001
+From 31f13a67b9b0897e55564419eb1eae0fdf4886b3 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 16 Aug 2026 05:31:51 +0000
 Subject: [PATCH] Fit fullscreen video to its picture so controls sit on it

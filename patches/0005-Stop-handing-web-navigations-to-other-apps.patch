@@ -1,4 +1,4 @@
-From 57f1cbd7ddbabe96670312c1b56fb8ee5ee028c5 Mon Sep 17 00:00:00 2001
+From 1116fe06733fb94d4d6bee741bdef2d56a73196e Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 15 Aug 2026 21:20:52 +0000
 Subject: [PATCH] Stop handing web navigations to other apps

@@ -1,4 +1,4 @@
-From fa11d0488950d92db72dcbe4d72cbc4459667661 Mon Sep 17 00:00:00 2001
+From d8168f737dd83e9df4c206e1bd4e48f94d6396ba Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 16 Aug 2026 08:07:00 +0000
 Subject: [PATCH] Stop showing the new tab page sign-in card

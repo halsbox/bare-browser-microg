@@ -1,4 +1,4 @@
-From e9973c353e09300eeeea3c4aea7cdb256dd05c32 Mon Sep 17 00:00:00 2001
+From 3d1bfcd6a723e7265434541a3db571c21291254c Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 18 Aug 2026 17:30:50 +0000
 Subject: [PATCH] Remove the built-in Gemini and AI Mode search shortcuts

@@ -1,4 +1,4 @@
-From 448757fd53c0d21a5743c57826de976d282e6a3c Mon Sep 17 00:00:00 2001
+From 0d52a62d85fedd8b21fd3cb4b9d2479e97196661 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 25 Aug 2026 00:39:09 +0000
 Subject: [PATCH] Send the update row to the release it just found
@@ -50,10 +50,10 @@ index a47025fcf9..6e201bf72a 100644
      private static final long REMINDER_INTERVAL_MS = TimeUnit.DAYS.toMillis(7);
      private static final int TIMEOUT_MS = 15000;
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index 1abf32fcb4..18a302f3af 100644
+index 3bc126844e..cef12613db 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-@@ -653,6 +653,19 @@ public class MainSettings extends ChromeBaseSettingsFragment
+@@ -658,6 +658,19 @@ public class MainSettings extends ChromeBaseSettingsFragment
                  pref -> {
                      // Opening the row is acknowledgement, whether or not they go on to update.
                      BareUpdateCheck.clearBadge();

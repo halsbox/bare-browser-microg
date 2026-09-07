@@ -1,4 +1,4 @@
-From bce8c2275a2ebde832d811ae3eab69a64c497bea Mon Sep 17 00:00:00 2001
+From 10d388f1fbe3e5d9188013812e0450a06bd4d9ab Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 22 Aug 2026 15:43:08 +0000
 Subject: [PATCH] Keep the verbatim match the current page row needs
@@ -34,7 +34,7 @@ loaded page offers that page first, with share, copy and edit beside it.
  2 files changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/components/omnibox/browser/autocomplete_result.cc b/components/omnibox/browser/autocomplete_result.cc
-index accdc6dae0..6fb7f46bc7 100644
+index 36560aa999..8780ed38eb 100644
 --- a/components/omnibox/browser/autocomplete_result.cc
 +++ b/components/omnibox/browser/autocomplete_result.cc
 @@ -79,8 +79,13 @@ typedef AutocompleteMatchType ACMatchType;

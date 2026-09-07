@@ -1,4 +1,4 @@
-From 026a892bd17a74e4c3f6f175422a92681c5bed41 Mon Sep 17 00:00:00 2001
+From 5ae9af3f2e852d7d0c8ed4800a4a06c471e4e896 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Fri, 28 Aug 2026 17:29:13 +0000
 Subject: [PATCH] Give the bottom bar slots so its buttons can move later
@@ -29,6 +29,8 @@ its default rather than coming up empty.
 INCOGNITO was added to the ActionId constants without being added to the IntDef
 listing them, which the build only tolerates because static analysis is off
 here. No behaviour change.
+
+Migration note (8010.27): the mediator dispatches per resolved candidate now, so the loop over the shared slot candidates replaces the final else branch of that dispatch rather than the flat GLIC/AI Mode/Incognito lines this patch was written against.
 ---
  .../preferences/ChromePreferenceKeys.java     |   9 ++
  .../chrome/browser/ui/actions/ActionId.java   |   1 +
@@ -38,19 +40,19 @@ here. No behaviour change.
  .../ui/bottombar/BareToolbarLayout.java       |  54 +++++++++
  .../ui/bottombar/BareToolbarPrefs.java        |  83 +++++++++++++
  .../browser/ui/bottombar/BareToolbarSlot.java |  50 ++++++++
- .../ui/bottombar/BottomBarMediator.java       |  20 ++--
+ .../ui/bottombar/BottomBarMediator.java       |  25 ++--
  .../browser/ui/bottombar/BottomBarView.java   |  39 ++++---
- 10 files changed, 343 insertions(+), 28 deletions(-)
+ 10 files changed, 344 insertions(+), 32 deletions(-)
  create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarDefaults.java
  create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayout.java
  create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefs.java
  create mode 100644 chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarSlot.java
 
 diff --git a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
-index b6c462230a..f14f882bb2 100644
+index 7eab094e3c..c69642c41d 100644
 --- a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 +++ b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
-@@ -145,6 +145,14 @@ public final class ChromePreferenceKeys {
+@@ -141,6 +141,14 @@ public final class ChromePreferenceKeys {
      public static final String BOTTOM_BAR_GLIC_BUTTON_ENABLED =
              "Chrome.BottomBar.GlicButtonEnabled";
  
@@ -65,7 +67,7 @@ index b6c462230a..f14f882bb2 100644
      /** Whether Chrome is set as the default browser. Default value is false. */
      public static final String CHROME_DEFAULT_BROWSER = "applink.chrome_default_browser";
  
-@@ -1278,6 +1286,7 @@ public final class ChromePreferenceKeys {
+@@ -1276,6 +1284,7 @@ public final class ChromePreferenceKeys {
                  BOOKMARKS_SORT_ORDER,
                  BOOKMARKS_VISUALS_PREF,
                  BOTTOM_BAR_GLIC_BUTTON_ENABLED,
@@ -74,10 +76,10 @@ index b6c462230a..f14f882bb2 100644
                  CLIPBOARD_SHARED_URI_TIMESTAMP,
                  CLOUD_MANAGEMENT_CLIENT_ID,
 diff --git a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
-index 35791e6164..1c341a1f5d 100644
+index 2e0f7a46e5..dd1311c13f 100644
 --- a/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
 +++ b/chrome/browser/ui/android/actions/java/src/org/chromium/chrome/browser/ui/actions/ActionId.java
-@@ -22,6 +22,7 @@ import java.lang.annotation.Target;
+@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
      ActionId.NEW_TAB,
      ActionId.GLIC,
      ActionId.AI_MODE,
@@ -86,7 +88,7 @@ index 35791e6164..1c341a1f5d 100644
  @Retention(RetentionPolicy.SOURCE)
  @Target(ElementType.TYPE_USE)
 diff --git a/chrome/browser/ui/android/bottombar/BUILD.gn b/chrome/browser/ui/android/bottombar/BUILD.gn
-index aa7b892118..4b6726fc0f 100644
+index 88096dc11b..d23df434a7 100644
 --- a/chrome/browser/ui/android/bottombar/BUILD.gn
 +++ b/chrome/browser/ui/android/bottombar/BUILD.gn
 @@ -60,6 +60,10 @@ android_library("java") {
@@ -441,12 +443,12 @@ index 0000000000..60151e46c5
 +    int NONE = -1;
 +}
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
-index 374ae916da..2b5c853229 100644
+index 02018982e6..869d76e694 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
 +++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarMediator.java
-@@ -291,9 +291,10 @@ public class BottomBarMediator
-         updateObservers(originalProfile);
- 
+@@ -306,9 +306,10 @@ public class BottomBarMediator
+         if (mDestroyed) return;
+         Profile profile = mProfileSupplier.get();
          if (profile == null) {
 -            setButtonVisibility(ActionId.GLIC, false);
 -            setButtonVisibility(ActionId.AI_MODE, false);
@@ -458,26 +460,32 @@ index 374ae916da..2b5c853229 100644
              return;
          }
  
-@@ -318,12 +319,13 @@ public class BottomBarMediator
+@@ -350,17 +351,15 @@ public class BottomBarMediator
+             updateGlicVisibility(originalProfile);
+         } else if (candidateExtraAction != null && candidateExtraAction == ActionId.AI_MODE) {
+             updateAiModeVisibility();
+-        } else if (candidateExtraAction != null && candidateExtraAction == ActionId.INCOGNITO) {
+-            // De-Googled build: the incognito button shares this slot, so it needs asking about
+-            // too. Only GLIC and AI_MODE were considered here, which left the slot empty for any
+-            // other action however correctly it was registered.
+-            setButtonVisibility(ActionId.GLIC, /* visible= */ false);
+-            setButtonVisibility(ActionId.AI_MODE, /* visible= */ false);
+-            setButtonVisibility(ActionId.INCOGNITO, /* visible= */ true);
+         } else {
+-            setButtonVisibility(ActionId.GLIC, /* visible= */ false);
+-            setButtonVisibility(ActionId.AI_MODE, /* visible= */ false);
+-            setButtonVisibility(ActionId.INCOGNITO, /* visible= */ false);
++            // Each action the shared slot can hold is asked about, rather than the three that
++            // happened to exist being named one by one. Naming them was what left the slot empty
++            // for any other action however correctly it was registered, and it would have had to
++            // be extended again for every action the slot learns to hold.
++            for (@ActionId int action : BareToolbarLayout.candidatesForSlot(BareToolbarSlot.EXTRA)) {
++                setButtonVisibility(
++                        action, candidateExtraAction != null && action == candidateExtraAction);
++            }
          }
-         mGlicWasVisible = showGlic;
- 
--        setButtonVisibility(ActionId.GLIC, showGlic);
--        setButtonVisibility(ActionId.AI_MODE, showAiMode);
--        // De-Googled build: the incognito button shares this slot, so it needs asking about too.
--        // Only GLIC and AI_MODE were considered here, which left the slot empty for any other
--        // action however correctly it was registered.
--        setButtonVisibility(ActionId.INCOGNITO, eligibleAction == ActionId.INCOGNITO);
-+        // Each action the shared slot can hold is asked about, rather than the three that
-+        // happened to exist being named one by one. Naming them was what left the slot empty for
-+        // any other action however correctly it was registered, and it would have had to be
-+        // extended again for every action the slot learns to hold.
-+        for (@ActionId int action : BareToolbarLayout.candidatesForSlot(BareToolbarSlot.EXTRA)) {
-+            setButtonVisibility(action, action == eligibleAction);
-+        }
      }
  
-     private void updateObservers(@Nullable Profile originalProfile) {
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarView.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarView.java
 index e9f640c4e4..2bde67c5ac 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarView.java

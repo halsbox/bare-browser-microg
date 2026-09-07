@@ -1,4 +1,4 @@
-From b3709a53f6e371d4f4607be07f21449e9b54c5b5 Mon Sep 17 00:00:00 2001
+From 2aa11a401636c7ed762cfea8e8532db6ae01248c Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 23 Aug 2026 17:17:00 +0000
 Subject: [PATCH] Stop asking Google for a messaging token at every cold start

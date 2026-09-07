@@ -1,4 +1,4 @@
-From c3ca979281957621d910d4ddb7257d5cce34458f Mon Sep 17 00:00:00 2001
+From 201ba9e330d34576919018795f0b582f60f3d272 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Thu, 20 Aug 2026 06:39:36 +0000
 Subject: [PATCH] Offer the main settings on the welcome screen
@@ -45,10 +45,10 @@ before profile prefs exist.
  create mode 100644 chrome/android/java/res/values/bare_welcome_colors.xml
 
 diff --git a/chrome/android/chrome_java_resources.gni b/chrome/android/chrome_java_resources.gni
-index 448abd5498..65cd791587 100644
+index a1ed2e5758..a120889b25 100644
 --- a/chrome/android/chrome_java_resources.gni
 +++ b/chrome/android/chrome_java_resources.gni
-@@ -457,6 +457,12 @@ chrome_java_resources = [
+@@ -460,6 +460,12 @@ chrome_java_resources = [
    "java/res/layout/autofill_settings_home_profile_icon.xml",
    "java/res/layout/autofill_settings_local_profile_icon.xml",
    "java/res/layout/autofill_settings_work_profile_icon.xml",
@@ -964,7 +964,7 @@ index b8025e4e41..c95c75ec36 100644
    if (crx.empty()) {
      return prefs;
 diff --git a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
-index 5ed555756b..a639febc5f 100644
+index bf7560bb35..b395bed553 100644
 --- a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 +++ b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 @@ -399,6 +399,14 @@ public final class ChromePreferenceKeys {
@@ -982,9 +982,9 @@ index 5ed555756b..a639febc5f 100644
      public static final String DOWNLOAD_USE_EXTERNAL_DOWNLOAD_MANAGER =
              "Chrome.Download.UseExternalDownloadManager";
  
-@@ -1215,6 +1223,7 @@ public final class ChromePreferenceKeys {
-                 APPEARANCE_SETTINGS_CLICKED,
-                 APPEARANCE_SETTINGS_VIEW_COUNT,
+@@ -1213,6 +1221,7 @@ public final class ChromePreferenceKeys {
+                 AI_ASSISTANT_AVAILABILITY_CHECK_TIMESTAMP_MS,
+                 AI_ASSISTANT_WEB_SUMMARIZATION_AVAILABILITY,
                  AUTOFILL_ASSISTANT_FIRST_TIME_LITE_SCRIPT_USER,
 +                BARE_BUNDLED_AD_BLOCKER_ENABLED,
                  DOWNLOAD_EXTERNAL_MANAGER_PACKAGE,

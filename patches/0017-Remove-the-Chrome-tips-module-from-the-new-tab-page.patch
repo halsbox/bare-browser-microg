@@ -1,4 +1,4 @@
-From 154b14d9e9ed92a82f33e6b52df694056d6f82d5 Mon Sep 17 00:00:00 2001
+From ba911ce381f341554ac58941269c44e9905ee510 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 16 Aug 2026 08:07:01 +0000
 Subject: [PATCH] Remove the Chrome tips module from the new tab page

@@ -1,4 +1,4 @@
-From a987318c5dfbda8843e62bf9c9de1fd07209725f Mon Sep 17 00:00:00 2001
+From cb6a68bcdfc919c003d815e5165df3d4ce7ee7c1 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 23 Aug 2026 17:41:26 +0000
 Subject: [PATCH] Stop registering Firebase tokens for cloud policy nobody

@@ -1,4 +1,4 @@
-From 9799e42030f954594fa1d3f667b412d92b28bc25 Mon Sep 17 00:00:00 2001
+From 67203ec207211479f4eb678af8a70eb73cff2877 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 23 Aug 2026 17:13:36 +0000
 Subject: [PATCH] Stop advertising Safe Browsing, which has no handler in this
@@ -51,10 +51,10 @@ index 6120bc102a..6a08f65e80 100644
          android:key="password_leak_detection"
          android:title="@string/passwords_leak_detection_switch_title"
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsFragmentRegistry.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsFragmentRegistry.java
-index 768aa28165..46edd7ea54 100644
+index 73d6f07ee2..48fe2f20d1 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsFragmentRegistry.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsFragmentRegistry.java
-@@ -33,7 +33,6 @@ import org.chromium.chrome.browser.privacy.secure_dns.SecureDnsSettings;
+@@ -37,7 +37,6 @@ import org.chromium.chrome.browser.privacy.secure_dns.SecureDnsSettings;
  import org.chromium.chrome.browser.privacy.settings.DoNotTrackSettings;
  import org.chromium.chrome.browser.privacy.settings.PrivacySettings;
  import org.chromium.chrome.browser.safe_browsing.settings.EnhancedProtectionSettingsFragment;
@@ -62,7 +62,7 @@ index 768aa28165..46edd7ea54 100644
  import org.chromium.chrome.browser.safe_browsing.settings.StandardProtectionSettingsFragment;
  import org.chromium.chrome.browser.safety_check.SafetyCheckSettingsFragment;
  import org.chromium.chrome.browser.safety_hub.SafetyHubFragment;
-@@ -103,7 +102,7 @@ public class SettingsFragmentRegistry {
+@@ -117,7 +116,7 @@ public class SettingsFragmentRegistry {
          registerMapping("/preloadPages/extended", ExtendedPreloadingSettingsFragment.class);
  
          // Security
@@ -72,7 +72,7 @@ index 768aa28165..46edd7ea54 100644
          registerMapping("/safeBrowsing/standard", StandardProtectionSettingsFragment.class);
          registerMapping("/httpsFirstMode", HttpsFirstModeSettingsFragment.class);
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsNavigationImpl.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsNavigationImpl.java
-index 161d3b3a13..1625d5bd7e 100644
+index ae2b707a34..3069a60b23 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsNavigationImpl.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/SettingsNavigationImpl.java
 @@ -48,9 +48,6 @@ import org.chromium.chrome.browser.prefetch.settings.StandardPreloadingSettingsF

@@ -1,4 +1,4 @@
-From b6d7b3790d12e5f6181bf83cc3099b973318228a Mon Sep 17 00:00:00 2001
+From 4efd9a1dad7f1ced3fb4417d234bd62f130f9a04 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 20:32:34 +0000
 Subject: [PATCH] Ship uBlock Origin with the browser
@@ -49,10 +49,10 @@ the file.
  create mode 100644 chrome/browser/resources/bare/README.md
 
 diff --git a/chrome/android/BUILD.gn b/chrome/android/BUILD.gn
-index 5a610c924b..b0a896cd12 100644
+index 82c06267f0..9ee345c96f 100644
 --- a/chrome/android/BUILD.gn
 +++ b/chrome/android/BUILD.gn
-@@ -1832,6 +1832,7 @@ if (_is_default_toolchain) {
+@@ -1835,6 +1835,7 @@ if (_is_default_toolchain) {
    java_group("chrome_public_non_pak_assets") {
      deps = [
        "//chrome/android/webapk/libs/runtime_library:runtime_library_assets",
@@ -61,10 +61,10 @@ index 5a610c924b..b0a896cd12 100644
      ]
    }
 diff --git a/chrome/browser/extensions/BUILD.gn b/chrome/browser/extensions/BUILD.gn
-index f68557b740..fdfe2189a6 100644
+index 1046137d6a..2cb991ae14 100644
 --- a/chrome/browser/extensions/BUILD.gn
 +++ b/chrome/browser/extensions/BUILD.gn
-@@ -348,6 +348,8 @@ source_set("extensions") {
+@@ -346,6 +346,8 @@ source_set("extensions") {
      "external_policy_loader.h",
      "external_pref_loader.cc",
      "external_pref_loader.h",

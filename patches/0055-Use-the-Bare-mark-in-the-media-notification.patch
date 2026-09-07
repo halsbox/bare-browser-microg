@@ -1,4 +1,4 @@
-From 197c9eecda99d8ecbfbbb4f1752a41424979761d Mon Sep 17 00:00:00 2001
+From bd473ab5924bf51d3c45b3c0404e0623c0fef418 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 07:20:02 +0000
 Subject: [PATCH] Use the Bare mark in the media notification

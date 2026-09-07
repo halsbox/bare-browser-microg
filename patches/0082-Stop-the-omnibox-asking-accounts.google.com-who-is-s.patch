@@ -1,4 +1,4 @@
-From 683c3b3cf5528fa06830920a0e5105555de9051d Mon Sep 17 00:00:00 2001
+From 1a913ddeb8faf5bae13cb191cc951fdebd63449c Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 23 Aug 2026 17:17:00 +0000
 Subject: [PATCH] Stop the omnibox asking accounts.google.com who is signed in
@@ -17,7 +17,7 @@ is false and no request is needed to produce it.
  1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc b/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
-index 3e359e7be4..10290053fe 100644
+index 2728d68f84..766f3a3c0d 100644
 --- a/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
 +++ b/chrome/browser/autocomplete/chrome_autocomplete_provider_client.cc
 @@ -546,11 +546,14 @@ bool ChromeAutocompleteProviderClient::IsPersonalizedUrlDataCollectionActive()

@@ -1,4 +1,4 @@
-From 59c1253760a8ab6bac5c6896ed735356d98f216a Mon Sep 17 00:00:00 2001
+From 5dc5e4d946002b4a7d36b8a3fe56b8921f1f9ee2 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 20:12:02 +0000
 Subject: [PATCH] Keep Manifest V2 extensions working

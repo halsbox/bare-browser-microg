@@ -1,4 +1,4 @@
-From a80930a12c328c718258bc44a5da839fd80272fb Mon Sep 17 00:00:00 2001
+From e812896ed22c8e588fb43fb0cda6403d684653c3 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 25 Aug 2026 00:55:41 +0000
 Subject: [PATCH] Stop the bottom bar buttons reacting to a long press

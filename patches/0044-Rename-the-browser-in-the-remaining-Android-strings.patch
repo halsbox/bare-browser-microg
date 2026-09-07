@@ -1,4 +1,4 @@
-From 503137f5009ae5d362b977294a1d85cf7eb56c50 Mon Sep 17 00:00:00 2001
+From 2c71e97a0ae9df6f164984001d6ccf2bbc6b8e63 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 01:39:44 +0000
 Subject: [PATCH] Rename the browser in the remaining Android strings
@@ -49,7 +49,7 @@ other languages until retranslated. That is unavoidable in a rename.
  27 files changed, 338 insertions(+), 338 deletions(-)
 
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index 20c5512fb7..887d8fb0ff 100644
+index 0f61e716f2..739c7a7dd1 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
 @@ -308,10 +308,10 @@ CHAR_LIMIT guidelines:
@@ -191,7 +191,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
  
        <!-- Notifications preferences -->
-@@ -1097,7 +1097,7 @@ For example, some websites may respond to this request by showing you ads that a
+@@ -1100,7 +1100,7 @@ For example, some websites may respond to this request by showing you ads that a
          Delete history, cookies, site data, cache…
        </message>
        <message name="IDS_CLEAR_BROWSING_DATA_HISTORY_DIALOG_TITLE" desc="Title of a dialog that is shown after the deletion of browsing history finished.">
@@ -200,7 +200,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_CLEAR_BROWSING_DATA_HISTORY_DIALOG_DATA_TEXT" desc="Text of the dialog that is shown after the deletion of browsing history items finished, indicating that the selected data has been removed, but there may be other forms of browsing history still present in user's Google account.">
          The selected data has been removed from Chrome and your synced devices.
-@@ -1207,10 +1207,10 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1210,10 +1210,10 @@ Your Google account may have other forms of browsing history like searches and a
          Delete browsing data; select data to delete
        </message>
        <message name="IDS_OPEN_FULL_CHROME_HISTORY" desc="Title of the button that will open the full history in Chrome browser from CCT history page.">
@@ -213,7 +213,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_ANDROID_APP_HISTORY_OPEN_FULL_OTHER_FORMS" desc="The informational message at the top of the history page letting users know that app-specific history may be missing some entries, followed by the info on the other forms of browing history.">
          Some of your history might not show up here. To see all your Chrome history, open full Chrome history. Also, your Google Account may have other forms of browsing history at <ph name="BEGIN_LINK">&lt;link&gt;</ph>myactivity.google.com<ph name="END_LINK">&lt;/link&gt;</ph>.
-@@ -1219,7 +1219,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1222,7 +1222,7 @@ Your Google account may have other forms of browsing history like searches and a
          Your Google Account may have other forms of browsing history at <ph name="BEGIN_LINK">&lt;link&gt;</ph>myactivity.google.com<ph name="END_LINK">&lt;/link&gt;</ph>.
        </message>
        <message name="IDS_ANDROID_HISTORY_FROM_OTHER_APPS" desc="The notification at the top of the history page indicating that users will see the history from other apps that open links in Chrome.">
@@ -222,7 +222,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_ANDROID_HISTORY_FROM_OTHER_APPS_OTHER_FORMS_OF_HISTORY" desc="The notification at the top of the history page indicating that 1) users will see the history from other apps that open links in Chrome 2) deleting Chrome browsing history will not delete other forms of history stored at Google My Activity.">
          You may see the history from other apps that open links in Chrome. Your Google Account may have other forms of browsing history at <ph name="BEGIN_LINK">&lt;link&gt;</ph>myactivity.google.com<ph name="END_LINK">&lt;/link&gt;</ph>.
-@@ -1274,7 +1274,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1277,7 +1277,7 @@ Your Google account may have other forms of browsing history like searches and a
          URLs you visit are sent to Google to predict what sites you might visit next
        </message>
        <message name="IDS_PRIVACY_GUIDE_MSBB_ITEM_FOUR" desc="Fourth bullet point that describes the details of the MSBB toggle.">
@@ -231,7 +231,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_PRIVACY_GUIDE_HISTORY_SYNC_TOGGLE" desc="Title for the history sync toggle.">
          History sync
-@@ -1336,7 +1336,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1339,7 +1339,7 @@ Your Google account may have other forms of browsing history like searches and a
          Safety check
        </message>
        <message name="IDS_SAFETY_CHECK_DESCRIPTION" desc="Introduces the safety check categories to the user. Followed by several items, such as 'Safe Browsing', 'Updates', 'Passwords'.">
@@ -240,7 +240,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_CHECK_SAFE_BROWSING_TITLE" desc="Title for the Safe Browsing section.">
          Safe Browsing
-@@ -1383,22 +1383,22 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1386,22 +1386,22 @@ Your Google account may have other forms of browsing history like searches and a
          No saved passwords
        </message>
        <message name="IDS_SAFETY_CHECK_PASSWORDS_ERROR" desc="Text to display when the password check has an unknown error.">
@@ -268,7 +268,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_CHECK_TIMESTAMP_AFTER" desc="A message shown on the safety check page, explaining to the user that it ran a moment ago.">
          Checked just now
-@@ -1465,10 +1465,10 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1468,10 +1468,10 @@ Your Google account may have other forms of browsing history like searches and a
          Safety at a glance
        </message>
        <message name="IDS_SAFETY_HUB_SAFETY_TIPS_SECTION_HEADER" desc="Title for the user education section of Safety Hub. A series of entries that encourage the user to explore several safety related surfaces follows.">
@@ -281,7 +281,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_HUB_NOTIFICATIONS_RESET_ALL_BUTTON" desc="Text found on the primary button of the notifications module warning state. When clicked it will unsubscribe the user from all sites that send a lot of notifications.">
          Unsubscribe all
-@@ -1486,10 +1486,10 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1489,10 +1489,10 @@ Your Google account may have other forms of browsing history like searches and a
          <ph name="PERMISSION_1">%1$s<ex>Location</ex></ph>, <ph name="PERMISSION_2">%2$s<ex>Notifications</ex></ph>, and more <ph name="SEPARATOR">•</ph> Chrome removed these permissions because you haven’t visited recently
        </message>
        <message name="IDS_SAFETY_HUB_ABUSIVE_NOTIFICATION_PERMISSIONS_SUBLABEL" desc="Description text shown below a site name, when notification permissions were automatically revoked for that site.">
@@ -294,7 +294,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_HUB_NOTIFICATIONS_RESET_SNACKBAR" desc="Snackbar text displayed when the user clicks the Unsubscribe button for a site which sends a lot of notifications. Informs the user for which site the notifications were unsubscribed.">
         Unsubscribed from <ph name="SITE_NAME">%1$s<ex>https://example.com:443</ex></ph>. You'll be asked again on your next visit.
-@@ -1515,7 +1515,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1518,7 +1518,7 @@ Your Google account may have other forms of browsing history like searches and a
          Enhanced Safe Browsing is on
        </message>
        <message name="IDS_SAFETY_HUB_SAFE_BROWSING_ENHANCED_SUMMARY" desc="Summary for the Safe Browsing check row in the Safety Check page indicating that the user currently has the enhanced level of Safe Browsing enabled, which is Chrome's strongest security setting.">
@@ -303,7 +303,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_HUB_SAFE_BROWSING_ENHANCED_SUMMARY_MANAGED" desc="Summary for the Safe Browsing check row in the Safety Check page indicating that the organization of the user's account or device has turned on Enhanced level of Safe Browsing for the user, which is Chrome's strongest security setting.">
          Your organization turned on Enhanced Safe Browsing
-@@ -1575,16 +1575,16 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1578,16 +1578,16 @@ Your Google account may have other forms of browsing history like searches and a
          Automatically remove permissions
        </message>
        <message name="IDS_SAFETY_HUB_AUTOREVOCATION_TOGGLE_SUMMARY" desc="Subtitle for a setting located in the 'Site settings' page. It toggles the automatic revocation of unused site permissions.">
@@ -324,7 +324,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_HUB_SAFETY_TIPS_INCOGNITO_SUMMARY" desc="Subtitle for a entry in the Safety Hub user education section. The entry leads the user to a help center article about Incognito.">
          Incognito mode keeps your browsing private from others who use your device
-@@ -1593,7 +1593,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1596,7 +1596,7 @@ Your Google account may have other forms of browsing history like searches and a
          Safe Browsing
        </message>
        <message name="IDS_SAFETY_HUB_SAFETY_TIPS_SAFE_BROWSING_SUMMARY" desc="Subtitle for a entry in the Safety Hub user education section. The entry leads the user to a help center article about Safe Browsing.">
@@ -333,7 +333,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_HUB_SAFE_BROWSER_STATE_TITLE" desc="Title for the card at the very top of the Safety Check page, this card is only present if the browser is in an overall safe state.">
          Your browser looks good
-@@ -1617,22 +1617,22 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1620,22 +1620,22 @@ Your Google account may have other forms of browsing history like searches and a
          No saved passwords
        </message>
        <message name="IDS_SAFETY_HUB_NO_PASSWORDS_SUMMARY" desc="Summary for the password check row in the Safety Check page indicating that the user has no passwords saved and that Safety check will start checking for breached passwords when they save them.">
@@ -360,7 +360,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_HUB_NOTIFICATIONS_REVIEW_WARNING_SUMMARY" desc="Summary for the notifications module in the Safety Hub dashboard. It is displayed when the user has some notification permissions that need to be reviewed.">
          {NUM_SITES, plural,
-@@ -1640,7 +1640,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1643,7 +1643,7 @@ Your Google account may have other forms of browsing history like searches and a
          other {You can stop these sites from sending future notifications}}
        </message>
        <message name="IDS_SAFETY_HUB_PERMISSIONS_OK_SUMMARY" desc="Summary for the permissions module in the Safety Hub dashboard. It is displayed when the user has no automatically revoked permissions that need to be reviewed.">
@@ -369,7 +369,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_HUB_PERMISSIONS_WARNING_SUMMARY" desc="Text shown as a header at the very top of the Safety Hub permissions review subpage, or as a summary in the permissions review dashboard module. Further educates the user about why their permissions were revoked.">
          To help keep you safe, permissions were removed from some sites
-@@ -1688,13 +1688,13 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1691,13 +1691,13 @@ Your Google account may have other forms of browsing history like searches and a
        </message>
        <message name="IDS_SAFETY_HUB_WEAK_PASSWORDS_SUMMARY" desc="Summary for the password hub row in the Safety Check page indicating that the checkup found weak passwords and that the user should improve them.">
          {NUM_PASSWORDS, plural,
@@ -387,7 +387,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
         <message name="IDS_SAFETY_HUB_UNSUBSCRIBED_DISRUPTIVE_AND_SUSPICIOUS_NOTIFICATIONS_NOTIFICATION_TITLE_SINGULAR" desc="Title for the notification sent from Safety Hub for telling the user that the site's notifications have been unsubscribed.">
          Unsubscribed from <ph name="DOMAIN">%1$s<ex>example.com</ex></ph>
-@@ -1703,17 +1703,17 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1706,17 +1706,17 @@ Your Google account may have other forms of browsing history like searches and a
          Unsubscribed from <ph name="COUNT">%1$d<ex>2</ex></ph> sites
        </message>
        <message name="IDS_SAFETY_HUB_UNSUBSCRIBED_DISRUPTIVE_AND_SUSPICIOUS_NOTIFICATIONS_NOTIFICATION_MESSAGE" desc="Message for the notification sent from Safety Hub for telling the user that some notifications have been unsubscribed, due to disruptive and suspicious content." meaning="This message informs about notification permissions having been revoked from one or more sites and explains that the user can review and manage [those notification permission revocations] by either clicking on this message or on the Review button below it.">
@@ -410,7 +410,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_HUB_UNSUBSCRIBED_NOTIFICATIONS_NOTIFICATION_REVIEW" desc="Button to review revoked notifications on the notification sent from Safety Hub for telling the user that some notifications have been unsubscribed.">
          Review
-@@ -1786,7 +1786,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1789,7 +1789,7 @@ Your Google account may have other forms of browsing history like searches and a
          Doesn’t noticeably slow down your browser or device.
        </message>
        <message name="IDS_SAFE_BROWSING_ENHANCED_PROTECTION_LEARN_MORE_LABEL" desc="The text for a link to a help center article that gives more information about Safe Browsing.">
@@ -419,7 +419,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
  
        <!-- History App filter -->
-@@ -1869,7 +1869,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1872,7 +1872,7 @@ Your Google account may have other forms of browsing history like searches and a
          Offer to translate
        </message>
        <message name="IDS_LANGUAGES_SRP_TITLE" desc="Title of the dialog that explicitly asks the user what language they want Chrome on Android to be in.">
@@ -428,7 +428,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_LANGUAGES_SRP_SUBTITLE" desc="Subtitle warning a user that the language of their keyboard will not change if they change the application language of Chrome on Android.">
          Your keyboard won’t change
-@@ -1893,7 +1893,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -1896,7 +1896,7 @@ Your Google account may have other forms of browsing history like searches and a
          <ph name="LANG">%1$s<ex>Hindi</ex></ph> is ready
        </message>
        <message name="IDS_LANGUAGES_SNACKBAR_RESTART" desc="The clickable link letting the user know they can click to restart Chrome. [CHAR_LIMIT=32]">
@@ -437,7 +437,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_LANGUAGES_SETTINGS_TRANSLATION_TITLE" desc="Title of Language settings section to control translation preferences. [CHAR_LIMIT=32]">
          Translation settings
-@@ -2152,7 +2152,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -2155,7 +2155,7 @@ Your Google account may have other forms of browsing history like searches and a
          Learn more
        </message>
        <message name="IDS_DOWNLOAD_WARNING_BYPASS_DIALOG_ACTION_LEARN_MORE_ACCESSIBILITY_DESCRIPTION" desc="Accessibility description for the button to open a help page about download warnings.">
@@ -446,7 +446,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
  
        <!-- Download Home dangerous warning -->
-@@ -2189,7 +2189,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -2192,7 +2192,7 @@ Your Google account may have other forms of browsing history like searches and a
          Operating system
        </message>
        <message name="IDS_DEPRECATION_WARNING" desc="Warning about Chrome updates no longer being supported">
@@ -455,16 +455,16 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
  
        <!-- Account management UI strings. -->
-@@ -2197,7 +2197,7 @@ Your Google account may have other forms of browsing history like searches and a
+@@ -2200,7 +2200,7 @@ Your Google account may have other forms of browsing history like searches and a
          Signed in to Google as
        </message>
        <message name="IDS_ACCOUNT_MANAGEMENT_SIGN_OUT" desc="Button text for signing out of Chrome">
 -        Sign out of Chrome
 +        Sign out of Bare
        </message>
- 
-       <!-- Child accounts -->
-@@ -2288,7 +2288,7 @@ Your Google account may have other forms of browsing history like searches and a
+       <message name="IDS_MANAGE_SYNC_SETTINGS_SIGN_OUT_OF_CHROME" desc="Button text for signing out of Chrome on the manage sync settings screen">
+         Sign out of Chrome
+@@ -2294,7 +2294,7 @@ Your Google account may have other forms of browsing history like searches and a
          Some of your Chrome data hasn\u2019t been saved in your Google Account yet.\nTry waiting a few minutes before signing out. If you sign out now, this data will be deleted.
        </message>
        <message name="IDS_SIGN_OUT_TITLE" desc="The text is displayed as the title of a dialog to confirm if the user wants to sign out of Chrome. The user can cancel and stay signed in, or confirm and sign out.">
@@ -473,7 +473,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SIGN_OUT_MESSAGE" desc="Body of a dialog that is shown when the user starts to sign out. This string precedes the confirmation button 'Sign Out'. If the user chooses to continue to sign out, then the data in their Google Account (such as bookmarks, passwords, history, settings, and more) won't be available on their device. If they sign back in to their Google Account, their data will come back. The tone should be helpful and instructive.">
          After you sign out, your bookmarks, passwords, and more in your Google Account will be removed from this device.
-@@ -2610,7 +2610,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -2616,7 +2616,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Enter your passphrase
        </message>
        <message name="IDS_IDENTITY_ERROR_MESSAGE_TITLE_CLIENT_OUT_OF_DATE" desc="Error message/notification title for client out-of-date error.">
@@ -482,7 +482,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_IDENTITY_ERROR_MESSAGE_BUTTON_PASSPHRASE_REQUIRED" meaning="An on-screen button that opens the dialog for the user to enter a custom passphrase" desc="Error message button label for passphrase required error.">
          Enter
-@@ -2793,7 +2793,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -2799,7 +2799,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Runtime permission strings -->
        <message name="IDS_MISSING_STORAGE_PERMISSION_DOWNLOAD_EDUCATION_TEXT" desc="Text shown educating the user that Chrome is missing the Android storage permission, which is required to download files.">
@@ -491,7 +491,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
  
        <!-- ContextMenu -->
-@@ -2969,10 +2969,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -2975,10 +2975,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Exit Picture in Picture
        </message>
        <message name="IDS_CONTEXTMENU_OPEN_IN_NEW_CHROME_TAB" desc="Context sensitive menu item to open the selected link in a new Chrome tab from Chrome Custom Tab. [CHAR_LIMIT=30]">
@@ -504,7 +504,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_CONTEXTMENU_OPEN_IN_CHROME_INCOGNITO_TAB" desc="Context sensitive menu item to open the selected link in a Chrome Incognito tab from Chrome Custom Tab. [CHAR_LIMIT=30]">
          Open in Incognito tab
-@@ -3126,7 +3126,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3132,7 +3132,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Can't launch dialog. -->
        <message name="IDS_UPDATE_NEEDED" desc="The help message is displayed on launch if an update is required to function.">
@@ -513,7 +513,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
  
        <!-- Web Notifications API -->
-@@ -3414,7 +3414,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3420,7 +3420,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          No search results found
        </message>
        <message name="IDS_HISTORY_MANAGER_EMPTY_STATE_VIEW_OR_OPEN_MORE_HISTORY" desc="Indicates that users can search something else or open more history">
@@ -522,7 +522,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_HISTORY_MANAGER_SEARCH" desc="Placeholder text for the input field that allows users to search browsing history.">
          Search your history
-@@ -3437,10 +3437,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3443,10 +3443,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Close all Incognito tabs
        </message>
        <message name="IDS_HISTORY_OPEN_IN_CHROME" desc="App-specific history selection men item to open the selected link in Chrome. [CHAR_LIMIT=30]">
@@ -535,7 +535,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
  
        <!-- Incognito reauthentication page -->
-@@ -3453,10 +3453,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3459,10 +3459,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Incognito reauthentication promo card -->
       <message name ="IDS_INCOGNITO_REAUTH_PROMO_TITLE" desc="The title of the incognito re-auth promo card.">
@@ -548,7 +548,7 @@ index 20c5512fb7..887d8fb0ff 100644
       </message>
       <message name ="IDS_INCOGNITO_REAUTH_PROMO_DESCRIPTION" desc="The description of the incognito re-auth promo card.">
         Use screen lock to see open Incognito tabs
-@@ -3468,7 +3468,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3474,7 +3474,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
         Turn on Incognito lock
       </message>
       <message name ="IDS_INCOGNITO_REAUTH_SNACKBAR_TEXT" desc="The label of the snackbar notification which appears after the incognito re-authentication is turned on from the promo card shown inside the Incognito grid tab switcher.">
@@ -557,7 +557,7 @@ index 20c5512fb7..887d8fb0ff 100644
       </message>
  
        <!-- Autofill/Wallet integration prompt -->
-@@ -3484,13 +3484,13 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3490,13 +3490,13 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- First Run strings -->
        <message name="IDS_FRE_ACTIVITY_LABEL" desc="Label for first run dialog in Android Recents.">
@@ -573,7 +573,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SAFETY_FRE_PROMO_START_BROWSING_BUTTON" desc="Text on the button to start browsing from the Safety Promo screen of the First Run Experience.">
          Start browsing
-@@ -3529,7 +3529,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3562,7 +3562,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Accept &amp; continue
        </message>
        <message name="IDS_FRE_WELCOME" desc="Text for greeting the user on Chrome First Run">
@@ -582,7 +582,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_FRE_BROWSER_MANAGED_BY_ORGANIZATION" desc="Text that indicates the browser is managed by policy">
          Your browser is managed by your organization
-@@ -3555,13 +3555,13 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3588,13 +3588,13 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Manage usage and crash data settings
        </message>
        <message name="IDS_SIGNIN_FRE_UMA_DIALOG_TITLE" desc="Title of the dialog where users can change their Chrome metric sharing settings, like usage data. This appears when they open the Chrome app for the first time on their phone.">
@@ -598,7 +598,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SIGNIN_FRE_UMA_DIALOG_SECOND_SECTION_HEADER" desc="Header of the section with info about the data that users share with Google if they turn on the metric sharing option.">
          Things to consider
-@@ -3570,7 +3570,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3603,7 +3603,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Info is sent to Google about your Chrome usage, but it isn\u2019t tied to you\n\nIf Chrome crashes, details about the crash may include some personal info\n\nIf you sync your history to your Google Account, metrics may also include info about URLs you visit
        </message>
        <message name="IDS_SIGNIN_FRE_TITLE" desc="This string is the the title of a promotion about signing in to Chrome with the user's Google Account. It explains the overarching user benefit of signing in (access to bookmarks, passwords, history, settings, etc.). We want users to understand why signing in is beneficial, and click 'Continue as name' to sign in to their Google Account. The tone should be informative and lightweight.">
@@ -607,7 +607,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SIGNIN_FRE_SUBTITLE" desc="This string is the body of a promotion about signing in to Chrome with the user's Google Account. It explains the overarching user benefit of signing in (access to bookmarks, passwords, history, settings, etc.). We want users to understand why signing in is beneficial, and click 'Continue as name' to sign in to their Google Account. The tone should be informative and lightweight.">
          Sign in to get your bookmarks, passwords, and more on all your devices
-@@ -3656,7 +3656,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3686,7 +3686,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Continue without a car profile lock?
        </message>
        <message name="IDS_MISSING_DEVICE_LOCK_DESCRIPTION" desc="Text description explaining that a profile lock is required on automotive devices, and that sensitive personal data will be deleted from the profile if the user continues to Chrome without re-creating a profile lock.">
@@ -616,7 +616,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_MISSING_DEVICE_LOCK_REMOVE_LOCAL_DATA" desc="Option given to the user to delete all Chrome profile data, particularly mentioning bookmarks and history.">
          Also delete bookmarks, history, and more from this car
-@@ -3783,7 +3783,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3858,7 +3858,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Strings for Seamless Sign-in -->
        <message name="IDS_SIGNIN_PROMO_TITLE_NTP_SIGN_IN_AS_BUTTON" desc="This string is the headline of a card that appears when the user visits Chrome's new tab page; the user isn't signed in to Chrome. The line below this string is ether 'To get your passwords and more on all your devices, sign in to Chrome' or 'To get your passwords and more on all your devices, sign in to Chrome as john.doe@example.com'.">
@@ -625,7 +625,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_SIGNIN_PROMO_DESCRIPTION_NTP_GROUP1" desc="This string is the body of a message promotion about signing in to Chrome with the user's Google Account. It explains the overarching user benefit of signing in (access to passwords, etc.). We want users to understand why signing in is beneficial, and click 'Continue as John' to sign in to their Google Account. The tone should be informative and lightweight.">
          To get your passwords and more on all your devices, sign in as <ph name="EMAIL">%1$s<ex>john.doe@example.com</ex></ph>
-@@ -3900,7 +3900,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3975,7 +3975,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
        </message>
  
        <message name="IDS_EXTERNAL_APP_RESTRICTED_ACCESS_ERROR" desc="A message shown to the user if Chrome receives a file view request to something Chrome does not have access to view.">
@@ -634,7 +634,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
  
        <!-- New Tab Page strings -->
-@@ -4087,7 +4087,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4162,7 +4162,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Collapse to side view
        </message>
        <message name="IDS_CUSTOM_TAB_HISTORY_IPH_BUBBLE_TEXT" desc="The message on the text bubble shown to educate the user about history in CCTs.">
@@ -643,7 +643,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_CUSTOM_TAB_MINIMIZE" desc="The accessibility text for minimize button for custom tabs.">
          Minimize tab
-@@ -4179,13 +4179,13 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4254,13 +4254,13 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Main menu items -->
        <message name="IDS_MENU_UPDATE" desc="Menu item for updating chrome. [CHAR_LIMIT=24]">
@@ -659,7 +659,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_MENU_UPDATE_UNSUPPORTED_SUMMARY_DEFAULT" desc="Summary string for update menu item explaining that the Android version on the device is unsupported. [CHAR_LIMIT=30]">
          Android version is unsupported
-@@ -4331,7 +4331,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4409,7 +4409,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Visit Chrome Web Store
        </message>
        <message name="IDS_CHROME_HISTORY" desc="Menu item for opening the CCT history page. [CHAR_LIMIT=27]">
@@ -668,7 +668,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_MENU_PASSWORDS_AND_AUTOFILL" desc="Menu item for showing menus related to passwords and autofill. [CHAR_LIMIT=27]">
          Passwords and autofill
-@@ -4397,7 +4397,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4475,7 +4475,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Customize new tab page
        </message>
        <message name="IDS_MENU_CUSTOMIZE_CHROME" desc="Option in item menu. User can click the 'Customize new tab page' option to open the 'Customize your new tab page' bottom sheet. [CHAR_LIMIT=27]">
@@ -677,7 +677,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_MENU_LISTEN_TO_FEED" desc="Menu item for listening to the feed. [CHAR_LIMIT=27]">
          Listen to the feed
-@@ -4821,8 +4821,8 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4899,8 +4899,8 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <message name="IDS_OFFLINE_PAGES_AUTO_FETCH_IN_PROGRESS_NOTIFICATION_TEXT" desc="Text inside a notification explaining that one or more pages will be fetched when the device is online. [ICU Syntax]">
          {NUM_IN_PROGRESS, plural,
@@ -688,7 +688,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
  
        <message name="IDS_OFFLINE_PAGES_AUTO_FETCH_READY_NOTIFICATION_TEXT" desc="Text inside a notification explaining that the page has been fetched and is ready to view. This is the subtext of the notification and appars below the web page title. When the notification is tapped, the page is opened in Chrome.">
-@@ -4876,13 +4876,13 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4954,13 +4954,13 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Tab opened in background.
        </message>
        <message name="IDS_MENU_OPEN_IN_CHROME" desc="Context sensitive menu item for opening a link in Chrome. [CHAR_LIMIT=30]">
@@ -704,7 +704,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_MENU_OPEN_IN_PRODUCT" desc="App menu item for opening link in the browser. [CHAR_LIMIT=40]">
          Open in <ph name="PRODUCT_NAME">%1$s<ex>Chrome</ex></ph> browser
-@@ -4911,7 +4911,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4989,7 +4989,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Chrome survey -->
        <message name="IDS_CHROME_SURVEY_MESSAGE_TITLE" desc="Message shown that invites the user to take a survey about Chrome. 'Help' and 'improve' are imperative verbs.">
@@ -713,7 +713,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_CHROME_SURVEY_MESSAGE_BUTTON" desc="The label for the button to open a survey for Chrome.">
          Take survey
-@@ -4925,7 +4925,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5003,7 +5003,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Update settings
        </message>
        <message name="IDS_RDS_WINDOW_SETTING_MESSAGE_TITLE" desc="Title of the message shown after window setting changes the page layout from desktop to mobile.">
@@ -722,7 +722,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_RDS_WINDOW_SETTING_MESSAGE_BUTTON" desc="Text on the button allowing users to manage the setting.">
          Go to Settings
-@@ -4997,7 +4997,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5072,7 +5072,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Update available. More options
        </message>
        <message name="IDS_ACCESSIBILITY_TOOLBAR_BTN_MENU_OS_VERSION_UNSUPPORTED" desc="Content description for the menu button when it is covered by the warning icon that is displayed when the current Android OS version is unsupported.">
@@ -731,7 +731,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_ACCESSIBILITY_TOOLBAR_BTN_MIC" desc="Content description for the voice search button.">
          Start voice search
-@@ -5553,7 +5553,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5628,7 +5628,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- MultiWindow -->
        <message name="IDS_UNSUPPORTED_NUMBER_OF_WINDOWS" desc="Popup message for when the user has tried to start too many concurrent versions of Chrome.">
@@ -740,7 +740,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_MAX_NUMBER_OF_WINDOWS_INSTANCE_SWITCHER_ACTIVE_TAB" desc="Message to notify the user that a new window cannot be created because the total number of persisted instances exceeds the window limit.">
          To open a new window, reduce the total number of active windows to <ph name="MAX_WINDOW_COUNT_MINUS_ONE">%1$d</ph> or fewer.
-@@ -5565,7 +5565,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5640,7 +5640,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Restore windows?
        </message>
        <message name="IDS_CRASH_RECOVERY_DIALOG_MESSAGE" desc="Message on the crash recovery dialog that prompts the user to restore windows that were active during a crash.">
@@ -749,7 +749,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_CRASH_RECOVERY_DIALOG_POSITIVE_BUTTON_TEXT" desc="Positive button text on the crash recovery dialog.">
          Restore windows
-@@ -5672,7 +5672,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5747,7 +5747,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
           Google <ph name="APP_NAME">%1$s<ex>Chrome</ex></ph> storage
        </message>
        <message name="IDS_STORAGE_MANAGEMENT_UNIMPORTANT_SITE_DATA_DESCRIPTION" desc="Text to describe the data stored by unimportant or infrequent sites.">
@@ -758,7 +758,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_STORAGE_MANAGEMENT_UNIMPORTANT_SITE_DATA_SIZE_LABEL" desc="Label for the data usage of site data for unimportant sites (followed by a number of megabytes). [CHAR_LIMIT=30]">
          Unimportant data
-@@ -5681,7 +5681,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5756,7 +5756,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Free up space
        </message>
        <message name="IDS_STORAGE_MANAGEMENT_CLEAR_UNIMPORTANT_DIALOG_TEXT" desc="Text of the clear unimportant site data dialog in the storage UI.">
@@ -767,7 +767,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_STORAGE_MANAGEMENT_SITE_DATA_DESCRIPTION" desc="Text to describe the data stored on the device by websites.">
          All data stored by sites, including cookies and other locally stored data
-@@ -5744,7 +5744,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5819,7 +5819,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Search with Sogou
        </message>
        <message name="IDS_SOGOU_EXPLANATION" desc="Text explaining why Sogou should be used as default search engine.">
@@ -776,7 +776,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_KEEP_GOOGLE" desc="Text representing the option that the user wants to keep Google as the default search engine.">
          Keep Google
-@@ -5766,7 +5766,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5841,7 +5841,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          More app info
        </message>
        <message name="IDS_TWA_RUNNING_IN_CHROME" desc="Message on a snackbar indicating that the current Activity may use Chrome data (the rest of the app may not be).">
@@ -785,7 +785,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_TWA_RUNNING_IN_CHROME_TEMPLATE" desc="Message template that used to indicating that the current Activity may use Chrome data (the rest of the app may not be). [CHAR_LIMIT=32]">
          Running in <ph name="APP_NAME">%1$s<ex>Chromium</ex></ph>
-@@ -5778,7 +5778,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5853,7 +5853,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          <ph name="APP_NAME">%1$s<ex>YouTube</ex></ph> also has data in Chrome
        </message>
        <message name="IDS_TWA_CLEAR_DATA_DIALOG_MESSAGE" desc="Message of the delete data dialog">
@@ -794,7 +794,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_TWA_CLEAR_DATA_DIALOG_KEEP_DATA" desc="Text on the negative button of the clear data dialog">
          Keep Data
-@@ -5832,7 +5832,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5907,7 +5907,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Tab navigation shortcuts
        </message>
        <message name="IDS_KEYBOARD_SHORTCUT_OPEN_MENU" desc="A text label that appears next to a keyboard shortcut that opens the overflow menu in Chrome. The shortcut description is shown in a system dialog along with all other supported shortcuts. [CHAR_LIMIT=55]">
@@ -803,7 +803,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_KEYBOARD_SHORTCUT_NEXT_TAB" desc="A text label that appears next to the keyboard shortcut that will move the user to the next tab in the Chrome app. The shortcut description is shown in a system dialog along with all other supported shortcuts. [CHAR_LIMIT=55]">
          Jump to the next tab
-@@ -5906,7 +5906,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5981,7 +5981,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Reload the current page, ignoring cached content
        </message>
        <message name="IDS_KEYBOARD_SHORTCUT_HELP_CENTER" desc="A text label that appears next to the keyboard shortcut that will open the Google Chrome Help Center in a new tab. The shortcut description is shown in a system dialog along with all other supported shortcuts. [CHAR_LIMIT=55]">
@@ -812,7 +812,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_KEYBOARD_SHORTCUT_TOGGLE_BOOKMARK_BAR" desc="A text label that appears next to the keyboard shortcut that will toggle the bookmark bar. The shortcut description is shown in a system dialog along with all other supported shortcuts. [CHAR_LIMIT=55]">
          Show or hide Bookmarks bar
-@@ -6106,7 +6106,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -6181,7 +6181,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Manage your account
        </message>
        <message name="IDS_IPH_INSTANCE_SWITCHER_TEXT" desc="The in-product-help text prompting the user that app menu has a menu for managing multiple Chrome windows with instance switcher.">
@@ -821,7 +821,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_IPH_RECENT_TABS_TEXT" desc="The in-product-help text prompting the user that they can find their recently closed tabs and windows in the 'Recent tabs' surface.">
          Find your recently closed tabs and windows here
-@@ -6141,7 +6141,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -6216,7 +6216,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Introducing Gemini in Chrome
        </message>
        <message name="IDS_IPH_ANDROID_BOTTOM_BAR_AIM_DIALOG_TITLE" desc="Title for the in-product help dialog introducing AI Mode in the bottom bar.">
@@ -830,7 +830,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_IPH_ANDROID_BOTTOM_BAR_DIALOG_DESCRIPTION" desc="Description for the bottom bar Gemini introduction dialog.">
          Some tools have moved to give you easy access to Gemini while you browse
-@@ -6211,7 +6211,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -6286,7 +6286,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Tap to dismiss
        </message>
        <message name="IDS_EXTENSIONS_MENU_MANAGE_APP_MENU_IPH" desc="IPH message pointing to the Chrome app menu three-dot button shown after a user unpins the extensions menu puzzle piece explaining they can manage their extensions in the Chrome app menu.">
@@ -839,7 +839,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_EXTENSIONS_MENU_MANAGE_TOOLBAR_IPH" desc="IPH message pointing to the extension puzzle piece shown after a user installs their first extension explaining they can manage their extensions in the toolbar.">
          Manage your extensions in the toolbar
-@@ -6231,7 +6231,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -6306,7 +6306,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Change the default download location any time using the Settings menu option
        </message>
        <message name="IDS_SEARCH_WIDGET_DESCRIPTION" desc="Description text for the search widget">
@@ -848,7 +848,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
  
        <!-- Quick Action Search Widget -->
-@@ -6253,7 +6253,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -6328,7 +6328,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Dino Widget -->
        <message name="IDS_DINO_WIDGET_TEXT" desc="Text displayed on the Dino Widget. One medium-length or two short words max (area for about 10em)">
@@ -857,7 +857,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_DINO_WIDGET_DESCRIPTION" desc="Description text for the dino widget">
          Jump into a fun Dino game
-@@ -6372,19 +6372,19 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -6461,19 +6461,19 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Usage Stats strings -->
        <message name="IDS_USAGE_STATS_CONSENT_TITLE" desc="Title for activity authorizing Digital Wellbeing to access Chrome usage data">
@@ -881,7 +881,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_USAGE_STATS_SITE_PAUSED" desc="Message when a website is suspended due to exceeding a user-defined limit">
          Site paused
-@@ -6405,7 +6405,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -6494,7 +6494,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
        <message name="IDS_STACK_UNWINDER_MODULE_TITLE"
          desc="Text shown when the stack unwinder module is referenced in install start, success,
                failure UI (e.g. in IDS_MODULE_INSTALL_START_TEXT, which will expand to
@@ -890,7 +890,7 @@ index 20c5512fb7..887d8fb0ff 100644
          Stack Unwinder
        </message>
  
-@@ -6620,7 +6620,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -6709,7 +6709,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Read today's news <ph name="NEWS_ICON">📰</ph>
        </message>
        <message name="IDS_CHROME_REENGAGEMENT_NOTIFICATION_1_DESCRIPTION" desc="The body text of a notification shown to suggest that users use Chrome.  Users probably have not opened Chrome in a while.  Promotes relevant articles Chrome has.">
@@ -899,7 +899,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_CHROME_REENGAGEMENT_NOTIFICATION_2_TITLE" desc="The title of a notification shown to suggest that users use Chrome.  Users probably have not opened Chrome in a while.  Promotes data savings.">
          Save up to 60% data
-@@ -6637,7 +6637,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -6726,7 +6726,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Notification Permission Rationale Dialog Strings-->
        <message name="IDS_NOTIFICATION_PERMISSION_RATIONALE_DIALOG_TITLE" desc="The title of a dialog shown to users before asking for notification permission.">
@@ -908,7 +908,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_NOTIFICATION_PERMISSION_RATIONALE_DIALOG_MESSAGE" desc="The body text of a dialog explaining the benefits of enabling Chrome notifications.">
          You’ll be able to easily manage media controls, Incognito sessions, downloads and more
-@@ -6922,7 +6922,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7011,7 +7011,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Auto-darken web content -->
        <message name="IDS_AUTO_DARK_MESSAGE_TITLE" desc="Message shown that informs the user auto darkening of website contents has been enabled.">
@@ -917,7 +917,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_AUTO_DARK_MESSAGE_OPT_IN_TITLE" desc="Title of message shown that informs the user that auto darkening of website contents can be enabled.">
          Dark theme for sites is available
-@@ -6963,7 +6963,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7052,7 +7052,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Management
        </message>
        <message name="IDS_MANAGEMENT_BROWSER_NOTICE" desc="The descriptive text on chrome://management page that explains to the user the implications of browsing under a managed environment.">
@@ -926,7 +926,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_MANAGEMENT_PROFILE_NOTICE" desc="The descriptive text on chrome://management page that explains to the user the implications of browsing under a managed environment.">
          The profile you’re signed in to is a managed profile. Your administrator can make changes to your profile settings remotely, analyze information about the browser through reporting, and perform other necessary tasks.
-@@ -7477,7 +7477,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7566,7 +7566,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Default browser promo -->
        <message name="IDS_SET_CHROME_AS_YOUR_DEFAULT" desc="Generic text indicating that the user can change their default browser to Chrome.">
@@ -935,7 +935,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_PROMO_TEXT_SECURITY" desc="Promotional text advertising the speed and security of Chrome.">
          Fast and secure web browsing
-@@ -7489,22 +7489,22 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7578,22 +7578,22 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Seamlessly continue on any device
        </message>
        <message name="IDS_MAKE_CHROME_DEFAULT" desc="Menu item in the app menu to set Chrome as the default browser.">
@@ -962,7 +962,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_DEFAULT_BROWSER_PROMO_MESSAGE_DESCRIPTION" desc="Text description that displayed in a prompt message that encourage user to set Chrome as the default browser.">
          Quickly open links in messages and more
-@@ -7573,7 +7573,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7662,7 +7662,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Show me how
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_TITLE_ESB" desc="Title of the Enhanced Safe Browsing feature tip main page promo. [CHAR_LIMIT=32]">
@@ -971,7 +971,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_DESCRIPTION_ESB" desc="Description of the Enhanced Safe Browsing feature tip main page promo.">
          Add an extra layer of protection against online threats with enhanced protection
-@@ -7615,10 +7615,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7704,10 +7704,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Pick up where you left off
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_DESCRIPTION_RECENT_TABS" desc="Description of the Recent Tabs feature tip main page promo.">
@@ -984,7 +984,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_SECOND_STEP_ESB" desc="Description of the Enhanced Safe Browsing feature tip second step detail page promo.">
          Tap Privacy and security > Safe browsing
-@@ -7627,7 +7627,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7716,7 +7716,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Choose Enhanced protection
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_FIRST_STEP_QUICK_DELETE" desc="Description of the Quick Delete feature tip first step detail page promo.">
@@ -993,7 +993,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_SECOND_STEP_QUICK_DELETE" desc="Description of the Quick Delete feature tip second step detail page promo.">
          Tap Delete browsing data
-@@ -7645,7 +7645,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7734,7 +7734,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Take a photo or add an image from your photo gallery to search
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_FIRST_STEP_BOTTOM_OMNIBOX" desc="Description of the Bottom Omnibox feature tip first step detail page promo.">
@@ -1002,7 +1002,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_SECOND_STEP_BOTTOM_OMNIBOX" desc="Description of the Bottom Omnibox feature tip second step detail page promo.">
          Tap Address bar
-@@ -7657,7 +7657,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7746,7 +7746,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Sign in to a website
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_SECOND_STEP_PASSWORD_AUTOFILL" desc="Description of the Password Autofill feature tip second step detail page promo.">
@@ -1011,7 +1011,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_THIRD_STEP_PASSWORD_AUTOFILL" desc="Description of the Password Autofill feature tip third step detail page promo.">
          Tap save
-@@ -7690,7 +7690,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7779,7 +7779,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Tap pin this shortcut
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_FIRST_STEP_RECENT_TABS" desc="Description of the Recent tabs feature tip first step detail page promo.">
@@ -1020,7 +1020,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_TIPS_PROMO_BOTTOM_SHEET_SECOND_STEP_RECENT_TABS" desc="Description of the Recent Tabs feature tip second step detail page promo.">
          Tap Recent tabs
-@@ -7726,10 +7726,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7815,10 +7815,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Close
        </message>
        <message name="IDS_TIPS_OPT_IN_BOTTOM_SHEET_TITLE" desc="Title of the Tips Opt In bottom sheet promo. [CHAR_LIMIT=32]">
@@ -1033,7 +1033,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_TIPS_OPT_IN_SNACKBAR_MESSAGE" desc="Snackbar message shown when the user opts in to receive tips notifications.">
          Tips notifications turned on
-@@ -7769,10 +7769,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7858,10 +7858,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Chrome Finds -->
        <message name="IDS_CHROME_FINDS_OPT_IN_BOTTOM_SHEET_TITLE" desc="Title of the Chrome Finds opt-in bottom sheet promo. [CHAR_LIMIT=32]">
@@ -1046,7 +1046,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_CHROME_FINDS_OPT_IN_BOTTOM_SHEET_POSITIVE_BUTTON_TEXT" desc="Button text for the Chrome Finds opt-in bottom sheet to accept notifications. [CHAR_LIMIT=32]">
          Notify me
-@@ -7781,19 +7781,19 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7870,19 +7870,19 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          No, thanks
        </message>
        <message name="IDS_CHROME_FINDS_OPT_IN_BOTTOM_SHEET_CONTENT_DESCRIPTION" desc="Content description of the Chrome Finds opt-in bottom sheet informing the user on what Chrome Finds is and asking whether to opt-in.">
@@ -1071,7 +1071,7 @@ index 20c5512fb7..887d8fb0ff 100644
        </message>
        <message name="IDS_CHROME_FINDS_OPT_IN_SNACKBAR_ACTION_TEXT" desc="Action button of the Chrome Finds snackbar on user opt-in. [CHAR_LIMIT=10]">
          Manage
-@@ -7858,10 +7858,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -7953,10 +7953,10 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- Enterprise Signals Disclaimer strings -->
        <message name="IDS_ENTERPRISE_SIGNALS_DISCLAIMER_TITLE" desc="Title of the enterprise signals disclaimer dialog.">
@@ -1079,8 +1079,8 @@ index 20c5512fb7..887d8fb0ff 100644
 +        Your work secured on Bare
        </message>
        <message name="IDS_ENTERPRISE_SIGNALS_DISCLAIMER_DESCRIPTION" desc="Description of the enterprise signals disclaimer dialog.">
--        To secure your work on Chrome, your organization will be able to view or manage certain information when you’re signed-in to Chrome. Learn more
-+        To secure your work on Bare, your organization will be able to view or manage certain information when you’re signed-in to Bare. Learn more
+-        To secure your work on Chrome, your organization will be able to view or manage certain information when you’re signed-in to Chrome. <ph name="BEGIN_LINK">&lt;LINK&gt;</ph>Learn more<ph name="END_LINK">&lt;/LINK&gt;</ph>
++        To secure your work on Bare, your organization will be able to view or manage certain information when you’re signed-in to Bare. <ph name="BEGIN_LINK">&lt;LINK&gt;</ph>Learn more<ph name="END_LINK">&lt;/LINK&gt;</ph>
        </message>
        <message name="IDS_ENTERPRISE_SIGNALS_DISCLAIMER_PROFILE_INFORMATION_TITLE" desc="Title of the profile information section in the enterprise signals disclaimer dialog.">
          Profile information
@@ -1125,7 +1125,7 @@ index 309c36ba50..d085e0ec9a 100644
        <message name="IDS_PAYMENTS_AUTOFILL_SETTINGS_TOGGLE_MANDATORY_REAUTH" desc="Text that appears in the payments autofill mandatory re-authentication popup as the sublabel when users try to switch the mandatory reauth settings page toggle, asking the user to authenticate using biometric or device unlock before the toggle is switched.">
          Google Chrome is trying to modify settings for filling payment methods.
 diff --git a/components/autofill_strings.grdp b/components/autofill_strings.grdp
-index 7500db9648..35454abeaf 100644
+index 8d77d4906e..7162baa424 100644
 --- a/components/autofill_strings.grdp
 +++ b/components/autofill_strings.grdp
 @@ -24,10 +24,10 @@
@@ -1221,7 +1221,7 @@ index 7500db9648..35454abeaf 100644
    </message>
    <message name="IDS_AUTOFILL_AT_MEMORY_SEARCH_AFFORDANCE_SUBTITLE" desc="Descriptor under the query for enhanced autofill. 'Gemini' is a brand name and should match standard branding guidelines across languages.">
      Find and fill with Gemini
-@@ -1806,13 +1806,13 @@
+@@ -1824,13 +1824,13 @@
    </message>
    <if expr="_google_chrome">
      <message name="IDS_SETTINGS_AUTOFILL_AI_TOGGLE_SUB_LABEL" desc="The description of the setting. By 'understand forms better', we mean that when a user submits a form on a website, and if they're using smarter form understanding, this feature can offer to save the user's submitted info. When Chrome saves that info, we save the submitted values and consider the page context." formatter_data="android_java">
@@ -1237,7 +1237,7 @@ index 7500db9648..35454abeaf 100644
      </message>
    </if>
    <if expr="not _google_chrome">
-@@ -1843,7 +1843,7 @@
+@@ -1861,7 +1861,7 @@
      When you make a request for enhanced autofill, your usage data, requests, and page details are shared with Google to improve the autofill experience
    </message>
    <message name="IDS_SETTINGS_SUGGESTIONS_FROM_GEMINI_WHEN_USED_1" desc="Bullet point 1 under When used in the quality logging section.">
@@ -1744,7 +1744,7 @@ index 6125f35fa1..d93a75aa64 100644
    <message name="IDS_HEAVY_AD_INTERVENTION_BUTTON_RELOAD" desc="Label for the button that reloads the page and disables the intervention">
      Reload and show anyway
 diff --git a/components/history_strings.grdp b/components/history_strings.grdp
-index f22291d8ba..b4941b21ce 100644
+index eb84e15af2..a4a4508fc6 100644
 --- a/components/history_strings.grdp
 +++ b/components/history_strings.grdp
 @@ -198,7 +198,7 @@
@@ -2224,10 +2224,10 @@ index 9e9fc98a73..35f21db88c 100644
    <!-- iOS Omnibox Actions non-title strings -->
    <!-- Same as IDS_OMNIBOX_PEDAL_LAUNCH_INCOGNITO_SUGGESTION_CONTENTS but with "window" changed to "tab" -->
 diff --git a/components/omnibox_strings.grdp b/components/omnibox_strings.grdp
-index 15bdadcdaf..d8ace99763 100644
+index f0afe8e960..645d7405c3 100644
 --- a/components/omnibox_strings.grdp
 +++ b/components/omnibox_strings.grdp
-@@ -173,7 +173,7 @@
+@@ -176,7 +176,7 @@
    </if>
    <if expr="is_android">
      <message name="IDS_OMNIBOX_ON_CCT_EMPTY_HINT" desc="Hint text shown in the Omnibox on a Custom Tab." formatter_data="android_java">
@@ -2236,7 +2236,7 @@ index 15bdadcdaf..d8ace99763 100644
      </message>
      <message name="IDS_OMNIBOX_EMPTY_ASK_HINT_SHORT_WITH_DSE_NAME" desc="Alternative text displayed in the omnibox when it is empty, prompting the user to ask. Includes Default Search Engine name." formatter_data="android_java">
        Ask <ph name="ENGINE_NAME">$1<ex>Google</ex></ph>
-@@ -354,13 +354,13 @@
+@@ -357,13 +357,13 @@
      Resume your journey
    </message>
    <message name="IDS_OMNIBOX_ACTION_HISTORY_CLUSTERS_SEARCH_SUGGESTION_CONTENTS" desc="The button tooltip for the History Clusters omnibox action. Clicking this button takes users to a view of their browsing history related to the attached suggestion.">
@@ -2252,7 +2252,7 @@ index 15bdadcdaf..d8ace99763 100644
    </message>
  
    <!-- Omnibox Actions in Suggest. -->
-@@ -528,7 +528,7 @@
+@@ -531,7 +531,7 @@
      Dismiss Chrome Tip button, press Enter to dismiss, <ph name="REMOVE_BUTTON_FOCUSED_FRIENDLY_MATCH_TEXT">$1<ex>Type @gemini to Chat with Gemini</ex></ph>
    </message>
    <message name="IDS_ACC_DISMISS_CHROME_TIP_BUTTON" desc="Announcement when dismiss chrome tip button is focused.">
@@ -2443,7 +2443,7 @@ index 5f58c26466..4e631a5d0c 100644
      <message name="IDS_RESET_PASSWORD_EXPLANATION_PARAGRAPH_WITH_ORG_NAME" desc="The primary explanatory paragraph for the reset password page when the user manually navigates to this page.">
        Chrome recommends resetting your <ph name="BEGIN_BOLD">&lt;strong&gt;</ph><ph name="ORG_NAME">$1<ex>Google</ex></ph><ph name="END_BOLD">&lt;/strong&gt;</ph> password if you reused it on other sites.
 diff --git a/components/search_engine_choice_strings.grdp b/components/search_engine_choice_strings.grdp
-index 75c5ac959b..c466a86968 100644
+index cc85a72337..9d1c295837 100644
 --- a/components/search_engine_choice_strings.grdp
 +++ b/components/search_engine_choice_strings.grdp
 @@ -36,7 +36,7 @@
@@ -2491,13 +2491,13 @@ index 75c5ac959b..c466a86968 100644
 +        You can change your search engine anytime in Bare’s settings.
        </message>
        <message name="IDS_SEARCH_ENGINE_CHOICE_INFO_DIALOG_BODY_THIRD_PARAGRAPH_INSTRUCTIVE" desc="This is the third paragraph of the body text of a card that explains why users are being prompted to choose a search engine, and what a search engine does in Chrome. This screen provides the following details: 1. the list includes search engines that are popular in the user’s region and the order includes randomization (not in order of recommendation); 2. features may be unavailable if the chosen default search engine doesn’t support them; 3. the user can change their mind at any time. For JSA, we add more information on how to add non-regional search engines. This card appears when the user taps or clicks “Learn more” on the search engine choice screen. The headline for this card is “Your search engine in Chrome”.">
--        You can change your search engine anytime in Chrome’s settings. If you don’t see your preferred search engine, you can perform a search from their site. You’ll see the provider as a recently visited search provider in Chrome Settings, and you can make it your default.
-+        You can change your search engine anytime in Bare’s settings. If you don’t see your preferred search engine, you can perform a search from their site. You’ll see the provider as a recently visited search provider in Bare Settings, and you can make it your default.
+-        You can change your search engine anytime in Chrome’s settings. If you don’t see your preferred search engine, you can perform a search from their site. You’ll see it listed as a recently visited search engine in Chrome settings, and you can make it your default.
++        You can change your search engine anytime in Bare’s settings. If you don’t see your preferred search engine, you can perform a search from their site. You’ll see it listed as a recently visited search engine in Bare settings, and you can make it your default.
        </message>
      </if>
      <if expr="not _google_chrome">
 diff --git a/components/security_interstitials_strings.grdp b/components/security_interstitials_strings.grdp
-index f1029649dc..50f8a0a9c5 100644
+index d9a5a2de98..21552bd3df 100644
 --- a/components/security_interstitials_strings.grdp
 +++ b/components/security_interstitials_strings.grdp
 @@ -42,7 +42,7 @@
@@ -2608,7 +2608,7 @@ index f1029649dc..50f8a0a9c5 100644
 @@ -596,7 +596,7 @@
      Mark as safe
    </message>
-   <message name="IDS_SUSPICIOUS_SITE_HATS_CUSTOM_INVITATION" desc="The custom invitation string shown in the Happiness Tracking Survey (HaTS) prompt banner for suspicious site warnings on Android">
+   <message name="IDS_SAFE_BROWSING_HATS_CUSTOM_INVITATION" desc="The custom invitation string shown in the Happiness Tracking Survey (HaTS) prompt banner for Safe Browsing warnings (such as red warning interstitials or suspicious site warnings) on Android">
 -    Chrome just flagged a website you were trying to visit. Help us improve these warnings by taking a 1-minute survey.
 +    Bare just flagged a website you were trying to visit. Help us improve these warnings by taking a 1-minute survey.
    </message>

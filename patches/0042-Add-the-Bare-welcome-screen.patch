@@ -1,4 +1,4 @@
-From 1ca8a091bf932f1c7ebc25bdd3fdbbbf50c863c3 Mon Sep 17 00:00:00 2001
+From fa80870c2dea940fdbed5ae5a5bced85e28847e6 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 18 Aug 2026 20:21:20 +0000
 Subject: [PATCH] Add the Bare welcome screen
@@ -37,10 +37,10 @@ than when it is dismissed, so killing the app partway through does not bring it 
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareWelcomeOverlay.java
 
 diff --git a/chrome/android/chrome_java_resources.gni b/chrome/android/chrome_java_resources.gni
-index 82d9f764f7..22b8055ac3 100644
+index 0da1ea184d..290c2c8671 100644
 --- a/chrome/android/chrome_java_resources.gni
 +++ b/chrome/android/chrome_java_resources.gni
-@@ -248,6 +248,7 @@ chrome_java_resources = [
+@@ -249,6 +249,7 @@ chrome_java_resources = [
    "java/res/drawable/auto_pip_permission_dialog_background.xml",
    "java/res/drawable/autofill_save_card_credit_card_surface.xml",
    "java/res/drawable/autorenew_24dp.xml",
@@ -48,7 +48,7 @@ index 82d9f764f7..22b8055ac3 100644
    "java/res/drawable/bg_circle_tab_strip_button.xml",
    "java/res/drawable/bg_square_rounded_tab_strip_button.xml",
    "java/res/drawable/bg_tabstrip_tab_divider.xml",
-@@ -456,6 +457,7 @@ chrome_java_resources = [
+@@ -459,6 +460,7 @@ chrome_java_resources = [
    "java/res/layout/autofill_settings_home_profile_icon.xml",
    "java/res/layout/autofill_settings_local_profile_icon.xml",
    "java/res/layout/autofill_settings_work_profile_icon.xml",
@@ -57,7 +57,7 @@ index 82d9f764f7..22b8055ac3 100644
    "java/res/layout/bookmark_add_new_folder_input_layout.xml",
    "java/res/layout/bookmark_bar.xml",
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index 6016b8bd67..29a282ded1 100644
+index 8aa40a02e4..a1df914488 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
 @@ -218,6 +218,7 @@ chrome_java_sources = [
@@ -186,7 +186,7 @@ index 0000000000..fd830bb3f2
 +
 +</FrameLayout>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 22a4e46096..061af20fa8 100644
+index fce10dd6da..de218a3b93 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -107,6 +107,7 @@ import org.chromium.chrome.browser.auxiliary_search.module.AuxiliarySearchModule
@@ -197,7 +197,7 @@ index 22a4e46096..061af20fa8 100644
  import org.chromium.chrome.browser.bookmarks.BookmarkModel;
  import org.chromium.chrome.browser.bookmarks.BookmarkPane;
  import org.chromium.chrome.browser.bookmarks.BookmarkUtils;
-@@ -3374,6 +3375,10 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -3384,6 +3385,10 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
  
          if (isFinishing()) return;
  

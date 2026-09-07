@@ -1,4 +1,4 @@
-From a14787f22d748101281f001b6311402547352556 Mon Sep 17 00:00:00 2001
+From 097413a196ab97ce7d509b5c2310461741a44009 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 25 Aug 2026 18:13:27 +0000
 Subject: [PATCH] Stop shipping the XR module when XR is switched off

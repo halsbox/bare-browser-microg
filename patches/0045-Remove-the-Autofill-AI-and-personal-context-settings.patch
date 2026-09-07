@@ -1,4 +1,4 @@
-From 42e7900ab04e66f28de53bad169f34d424f25d56 Mon Sep 17 00:00:00 2001
+From a13a2406942ad6fee99ad640a60eefd9720e0841 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 01:39:45 +0000
 Subject: [PATCH] Remove the Autofill AI and personal context settings
@@ -58,7 +58,7 @@ index 9d2b3d470e..08349d34ed 100644
  
      public static final ChromeBaseSearchIndexProvider SEARCH_INDEX_DATA_PROVIDER =
 diff --git a/chrome/browser/autofill/android/java/src/org/chromium/chrome/browser/autofill/settings/options/AutofillOptionsMediator.java b/chrome/browser/autofill/android/java/src/org/chromium/chrome/browser/autofill/settings/options/AutofillOptionsMediator.java
-index a4e6cd9904..f4fbe4eb74 100644
+index 89bbfe66d1..a7f5028abe 100644
 --- a/chrome/browser/autofill/android/java/src/org/chromium/chrome/browser/autofill/settings/options/AutofillOptionsMediator.java
 +++ b/chrome/browser/autofill/android/java/src/org/chromium/chrome/browser/autofill/settings/options/AutofillOptionsMediator.java
 @@ -197,8 +197,9 @@ public class AutofillOptionsMediator implements ModalDialogProperties.Controller

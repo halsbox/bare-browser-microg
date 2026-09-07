@@ -1,4 +1,4 @@
-From 189736ec4125491a91fa76fe55f47f2e38893489 Mon Sep 17 00:00:00 2001
+From 51e2cfc1456bd2d9a8b30604bb1f3ff4135a4a9a Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 16 Aug 2026 17:29:29 +0000
 Subject: [PATCH] Send downloads to an installed download manager
@@ -119,7 +119,7 @@ index 4927beb4d2..fbf8acde91 100644
       * Called to download the given URL triggered from a tab.
       *
 diff --git a/chrome/browser/download/android/download_controller.cc b/chrome/browser/download/android/download_controller.cc
-index abeeb3a433..8edfa6a917 100644
+index 19759a96fd..3df0e7f0dd 100644
 --- a/chrome/browser/download/android/download_controller.cc
 +++ b/chrome/browser/download/android/download_controller.cc
 @@ -336,6 +336,16 @@ DownloadController::DownloadController() = default;
@@ -157,10 +157,10 @@ index 5e17f82ca9..3ebeaa13d0 100644
    // in sync with MobileDownloadStoragePermission in histograms.xml. This should
    // be append only.
 diff --git a/chrome/browser/download/chrome_download_manager_delegate.cc b/chrome/browser/download/chrome_download_manager_delegate.cc
-index 27be7a3c72..2f6a1beb22 100644
+index 66c1e4a132..a24552b130 100644
 --- a/chrome/browser/download/chrome_download_manager_delegate.cc
 +++ b/chrome/browser/download/chrome_download_manager_delegate.cc
-@@ -1164,6 +1164,17 @@ bool ChromeDownloadManagerDelegate::InterceptDownloadIfApplicable(
+@@ -1196,6 +1196,17 @@ bool ChromeDownloadManagerDelegate::InterceptDownloadIfApplicable(
      bool is_transient,
      bool is_content_initiated,
      content::WebContents* web_contents) {

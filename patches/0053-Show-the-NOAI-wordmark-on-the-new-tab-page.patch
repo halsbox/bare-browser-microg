@@ -1,4 +1,4 @@
-From 0524aa7a5332824e71a619330dfd96f2be34bdf6 Mon Sep 17 00:00:00 2001
+From 112e983842de3ff5e512a1bc844bcc861ffcc169 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 07:19:58 +0000
 Subject: [PATCH] Show the NOAI wordmark on the new tab page
@@ -75,7 +75,7 @@ index 0000000000..dba1d95372
 +        android:pathData="M6.747 71.566A6.747 6.747 0 0 1 0 64.82V10.251a8.266 8.266 0 0 1 14.976-4.827L46.536 49.3V8.733a6.747 6.747 0 0 1 13.494 0V63.3a8.266 8.266 0 0 1-14.976 4.826L13.494 24.25v40.57a6.747 6.747 0 0 1-6.747 6.747M224.203 1.985A6.797 6.797 0 0 1 231 8.782V64.77a6.797 6.797 0 0 1-13.594 0V8.781a6.797 6.797 0 0 1 6.797-6.797m-16.726 60.44c1.728 4.39-1.508 9.142-6.227 9.142a6.69 6.69 0 0 1-6.277-4.372l-5.032-13.62h-25.996l-5.076 13.736a6.51 6.51 0 0 1-6.11 4.256c-4.59 0-7.74-4.62-6.065-8.892l21.389-54.542a9.68 9.68 0 0 1 18.022-.01zm-39.464-19.982h17.86l-8.93-24.254z" />
 +</vector>
 diff --git a/chrome/browser/ui/android/logo/java/src/org/chromium/chrome/browser/logo/LogoMediator.java b/chrome/browser/ui/android/logo/java/src/org/chromium/chrome/browser/logo/LogoMediator.java
-index 553d6b7381..b71fc90492 100644
+index 630e96c8ea..f4af8b9d76 100644
 --- a/chrome/browser/ui/android/logo/java/src/org/chromium/chrome/browser/logo/LogoMediator.java
 +++ b/chrome/browser/ui/android/logo/java/src/org/chromium/chrome/browser/logo/LogoMediator.java
 @@ -95,6 +95,7 @@ public class LogoMediator implements TemplateUrlServiceObserver {
@@ -105,7 +105,7 @@ index 553d6b7381..b71fc90492 100644
          if (mLogoBridge == null) {
              mLogoBridge = new LogoBridge(mProfile);
          }
-@@ -358,7 +364,20 @@ public class LogoMediator implements TemplateUrlServiceObserver {
+@@ -351,7 +357,20 @@ public class LogoMediator implements TemplateUrlServiceObserver {
       * @return The default Google logo drawable.
       */
      @VisibleForTesting

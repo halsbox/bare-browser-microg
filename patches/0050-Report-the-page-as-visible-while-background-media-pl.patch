@@ -1,4 +1,4 @@
-From 0b6acb79dd90e651a633a9b85c1217b97b1c3fc5 Mon Sep 17 00:00:00 2001
+From 8843765089d6a8c0021c90e1b68013faf59971d6 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 07:19:51 +0000
 Subject: [PATCH] Report the page as visible while background media plays
@@ -10,10 +10,10 @@ Subject: [PATCH] Report the page as visible while background media plays
  3 files changed, 28 insertions(+), 7 deletions(-)
 
 diff --git a/third_party/blink/renderer/core/dom/document.cc b/third_party/blink/renderer/core/dom/document.cc
-index ab85788d5e..12cc50d164 100644
+index e6a4fe120d..d17b7b4aa4 100644
 --- a/third_party/blink/renderer/core/dom/document.cc
 +++ b/third_party/blink/renderer/core/dom/document.cc
-@@ -2288,12 +2288,32 @@ bool Document::IsPrefetchOnly() const {
+@@ -2287,12 +2287,32 @@ bool Document::IsPrefetchOnly() const {
  // Deliberately scoped to what script can see. Document::hidden() is left
  // alone, because Blink itself calls it for canvas font pruning, layout and
  // view transitions, and those should keep treating the page as hidden.
@@ -49,7 +49,7 @@ index ab85788d5e..12cc50d164 100644
      return V8VisibilityState(V8VisibilityState::Enum::kHidden);
    } else {
      return V8VisibilityState(V8VisibilityState::Enum::kVisible);
-@@ -2331,7 +2351,7 @@ void Document::DidChangeVisibilityState() {
+@@ -2330,7 +2350,7 @@ void Document::DidChangeVisibilityState() {
    // Bare Browser: a document that keeps reporting itself visible must not
    // announce a change that, as far as script is concerned, never happened.
    // The housekeeping below still runs, since the page really is hidden.
@@ -59,7 +59,7 @@ index ab85788d5e..12cc50d164 100644
      // Also send out the deprecated version until it can be removed.
      DispatchEvent(
 diff --git a/third_party/blink/renderer/core/dom/document.h b/third_party/blink/renderer/core/dom/document.h
-index f11572a4c5..0d19ebe7d4 100644
+index 5a7e9e0e46..5552d5f29d 100644
 --- a/third_party/blink/renderer/core/dom/document.h
 +++ b/third_party/blink/renderer/core/dom/document.h
 @@ -600,7 +600,8 @@ class CORE_EXPORT Document : public ContainerNode,

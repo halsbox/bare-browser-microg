@@ -1,4 +1,4 @@
-From 8e0684ea4fb15262bcf0c8f7fbf4e1e85b441c72 Mon Sep 17 00:00:00 2001
+From 8c2e5b93a8bb85f124b17e46fe3a3afb9e207227 Mon Sep 17 00:00:00 2001
 From: Bare <57wsdx6b8d@privaterelay.appleid.com>
 Date: Sat, 29 Aug 2026 06:40:40 +0000
 Subject: [PATCH] Let a button do a second thing when it is held
@@ -178,10 +178,10 @@ index 87517aa1c8..3ae9d3b3cf 100644
      public MonotonicObservableSupplier<String> getPageTitle() {
          return mPageTitle;
 diff --git a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
-index 904b0d3e75..810a99401a 100644
+index 4aec85765e..0915520333 100644
 --- a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 +++ b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
-@@ -153,6 +153,13 @@ public final class ChromePreferenceKeys {
+@@ -149,6 +149,13 @@ public final class ChromePreferenceKeys {
      public static final KeyPrefix BOTTOM_BAR_SLOT_PRIMARY_ACTION =
              new KeyPrefix("Chrome.BottomBar.SlotPrimaryAction.*");
  
@@ -195,7 +195,7 @@ index 904b0d3e75..810a99401a 100644
      /**
       * What a horizontal drag along the bottom bar does. Absent means it does nothing, which is
       * what the bar has always done and remains the default.
-@@ -1293,6 +1300,7 @@ public final class ChromePreferenceKeys {
+@@ -1291,6 +1298,7 @@ public final class ChromePreferenceKeys {
                  BOOKMARKS_VISUALS_PREF,
                  BOTTOM_BAR_GLIC_BUTTON_ENABLED,
                  BOTTOM_BAR_SLOT_PRIMARY_ACTION.pattern(),
@@ -282,7 +282,7 @@ index 171a3b2391..233affbf00 100644
          View targetView = ActionButtonBinder.resolveView(view);
          assert targetView instanceof ListMenuButton : "View must be a ListMenuButton";
 diff --git a/chrome/browser/ui/android/bottombar/BUILD.gn b/chrome/browser/ui/android/bottombar/BUILD.gn
-index b6b5750f8d..67edac2e59 100644
+index 7c05b19532..7227484327 100644
 --- a/chrome/browser/ui/android/bottombar/BUILD.gn
 +++ b/chrome/browser/ui/android/bottombar/BUILD.gn
 @@ -64,6 +64,7 @@ android_library("java") {
@@ -293,7 +293,7 @@ index b6b5750f8d..67edac2e59 100644
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarSlot.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarSwipeAction.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarSwipeAdjuster.java",
-@@ -136,6 +137,7 @@ robolectric_library("junit") {
+@@ -137,6 +138,7 @@ robolectric_library("junit") {
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarActionRenderingUnitTest.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarLayoutUnitTest.java",
      "java/src/org/chromium/chrome/browser/ui/bottombar/BareToolbarPrefsUnitTest.java",
@@ -936,10 +936,10 @@ index 0000000000..58225ad8b2
 +    }
 +}
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
-index 6dc247d779..ac472f5836 100644
+index 722e0c14fc..cc52e5f6e1 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
 +++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
-@@ -49,6 +49,7 @@ public class BottomBarCoordinator
+@@ -50,6 +50,7 @@ public class BottomBarCoordinator
      private final BottomBarPromoDialogCoordinator mPromoDialogCoordinator;
      private final NullableObservableSupplier<Tab> mTabSupplier;
      private final boolean mShouldIncludeHomeButton;
@@ -947,7 +947,7 @@ index 6dc247d779..ac472f5836 100644
  
      /**
       * @param parent The parent view to inflate the bottom bar into.
-@@ -120,6 +121,11 @@ public class BottomBarCoordinator
+@@ -125,6 +126,11 @@ public class BottomBarCoordinator
          mView.setSwipeAdjuster(
                  new BareToolbarSwipeAdjuster(context, ContextUtils.activityFromContext(context)));
  
@@ -959,7 +959,7 @@ index 6dc247d779..ac472f5836 100644
          // The arrangement can change while the bar is on screen, because settings writes the
          // preference and goes away. This is the same route the bar already uses to hear about its
          // other setting, and the same one the address bar uses to move itself between top and
-@@ -221,10 +227,18 @@ public class BottomBarCoordinator
+@@ -226,10 +232,18 @@ public class BottomBarCoordinator
      @Override
      @SuppressWarnings("UseSharedPreferencesManagerFromChromeCheck")
      public void onSharedPreferenceChanged(SharedPreferences preferences, @Nullable String key) {
@@ -981,7 +981,7 @@ index 6dc247d779..ac472f5836 100644
      }
  
      /**
-@@ -245,6 +259,7 @@ public class BottomBarCoordinator
+@@ -250,6 +264,7 @@ public class BottomBarCoordinator
      @SuppressWarnings("UseSharedPreferencesManagerFromChromeCheck")
      public void destroy() {
          ContextUtils.getAppSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
@@ -1032,10 +1032,10 @@ index 81836c8f34..2fb480f6c7 100644
      boolean isSwipeActiveForTesting() {
          return mSwipeActive;
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index 1de3f92497..e1c4a50eea 100644
+index d3bcd10f6b..7595ee3ca4 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -4179,6 +4179,18 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4254,6 +4254,18 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
        <message name="IDS_BARE_TOOLBAR_SETTINGS_CHOOSE_ACTION" desc="Title of the dialog for choosing which button goes in one toolbar position.">
          Choose a button
        </message>

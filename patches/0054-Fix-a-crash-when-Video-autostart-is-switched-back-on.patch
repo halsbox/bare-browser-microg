@@ -1,4 +1,4 @@
-From 0f8ace91db5311de58d1a316c7170031bc88ed1e Mon Sep 17 00:00:00 2001
+From 534cc45c0b4b5a109d5b17d9f05364d825d19ef0 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 07:20:00 +0000
 Subject: [PATCH] Fix a crash when Video autostart is switched back on

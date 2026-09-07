@@ -1,4 +1,4 @@
-From 2e07469465c7fb0e69db0faf8b9428e0886e54c2 Mon Sep 17 00:00:00 2001
+From f4332408a834ac8172bcd40bf22c1718bf25c0c0 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 23 Aug 2026 17:17:01 +0000
 Subject: [PATCH] Remove Send to your devices, which only led to a Google
@@ -26,10 +26,10 @@ Share, Copy link and QR code are untouched.
  4 files changed, 10 insertions(+), 32 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index bbad00e9c5..672b28914e 100644
+index 452b534f88..7fae27b0e7 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-@@ -4314,15 +4314,6 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -4313,15 +4313,6 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
                              /* notifyOnSuccess= */ true);
              RecordUserAction.record("MobileMenuCopyLink");
              return true;
@@ -71,10 +71,10 @@ index 0f0247f92e..786837ea24 100644
      public ListItem buildShareQrCodeItem() {
          return AppMenuItemUtils.createStandardListItem(
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-index c440f15eae..22834e4645 100644
+index 44df312983..50861fd78b 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/tabbed_mode/TabbedAppMenuPropertiesDelegate.java
-@@ -1179,9 +1179,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
+@@ -1181,9 +1181,9 @@ public class TabbedAppMenuPropertiesDelegate extends AppMenuPropertiesDelegateIm
          if (ShareUtils.shouldEnableShare(currentTab)) {
              submenuItems.add(buildShareListItem(/* showIcon= */ false));
              submenuItems.add(mSaveAndShareItemBuilder.buildCopyLinkItem());

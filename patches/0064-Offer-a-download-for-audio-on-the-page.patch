@@ -1,4 +1,4 @@
-From ae26d8f0680906d29f82152e402ce63cdc1d39d4 Mon Sep 17 00:00:00 2001
+From e0d4b7d2785302d35cc6e5ae996c4631eba1daee Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Thu, 20 Aug 2026 06:54:26 +0000
 Subject: [PATCH] Offer a download for audio on the page
@@ -44,7 +44,7 @@ additions there are two contiguous blocks rather than being spread through it.
  6 files changed, 66 insertions(+), 3 deletions(-)
 
 diff --git a/chrome/android/java/res/values/ids.xml b/chrome/android/java/res/values/ids.xml
-index 2e59411005..501cdf9851 100644
+index 157ce8357e..79f16a2d3d 100644
 --- a/chrome/android/java/res/values/ids.xml
 +++ b/chrome/android/java/res/values/ids.xml
 @@ -139,6 +139,7 @@ found in the LICENSE file.
@@ -156,10 +156,10 @@ index 340688865c..aa73f2e04d 100644
              recordContextMenuSelection(ContextMenuUma.Action.SAVE_VIDEO);
              if (mIsDownloadRestrictedByPolicy) {
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index 5fffea7dd6..7ebf98c7fe 100644
+index 11fa22b2c4..8fc36bbe15 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -2947,6 +2947,12 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -2953,6 +2953,12 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
        <message name="IDS_CONTEXTMENU_COPY_LINK_TO_HIGHLIGHT" desc="This string is shown in the context menu for copying the link-to-text.">
          Copy link to highlight
        </message>
@@ -210,7 +210,7 @@ index ed2b20315b..295e4bc979 100644
          mMediaFlags = mediaFlags;
          mTriggeringTouchXDp = triggeringTouchXDp;
 diff --git a/components/embedder_support/android/java/src/org/chromium/components/embedder_support/contextmenu/ContextMenuUtils.java b/components/embedder_support/android/java/src/org/chromium/components/embedder_support/contextmenu/ContextMenuUtils.java
-index 89d60b2fda..871810c679 100644
+index a3dc0e78d2..444e26ef12 100644
 --- a/components/embedder_support/android/java/src/org/chromium/components/embedder_support/contextmenu/ContextMenuUtils.java
 +++ b/components/embedder_support/android/java/src/org/chromium/components/embedder_support/contextmenu/ContextMenuUtils.java
 @@ -196,7 +196,7 @@ public final class ContextMenuUtils {

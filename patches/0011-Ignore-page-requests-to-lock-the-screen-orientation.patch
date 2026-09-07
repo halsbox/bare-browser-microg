@@ -1,4 +1,4 @@
-From 0f761a054468783aee128b9f874038a501dcae39 Mon Sep 17 00:00:00 2001
+From 603fa8bf9ac93c408aa21eb74624ad260bf7335e Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 16 Aug 2026 04:43:40 +0000
 Subject: [PATCH] Ignore page requests to lock the screen orientation
@@ -17,7 +17,7 @@ orientation state set before this change can still be cleared.
  1 file changed, 11 insertions(+), 16 deletions(-)
 
 diff --git a/content/public/android/java/src/org/chromium/content/browser/ScreenOrientationProviderImpl.java b/content/public/android/java/src/org/chromium/content/browser/ScreenOrientationProviderImpl.java
-index ef24dc67a4..64c80e60d2 100644
+index 1490448a60..a584227b77 100644
 --- a/content/public/android/java/src/org/chromium/content/browser/ScreenOrientationProviderImpl.java
 +++ b/content/public/android/java/src/org/chromium/content/browser/ScreenOrientationProviderImpl.java
 @@ -185,22 +185,17 @@ public class ScreenOrientationProviderImpl

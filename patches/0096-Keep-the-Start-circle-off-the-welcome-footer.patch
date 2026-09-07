@@ -1,4 +1,4 @@
-From 71a8d55d3548555439e800bfde6bd57238dd6c8d Mon Sep 17 00:00:00 2001
+From 74023e75a4f1396ef5c59b21d8b624937a227607 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 25 Aug 2026 18:48:42 +0000
 Subject: [PATCH] Keep the Start circle off the welcome footer

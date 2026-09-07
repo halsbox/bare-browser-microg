@@ -1,4 +1,4 @@
-From abc18da397078fa432cadc33f06120ad93c145bb Mon Sep 17 00:00:00 2001
+From c9af93ca5b7396487929565e2ca9d0a47ad6a357 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Fri, 21 Aug 2026 07:53:03 +0000
 Subject: [PATCH] Add a Dark AMOLED theme
@@ -64,7 +64,7 @@ learns to attach it under the new option too.
  14 files changed, 137 insertions(+), 16 deletions(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeBaseAppCompatActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeBaseAppCompatActivity.java
-index 69a986f1b9..ac464602ae 100644
+index 401927122d..b29a0b45ac 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeBaseAppCompatActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeBaseAppCompatActivity.java
 @@ -58,6 +58,7 @@ import org.chromium.chrome.browser.language.GlobalAppLocaleController;
@@ -75,8 +75,8 @@ index 69a986f1b9..ac464602ae 100644
  import org.chromium.chrome.browser.ntp_customization.NtpCustomizationUtils;
  import org.chromium.chrome.browser.ntp_customization.theme.NtpThemeStateProvider;
  import org.chromium.chrome.browser.ui.edge_to_edge.EdgeToEdgeController;
-@@ -631,6 +632,13 @@ public class ChromeBaseAppCompatActivity extends AppCompatActivity
-             applyDynamicColors();
+@@ -633,6 +634,13 @@ public class ChromeBaseAppCompatActivity extends AppCompatActivity
+             }
          }
  
 +        // Bare: "Dark AMOLED" is the dark theme with its flat surfaces taken to
@@ -288,10 +288,10 @@ index a8690622a9..12573a4680 100644
  
                  private void addEntryForKey(
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index 7ebf98c7fe..e8f57a42d5 100644
+index 8fc36bbe15..bb507c9c9d 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -3032,6 +3032,9 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3038,6 +3038,9 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
        <message name="IDS_LIGHT_MODE" desc="Title of button that will change theme of distilled pages to light mode.">
          Light
        </message>
@@ -302,10 +302,10 @@ index 7ebf98c7fe..e8f57a42d5 100644
          Sepia
        </message>
 diff --git a/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/theme/ThemeUtils.java b/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/theme/ThemeUtils.java
-index 2ff765f051..46b2d1a38f 100644
+index a4f9b14b88..b13c4b38f9 100644
 --- a/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/theme/ThemeUtils.java
 +++ b/chrome/browser/ui/android/theme/java/src/org/chromium/chrome/browser/theme/ThemeUtils.java
-@@ -15,6 +15,8 @@ import androidx.annotation.ColorRes;
+@@ -13,6 +13,8 @@ import androidx.annotation.ColorRes;
  import androidx.annotation.VisibleForTesting;
  import androidx.core.content.ContextCompat;
  
@@ -314,7 +314,7 @@ index 2ff765f051..46b2d1a38f 100644
  import org.chromium.build.annotations.NullMarked;
  import org.chromium.build.annotations.Nullable;
  import org.chromium.chrome.browser.tab.Tab;
-@@ -107,7 +109,10 @@ public class ThemeUtils {
+@@ -88,7 +90,10 @@ public class ThemeUtils {
              Context context, @ColorInt int color, boolean isIncognito, boolean isCustomTab) {
          // Text box color on default toolbar background in incognito mode is a pre-defined color.
          if (isIncognito) {
@@ -343,10 +343,10 @@ index 61ce66c84d..7c9c3deb77 100644
      <attr name="colorButtonSizeOverlay" format="reference" />
  </resources>
 diff --git a/components/browser_ui/styles/android/java/res/values/styles.xml b/components/browser_ui/styles/android/java/res/values/styles.xml
-index 2876f1d44b..5202e68c82 100644
+index 74f908d74e..af11c0a681 100644
 --- a/components/browser_ui/styles/android/java/res/values/styles.xml
 +++ b/components/browser_ui/styles/android/java/res/values/styles.xml
-@@ -362,4 +362,29 @@ found in the LICENSE file.
+@@ -368,4 +368,29 @@ found in the LICENSE file.
      <style name="TextAppearance.TextAccentMediumThick.ColorOnPrimaryContainer">
          <item name="android:textColor">?attr/colorOnPrimaryContainer</item>
      </style>

@@ -1,4 +1,4 @@
-From 01cbb2a75d4084d50665a5a25cf0216de9be7c21 Mon Sep 17 00:00:00 2001
+From 8a6d96c5afe321b0df9019c7cbc1ec3f17059d9c Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 22 Aug 2026 07:40:03 +0000
 Subject: [PATCH] Look for Bare's own updates on GitHub
@@ -58,7 +58,7 @@ kept converting it back.
  create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/bare/BareUpdateCheck.java
 
 diff --git a/chrome/android/chrome_java_sources.gni b/chrome/android/chrome_java_sources.gni
-index 43e242d208..ddaf9410ae 100644
+index f1b0b1297e..4059eefd3a 100644
 --- a/chrome/android/chrome_java_sources.gni
 +++ b/chrome/android/chrome_java_sources.gni
 @@ -219,6 +219,7 @@ chrome_java_sources = [
@@ -70,10 +70,10 @@ index 43e242d208..ddaf9410ae 100644
    "java/src/org/chromium/chrome/browser/background_sync/BackgroundSyncBackgroundTask.java",
    "java/src/org/chromium/chrome/browser/background_sync/BackgroundSyncBackgroundTaskScheduler.java",
 diff --git a/chrome/android/java/res/xml/main_preferences.xml b/chrome/android/java/res/xml/main_preferences.xml
-index 0d4a64ba52..30c701dbdd 100644
+index 97007db310..f702f069f9 100644
 --- a/chrome/android/java/res/xml/main_preferences.xml
 +++ b/chrome/android/java/res/xml/main_preferences.xml
-@@ -131,5 +131,9 @@ found in the LICENSE file.
+@@ -132,5 +132,9 @@ found in the LICENSE file.
          android:key="about_chrome"
          android:order="31"
          android:title="@string/prefs_about_chrome"/>
@@ -84,7 +84,7 @@ index 0d4a64ba52..30c701dbdd 100644
  
  </PreferenceScreen>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 061af20fa8..bbad00e9c5 100644
+index de218a3b93..452b534f88 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 @@ -107,6 +107,7 @@ import org.chromium.chrome.browser.auxiliary_search.module.AuxiliarySearchModule
@@ -95,7 +95,7 @@ index 061af20fa8..bbad00e9c5 100644
  import org.chromium.chrome.browser.bare.BareWelcomeOverlay;
  import org.chromium.chrome.browser.bookmarks.BookmarkModel;
  import org.chromium.chrome.browser.bookmarks.BookmarkPane;
-@@ -1742,6 +1743,9 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -1738,6 +1739,9 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
  
      @Override
      public void onResumeWithNative() {
@@ -560,7 +560,7 @@ index 7b99d0466d..bf22c06ca1 100644
          whenProfileReady(
                  profile -> {
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index 9a8d9737ab..1abf32fcb4 100644
+index c625c564de..3bc126844e 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 @@ -45,6 +45,7 @@ import org.chromium.chrome.browser.autofill.settings.SettingsNavigationHelper;
@@ -588,7 +588,7 @@ index 9a8d9737ab..1abf32fcb4 100644
          cachePreferences();
          updateAutofillPreferences();
          updateGlicPreference();
-@@ -636,6 +640,45 @@ public class MainSettings extends ChromeBaseSettingsFragment
+@@ -641,6 +645,45 @@ public class MainSettings extends ChromeBaseSettingsFragment
          return preferenceInAllPreferences;
      }
  
@@ -635,10 +635,10 @@ index 9a8d9737ab..1abf32fcb4 100644
          Preference preference = getPreferenceScreen().findPreference(key);
          if (preference != null) getPreferenceScreen().removePreference(preference);
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java b/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
-index f99ae20cf9..35c13f2807 100644
+index 900dee9ca0..0a43fc40ae 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
-@@ -68,6 +68,7 @@ import org.chromium.chrome.browser.back_press.BackPressManager;
+@@ -69,6 +69,7 @@ import org.chromium.chrome.browser.back_press.BackPressManager;
  import org.chromium.chrome.browser.back_press.BackPressMetrics;
  import org.chromium.chrome.browser.back_press.BackPressMetrics.NavigationDirection;
  import org.chromium.chrome.browser.back_press.BackPressMetrics.PredictiveGestureNavPhase;
@@ -646,7 +646,7 @@ index f99ae20cf9..35c13f2807 100644
  import org.chromium.chrome.browser.bookmarks.BookmarkModel;
  import org.chromium.chrome.browser.bookmarks.BookmarkModelObserver;
  import org.chromium.chrome.browser.bookmarks.TabBookmarker;
-@@ -1002,6 +1003,16 @@ public class ToolbarManager
+@@ -1011,6 +1012,16 @@ public class ToolbarManager
  
          Supplier<@Nullable MenuButtonState> menuButtonStateSupplier =
                  () -> {
@@ -664,7 +664,7 @@ index f99ae20cf9..35c13f2807 100644
                      return mUpdateMenuItemHelper.getUiState().buttonState;
                  };
 diff --git a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
-index a639febc5f..685f782ed1 100644
+index b395bed553..51f578a6c7 100644
 --- a/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 +++ b/chrome/browser/preferences/android/java/src/org/chromium/chrome/browser/preferences/ChromePreferenceKeys.java
 @@ -407,6 +407,24 @@ public final class ChromePreferenceKeys {
@@ -692,8 +692,8 @@ index a639febc5f..685f782ed1 100644
      public static final String DOWNLOAD_USE_EXTERNAL_DOWNLOAD_MANAGER =
              "Chrome.Download.UseExternalDownloadManager";
  
-@@ -1224,6 +1242,11 @@ public final class ChromePreferenceKeys {
-                 APPEARANCE_SETTINGS_VIEW_COUNT,
+@@ -1222,6 +1240,11 @@ public final class ChromePreferenceKeys {
+                 AI_ASSISTANT_WEB_SUMMARIZATION_AVAILABILITY,
                  AUTOFILL_ASSISTANT_FIRST_TIME_LITE_SCRIPT_USER,
                  BARE_BUNDLED_AD_BLOCKER_ENABLED,
 +                BARE_UPDATE_BADGE,
@@ -705,10 +705,10 @@ index a639febc5f..685f782ed1 100644
                  DOWNLOAD_USE_EXTERNAL_DOWNLOAD_MANAGER,
                  WEBSTORE_DESKTOP_SITE_SEEDED,
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index 2158820a01..f96817adaf 100644
+index d04bf0ae91..1bfe54f549 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -3032,6 +3032,36 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -3038,6 +3038,36 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
        <message name="IDS_LIGHT_MODE" desc="Title of button that will change theme of distilled pages to light mode.">
          Light
        </message>

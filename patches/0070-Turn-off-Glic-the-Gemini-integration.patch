@@ -1,4 +1,4 @@
-From 3a5ea7897072bc27c02a0ca36740a2b16d03ba25 Mon Sep 17 00:00:00 2001
+From fde11cf191612ae40a5cbcede304aa48b34a96fa Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 22 Aug 2026 04:59:04 +0000
 Subject: [PATCH] Turn off Glic, the Gemini integration

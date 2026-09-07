@@ -1,4 +1,4 @@
-From fbc26ebb5cba245fd15b1bdf1a08a0f2b15865b5 Mon Sep 17 00:00:00 2001
+From 58875e1b29a508cd2dad59f43b68f71605d92f58 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Thu, 20 Aug 2026 15:31:19 +0000
 Subject: [PATCH] Let extension context menu items run their own command

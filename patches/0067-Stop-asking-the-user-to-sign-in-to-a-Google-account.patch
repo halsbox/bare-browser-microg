@@ -1,4 +1,4 @@
-From c57e4a175c48fe3f1389c0c462cc13d119c6797c Mon Sep 17 00:00:00 2001
+From 4a8310cb458dd07a506c87e7b94c5ce812cc5f1f Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Thu, 20 Aug 2026 15:18:25 +0000
 Subject: [PATCH] Stop asking the user to sign in to a Google account

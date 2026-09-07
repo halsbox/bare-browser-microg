@@ -1,4 +1,4 @@
-From 27530b5d0616eb937220b5a70d53ce1ceaaa5d2c Mon Sep 17 00:00:00 2001
+From 377bbfe77c6d83d94b33037618d70a5ce408a7be Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 18 Aug 2026 03:38:04 +0000
 Subject: [PATCH] Hide the shortcuts row and new tab page cards by default
@@ -32,10 +32,10 @@ index 0d80babfbd..74a34ca2f8 100644
  
      /**
 diff --git a/chrome/browser/ntp_customization/java/src/org/chromium/chrome/browser/ntp_customization/NtpCustomizationConfigManager.java b/chrome/browser/ntp_customization/java/src/org/chromium/chrome/browser/ntp_customization/NtpCustomizationConfigManager.java
-index 3d7e1537ee..65ffdd268e 100644
+index d720b4b37c..9e77c3704f 100644
 --- a/chrome/browser/ntp_customization/java/src/org/chromium/chrome/browser/ntp_customization/NtpCustomizationConfigManager.java
 +++ b/chrome/browser/ntp_customization/java/src/org/chromium/chrome/browser/ntp_customization/NtpCustomizationConfigManager.java
-@@ -189,7 +189,12 @@ public class NtpCustomizationConfigManager {
+@@ -195,7 +195,12 @@ public class NtpCustomizationConfigManager {
  
          mIsMvtToggleOn =
                  ChromeSharedPreferences.getInstance()

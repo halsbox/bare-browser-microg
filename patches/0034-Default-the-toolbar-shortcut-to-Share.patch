@@ -1,4 +1,4 @@
-From 5e68720c553558193d02e60fe46476a2b6991a7b Mon Sep 17 00:00:00 2001
+From e9e59bb7228f06432fa209d1393bdb6095294831 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 18 Aug 2026 16:40:34 +0000
 Subject: [PATCH] Default the toolbar shortcut to Share

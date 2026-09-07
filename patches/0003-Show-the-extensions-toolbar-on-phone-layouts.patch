@@ -1,4 +1,4 @@
-From 27911e3d3d2ce181f1c6017cfcf8ce517d36209e Mon Sep 17 00:00:00 2001
+From 13504afe33882c8ec850cc86674a0e884300dcfa Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 15 Aug 2026 17:56:36 +0000
 Subject: [PATCH] Show the extensions toolbar on phone layouts
@@ -16,10 +16,10 @@ Known follow-ups: the popup can overflow the window width, and the omnibox is sq
  2 files changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java b/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
-index 1bd5c5cbfa..f7f41ff3fb 100644
+index d2a06035d3..0bd756aceb 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/toolbar/ToolbarManager.java
-@@ -2668,7 +2668,11 @@ public class ToolbarManager
+@@ -2687,7 +2687,11 @@ public class ToolbarManager
                                                          mActivityTabProvider.asObservable(),
                                                          mTabCreatorManager.getTabCreator(false),
                                                          getBrowsingModeThemeColorProvider(),

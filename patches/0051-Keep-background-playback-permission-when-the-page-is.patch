@@ -1,4 +1,4 @@
-From 2b697d9eef6d537c6cda7758293f68ed0db7c56d Mon Sep 17 00:00:00 2001
+From 36fed86d31d1460a540c360b1b94412b09be55ab Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 19 Aug 2026 07:19:53 +0000
 Subject: [PATCH] Keep background playback permission when the page is hidden
@@ -11,7 +11,7 @@ Subject: [PATCH] Keep background playback permission when the page is hidden
  4 files changed, 32 insertions(+), 4 deletions(-)
 
 diff --git a/third_party/blink/public/platform/web_media_player.h b/third_party/blink/public/platform/web_media_player.h
-index 35e1dfc921..ccbf0cba61 100644
+index 674144762d..3fdaca8d3b 100644
 --- a/third_party/blink/public/platform/web_media_player.h
 +++ b/third_party/blink/public/platform/web_media_player.h
 @@ -232,6 +232,11 @@ class WebMediaPlayer {
@@ -48,7 +48,7 @@ index 1a7cbc6525..92c4f7ddfe 100644
        FastHasAttribute(html_names::kDisableremoteplaybackAttr));
  
 diff --git a/third_party/blink/renderer/platform/media/web_media_player_impl.cc b/third_party/blink/renderer/platform/media/web_media_player_impl.cc
-index 1e93df8367..93803f0c0b 100644
+index 839bcbcfe7..05a3878e0e 100644
 --- a/third_party/blink/renderer/platform/media/web_media_player_impl.cc
 +++ b/third_party/blink/renderer/platform/media/web_media_player_impl.cc
 @@ -1297,6 +1297,10 @@ bool WebMediaPlayerImpl::GetShouldPauseWhenFrameIsHidden() {
@@ -62,7 +62,7 @@ index 1e93df8367..93803f0c0b 100644
  void WebMediaPlayerImpl::OnRequestPictureInPicture() {
    ActivateSurfaceLayerForVideo();
  
-@@ -2657,8 +2661,9 @@ void WebMediaPlayerImpl::OnVideoPipelineInfoChange(
+@@ -2652,8 +2656,9 @@ void WebMediaPlayerImpl::OnVideoPipelineInfoChange(
  void WebMediaPlayerImpl::OnPageHidden() {
    DCHECK(main_task_runner_->BelongsToCurrentThread());
  
@@ -74,7 +74,7 @@ index 1e93df8367..93803f0c0b 100644
      allow_background_video_playback_ = false;
    }
  
-@@ -2778,8 +2783,9 @@ void WebMediaPlayerImpl::OnFrameHidden() {
+@@ -2773,8 +2778,9 @@ void WebMediaPlayerImpl::OnFrameHidden() {
    DCHECK(main_task_runner_->BelongsToCurrentThread());
    is_frame_hidden_ = true;
  
@@ -87,10 +87,10 @@ index 1e93df8367..93803f0c0b 100644
    }
  
 diff --git a/third_party/blink/renderer/platform/media/web_media_player_impl.h b/third_party/blink/renderer/platform/media/web_media_player_impl.h
-index 5a940ae82f..995d291f3e 100644
+index a7b5e4a39b..bcb0719b74 100644
 --- a/third_party/blink/renderer/platform/media/web_media_player_impl.h
 +++ b/third_party/blink/renderer/platform/media/web_media_player_impl.h
-@@ -264,6 +264,8 @@ class PLATFORM_EXPORT WebMediaPlayerImpl
+@@ -262,6 +262,8 @@ class PLATFORM_EXPORT WebMediaPlayerImpl
        bool should_pause_when_frame_is_hidden) override;
    bool GetShouldPauseWhenFrameIsHidden() override;
  
@@ -99,7 +99,7 @@ index 5a940ae82f..995d291f3e 100644
    bool HasAvailableVideoFrame() const override;
    bool HasReadableVideoFrame() const override;
  
-@@ -1032,6 +1034,11 @@ class PLATFORM_EXPORT WebMediaPlayerImpl
+@@ -1030,6 +1032,11 @@ class PLATFORM_EXPORT WebMediaPlayerImpl
    // the background. Affects the value of ShouldPausePlaybackWhenHidden().
    bool allow_background_video_playback_ = true;
  

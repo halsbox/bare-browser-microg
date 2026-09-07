@@ -1,4 +1,4 @@
-From 190e6f6aca0d7cd6c798e4cd532d9f44f8deb041 Mon Sep 17 00:00:00 2001
+From c58350c7343f508e20a54f40757e8c603fcaad04 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 29 Aug 2026 23:10:12 +0000
 Subject: [PATCH] Keep the app menu where the user can always reach it
@@ -1070,10 +1070,10 @@ index 58225ad8b2..de2d3658a5 100644
      public void testAssigningAHoldDoesNotDisturbTheTaps() {
          BareToolbarPrefs.setSecondaryAction(BareToolbarSlot.HOME, ActionId.SHARE);
 diff --git a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
-index ac472f5836..512eacafcb 100644
+index cc52e5f6e1..e2c1a79158 100644
 --- a/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
 +++ b/chrome/browser/ui/android/bottombar/java/src/org/chromium/chrome/browser/ui/bottombar/BottomBarCoordinator.java
-@@ -139,7 +139,7 @@ public class BottomBarCoordinator
+@@ -144,7 +144,7 @@ public class BottomBarCoordinator
       *
       * <p>This used to name the actions one at a time, which is what fixed them in place. It now
       * walks the positions and asks the resolved arrangement what each one holds, so an action that
@@ -1082,7 +1082,7 @@ index ac472f5836..512eacafcb 100644
       * cannot change resolve to the same answers they always did.
       *
       * <p>Order matters and is the order of the slots themselves: the manager works out which side
-@@ -160,10 +160,12 @@ public class BottomBarCoordinator
+@@ -165,10 +165,12 @@ public class BottomBarCoordinator
              BottomBarButtonContainer container = view.getContainerForSlot(slot);
              boolean managed = BareToolbarActionRendering.hasManagedVisibility(actionId);
  
@@ -1098,10 +1098,10 @@ index ac472f5836..512eacafcb 100644
                  if (!container.hasTargetView()) {
                      container.setStubLayoutResource(template);
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index e1c4a50eea..4019cd41c3 100644
+index 7595ee3ca4..222119b2fb 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -4227,9 +4227,6 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -4302,9 +4302,6 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
        <message name="IDS_BARE_TOOLBAR_POSITION_SECOND" desc="Accessibility name for the second configurable button on the toolbar.">
          Second toolbar button
        </message>

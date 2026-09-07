@@ -1,4 +1,4 @@
-From 3fa13e7ec6105c77940ae6b4ff4768f85fd31e95 Mon Sep 17 00:00:00 2001
+From 8a7f2e37ba8d6e59637c10a2ef96d03612160094 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 15 Aug 2026 04:07:03 +0000
 Subject: [PATCH] Stop the extensions menu crashing without a toolbar
@@ -12,10 +12,10 @@ The extensions toolbar coordinator is only created for Desktop Android, but exte
  create mode 100644 chrome/android/junit/src/org/chromium/chrome/browser/ChromeTabbedActivityUnitTest.java
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-index 99944c0391..9ea6b8fbb8 100644
+index 888a4909ba..7e515925c5 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/ChromeTabbedActivity.java
-@@ -4504,17 +4504,15 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -4503,17 +4503,15 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
          } else if (id == R.id.extensions_menu_menu_id) {
              ExtensionsToolbarCoordinator coordinator =
                      getToolbarManager().getExtensionsToolbarCoordinator();
@@ -40,7 +40,7 @@ index 99944c0391..9ea6b8fbb8 100644
              RecordUserAction.record("MobileMenuManageExtensions");
              Profile profile = mTabModelProfileSupplier.get();
              if (profile != null) {
-@@ -4702,6 +4700,25 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
+@@ -4683,6 +4681,25 @@ public class ChromeTabbedActivity extends ChromeActivity implements PreAttachInt
          return true;
      }
  
@@ -67,10 +67,10 @@ index 99944c0391..9ea6b8fbb8 100644
          Profile profile = getTabModelSelector().getCurrentModel().getProfile();
          ForeignSessionHelper helper = new ForeignSessionHelper(profile);
 diff --git a/chrome/android/junit/BUILD.gn b/chrome/android/junit/BUILD.gn
-index 714390b3e5..a7b47bd61e 100644
+index f7a78991b7..3aab8ac3b7 100644
 --- a/chrome/android/junit/BUILD.gn
 +++ b/chrome/android/junit/BUILD.gn
-@@ -434,6 +434,7 @@ if (is_android) {
+@@ -435,6 +435,7 @@ if (is_android) {
        "src/org/chromium/chrome/browser/ChromeActivityUnitTest.java",
        "src/org/chromium/chrome/browser/ChromeBaseAppCompatActivityUnitTest.java",
        "src/org/chromium/chrome/browser/ChromeLocalizationUtilsTest.java",

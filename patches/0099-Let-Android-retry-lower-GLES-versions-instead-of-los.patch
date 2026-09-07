@@ -1,4 +1,4 @@
-From 2f7782f5dfcba6d07af23c58af28eee1d732dcb7 Mon Sep 17 00:00:00 2001
+From 43805187832a92f53662fb629a11d3089d3ec36b Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 26 Aug 2026 20:57:35 +0000
 Subject: [PATCH] Let Android retry lower GLES versions instead of losing the

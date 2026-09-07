@@ -1,4 +1,4 @@
-From f10ad285bee4e4da8da9fec7ef20fc7f14021a65 Mon Sep 17 00:00:00 2001
+From 47866e1678144faec98316b60397d68c86f118e9 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 18 Aug 2026 20:21:18 +0000
 Subject: [PATCH] Stop badging settings rows as new
@@ -15,10 +15,10 @@ label, so this is a single flag rather than a change per preference.
  1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-index d54e5cd46b..454a4514d1 100644
+index b18f0f7be5..e7086b160e 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/MainSettings.java
-@@ -843,7 +843,12 @@ public class MainSettings extends ChromeBaseSettingsFragment
+@@ -852,7 +852,12 @@ public class MainSettings extends ChromeBaseSettingsFragment
          }
  
          final int viewCount = sharedPreferences.readInt(viewCountPrefKey, 0);

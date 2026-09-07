@@ -1,4 +1,4 @@
-From 634de6f21c4161f7a5c0a6d988af0cb71096ea18 Mon Sep 17 00:00:00 2001
+From 11b7288a5e77979bd6b331c7b86f2e53845f9269 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 16 Aug 2026 08:07:02 +0000
 Subject: [PATCH] Remove the web app restore promo

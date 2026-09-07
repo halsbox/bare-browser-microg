@@ -1,4 +1,4 @@
-From 4136662260bd4c72c84dcb33ed3148ea154c44d1 Mon Sep 17 00:00:00 2001
+From 0a63af0f69aeaca171038d480ffbaf2eeaff8d6b Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Thu, 20 Aug 2026 06:39:38 +0000
 Subject: [PATCH] Finish renaming the browser in the remaining strings
@@ -14,7 +14,7 @@ the copyright line, and the project's own name where it appears as the link
 text in the credits. The about page now reads that Bare is made possible by the
 Chromium open source project, which is the accurate statement.
 ---
- chrome/app/chromium_strings.grd               | 1098 ++++++++---------
+ chrome/app/chromium_strings.grd               | 1094 ++++++++---------
  chrome/app/generated_resources.grd            |    2 +-
  chrome/app/password_manager_ui_strings.grdp   |   16 +-
  chrome/app/settings_chromium_strings.grdp     |  236 ++--
@@ -22,21 +22,21 @@ Chromium open source project, which is the accurate statement.
  .../strings/android_chrome_strings.grd        |    4 +-
  components/autofill_payments_strings.grdp     |   12 +-
  components/autofill_strings.grdp              |   12 +-
- components/components_chromium_strings.grd    |   40 +-
+ components/components_chromium_strings.grd    |   34 +-
  components/management_strings.grdp            |    4 +-
  components/new_or_sad_tab_strings.grdp        |    4 +-
  components/page_info_strings.grdp             |   14 +-
  components/password_manager_strings.grdp      |    8 +-
- components/privacy_sandbox_strings.grd        |    6 +-
+ components/privacy_sandbox_strings.grd        |    4 +-
  components/reset_password_strings.grdp        |    4 +-
- components/search_engine_choice_strings.grdp  |   14 +-
+ components/search_engine_choice_strings.grdp  |   12 +-
  .../security_interstitials_strings.grdp       |    8 +-
  components/send_tab_to_self_strings.grdp      |    2 +-
  components/ssl_errors_strings.grdp            |    6 +-
- 19 files changed, 746 insertions(+), 746 deletions(-)
+ 19 files changed, 739 insertions(+), 739 deletions(-)
 
 diff --git a/chrome/app/chromium_strings.grd b/chrome/app/chromium_strings.grd
-index b9b766e726..705073e80a 100644
+index a741f89bf5..11d4d7beda 100644
 --- a/chrome/app/chromium_strings.grd
 +++ b/chrome/app/chromium_strings.grd
 @@ -294,15 +294,15 @@ If you update this file, be sure also to update google_chrome_strings.grd. -->
@@ -501,7 +501,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_PIN_INFOBAR_DOCK_BUTTON" desc="Label for the button on an infobar offering to keep Chromium in the Dock.">
            Keep in Dock
-@@ -802,257 +802,257 @@ Chromium is unable to recover your settings.
+@@ -802,78 +802,78 @@ Chromium is unable to recover your settings.
              <!-- Pin InfoBar Experimental strings -->
        <if expr="is_win">
          <message name="IDS_PIN_INFOBAR_EXPERIMENTAL_MESSAGE_1" translateable="false" desc="Message text for the experimental pin infobar version 1 on Windows">
@@ -602,12 +602,9 @@ index b9b766e726..705073e80a 100644
 +          Set Bare as your default browser
          </message>
          <message name="IDS_DEFAULT_BROWSER_MODAL_BODY_WITHOUT_SETTINGS_ILLUSTRATION" desc="Body text of the default browser modal without settings illustration.">
--          Get easy access to the features you know, love, and trust by setting Chromium as your default browser.
-+          Get easy access to the features you know, love, and trust by setting Bare as your default browser.
-         </message>
-         <message name="IDS_DEFAULT_BROWSER_MODAL_BODY_WITHOUT_SETTINGS_ILLUSTRATION_UNPINNED" desc="Body text of the default browser modal without settings illustration when Chromium is not pinned to the taskbar.">
--          Get easy access to the features you know, love, and trust by setting Chromium as your default browser. Chromium will be pinned to your taskbar for quick access.
-+          Get easy access to the features you know, love, and trust by setting Bare as your default browser. Bare will be pinned to your taskbar for quick access.
+           Keep your passwords, bookmarks, and history perfectly synced across devices. Easily access the features you know and love by updating your default browser to Chromium.
+@@ -882,177 +882,177 @@ Chromium is unable to recover your settings.
+           Keep your passwords, bookmarks, and history perfectly synced across devices. Easily access the features you know and love by updating your default browser to Chromium. Chromium will be pinned to your taskbar for quick access.
          </message>
          <message name="IDS_DEFAULT_BROWSER_BUBBLE_DIALOG_TITLE" desc="Title of the dialog prompting the user to set Chromium as the default browser.">
 -          Set Chromium as your default browser
@@ -1199,7 +1196,7 @@ index b9b766e726..705073e80a 100644
          </message>
        </if>
  
-@@ -1394,127 +1394,127 @@ Chromium is unable to recover your settings.
+@@ -1394,48 +1394,48 @@ Chromium is unable to recover your settings.
        <if expr="not use_titlecase">
          <message name="IDS_AVATAR_BUTTON_INTERCEPT_BUBBLE_CHROME_SIGNIN_TEXT"
            desc="Text asking the user to sign into Chromium while the Chromium Signin Bubble intercept is shown.">
@@ -1257,6 +1254,11 @@ index b9b766e726..705073e80a 100644
          <message name="IDS_SIGNIN_DICE_WEB_INTERCEPT_CREATE_BUBBLE_DESC" desc="Body of the web signin interception bubble. It is shown when the user signs in on the web while they already have another account present in the current profile.">
 -          <ph name="EXISTING_USER">$1<ex>Elisa</ex></ph> is already signed in.  To keep your browsing separate, sign in to Chromium in your own profile as <ph name="USER_EMAIL_ADDRESS">$2<ex>foo@gmail.com</ex></ph>.
 +          <ph name="EXISTING_USER">$1<ex>Elisa</ex></ph> is already signed in.  To keep your browsing separate, sign in to Bare in your own profile as <ph name="USER_EMAIL_ADDRESS">$2<ex>foo@gmail.com</ex></ph>.
+         </message>
+         <!-- Account Preview Multi-User / Profile Separation Intercept Promo Subtitles -->
+         <message name="IDS_ACCOUNT_PREVIEW_PROFILE_SEPARATION_SUBTITLE_PASSWORDS_WITH_DEVICE" desc="Body of the web signin interception bubble with account preview, informing the user they can keep accounts separate and access passwords from their other device.">
+@@ -1457,83 +1457,83 @@ Chromium is unable to recover your settings.
+           <ph name="EXISTING_USER">$1<ex>Elisa</ex></ph> is already signed in. To keep your browsing separate, sign in to Chromium in your own profile as <ph name="USER_EMAIL_ADDRESS">$2<ex>bob.beckett@gmail.com</ex></ph>. You’ll also get your saved info and more on all your devices.
          </message>
          <message name="IDS_SIGNIN_DICE_WEB_INTERCEPT_BUBBLE_CHROME_SIGNIN_SUBTITLE" desc="Subtitle of the Chromium Signin Bubble intercept that is shown when a signed out user signs in on the web with it's first account.">
 -          To get your passwords and more on all your devices, sign in to Chromium
@@ -1363,7 +1365,7 @@ index b9b766e726..705073e80a 100644
          </message>
        </if>
  
-@@ -1527,7 +1527,7 @@ Chromium is unable to recover your settings.
+@@ -1546,7 +1546,7 @@ Chromium is unable to recover your settings.
            ChromiumOS could not sync your data because your account sign-in details are out of date.
          </message>
          <message name="IDS_SYNC_SIGN_IN_ERROR_BUBBLE_VIEW_MESSAGE_2" desc="Message in the sign-in error notification when the user's sign-in credentials are out of date.">
@@ -1372,7 +1374,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_SYNC_UNAVAILABLE_ERROR_BUBBLE_VIEW_MESSAGE" desc="Message in the sign-in error notification when sync is not available for their domain.">
            ChromiumOS could not sync your data because Sync is not available for your domain.
-@@ -1536,88 +1536,88 @@ Chromium is unable to recover your settings.
+@@ -1555,88 +1555,88 @@ Chromium is unable to recover your settings.
            ChromiumOS could not sync your data due to an error signing in.
          </message>
          <message name="IDS_SYNC_OTHER_SIGN_IN_ERROR_BUBBLE_VIEW_MESSAGE_2" desc="Message in the sign-in error notification when there's an error signing in.">
@@ -1483,7 +1485,7 @@ index b9b766e726..705073e80a 100644
        </message>
        <if expr="is_win">
          <message name="IDS_APP_SHORTCUTS_SUBDIR_NAME_BETA" desc="Unused in Chromium builds" translateable="false">
-@@ -1628,44 +1628,44 @@ Chromium is unable to recover your settings.
+@@ -1647,44 +1647,44 @@ Chromium is unable to recover your settings.
  
        <!-- MediaStream capture status tray icon -->
        <message name="IDS_MEDIA_STREAM_STATUS_TRAY_TEXT_AUDIO_AND_VIDEO" desc="Tool tip for the capture status tray icon when microphone and camera are being used">
@@ -1539,7 +1541,7 @@ index b9b766e726..705073e80a 100644
          </message>
        </if>
  
-@@ -1673,40 +1673,40 @@ Chromium is unable to recover your settings.
+@@ -1692,40 +1692,40 @@ Chromium is unable to recover your settings.
        <if expr="not is_android and not is_chromeos">
          <!-- User pod remove sync warning text -->
          <message name="IDS_LOGIN_POD_USER_REMOVE_WARNING_SYNC" desc="Main text shown as a warning when attempting to remove an user.">
@@ -1590,7 +1592,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_TUTORIAL_PASSWORD_MANAGER_CLICK_PASSWORD_MANAGER" desc="The description of the 'click password manager' step in password manager tutorial">
            Click “Password Manager”
-@@ -1721,29 +1721,29 @@ Chromium is unable to recover your settings.
+@@ -1740,29 +1740,29 @@ Chromium is unable to recover your settings.
  
        <!-- Settings API bubble -->
        <message name="IDS_EXTENSIONS_SETTINGS_API_SECOND_LINE_START_PAGES" desc="Second line in the Settings API bubble. Only shown if the secondary change by the extension was just the start pages. The triple single quotes are needed to preserve the space before and after the sentence which is needed when the language (Chrome is being translated to) uses space as word separator. Please preserve them, unless the language being translated to does not use space as word separator.">
@@ -1626,7 +1628,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_INBOUND_MDNS_RULE_NAME_BETA" desc="Unused in Chromium builds" translateable="false">
          </message>
-@@ -1752,7 +1752,7 @@ Chromium is unable to recover your settings.
+@@ -1771,7 +1771,7 @@ Chromium is unable to recover your settings.
          <message name="IDS_INBOUND_MDNS_RULE_NAME_DEV" desc="Unused in Chromium builds" translateable="false">
          </message>
          <message name="IDS_INBOUND_MDNS_RULE_DESCRIPTION" desc="The description of the firewall rule allowing inbound mDNS traffic.">
@@ -1635,7 +1637,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_INBOUND_MDNS_RULE_DESCRIPTION_BETA" desc="Unused in Chromium builds" translateable="false">
          </message>
-@@ -1764,51 +1764,51 @@ Chromium is unable to recover your settings.
+@@ -1783,51 +1783,51 @@ Chromium is unable to recover your settings.
  
        <if expr="not is_android">
          <message name="IDS_CONTENT_CONTEXT_ACCESSIBILITY_LABELS_BUBBLE_TEXT" desc="The text of a bubble that confirms users allows integrating the accessibility labels service of Google to Chromium.">
@@ -1698,7 +1700,7 @@ index b9b766e726..705073e80a 100644
            </message>
          </if>
        </if>
-@@ -1816,13 +1816,13 @@ Chromium is unable to recover your settings.
+@@ -1835,13 +1835,13 @@ Chromium is unable to recover your settings.
        <!-- Update Recommended dialog -->
        <if expr="not is_chromeos">
          <message name="IDS_UPDATE_RECOMMENDED_DIALOG_TITLE" desc="The window title for the Update Recommended dialog.">
@@ -1716,7 +1718,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_RELAUNCH_AND_UPDATE" desc="The button in the Update Recommended dialog which updates and relaunches Chrome.">
            Relaunch
-@@ -1842,71 +1842,71 @@ Chromium is unable to recover your settings.
+@@ -1861,71 +1861,71 @@ Chromium is unable to recover your settings.
  
        <if expr="is_win or is_macosx or is_linux">
          <message name="IDS_UPDATE_RECOMMENDED_DIALOG_TITLE_ALT" desc="Alternate window title for the Update Recommended dialog." translateable="false">
@@ -1805,7 +1807,7 @@ index b9b766e726..705073e80a 100644
          </message>
        </if>
        <message name="IDS_RECOVERY_BUBBLE_TEXT" desc="Text for the chrome recovery bubble view full description.">
-@@ -1915,77 +1915,77 @@ Chromium is unable to recover your settings.
+@@ -1934,77 +1934,77 @@ Chromium is unable to recover your settings.
  
        <!-- Critical Notification bubble -->
        <message name="IDS_CRITICAL_NOTIFICATION_TITLE" desc="The title for a bubble that appears when there is a critical update and Chromium must restart to install it. It counts down a timer and then Chromium automatically restarts.">
@@ -1904,7 +1906,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_LOCAL_NETWORK_ACCESS_PERMISSION_DESC" desc="Text shown in the macOS permission dialog, describing why Chrome needs the permission to access local network.">
            This will allow you to select from available devices and display content on them.
-@@ -1994,12 +1994,12 @@ Chromium is unable to recover your settings.
+@@ -2013,12 +2013,12 @@ Chromium is unable to recover your settings.
  
        <!-- Side panel strings -->
        <message name="IDS_SIDE_PANEL_CUSTOMIZE_CHROME_TITLE" desc="The name of the Customize Chrome feature in the side panel combo box.">
@@ -1919,7 +1921,7 @@ index b9b766e726..705073e80a 100644
        </message>
  
        <!-- Lens Overlay Strings -->
-@@ -2341,7 +2341,7 @@ Chromium is unable to recover your settings.
+@@ -2361,7 +2361,7 @@ Chromium is unable to recover your settings.
          </message>
          <message name="IDS_LENS_PERMISSION_BUBBLE_DIALOG_LEARN_MORE_ABOUT_GOOGLE_LENS_LINK"
            desc="Accessibility label for text link that is shown to users to learn more about privacy in relation to Google Lens.">
@@ -1928,7 +1930,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_LENS_PERMISSION_BUBBLE_DIALOG_TITLE"
            desc="The title of the lens permission search bubble dialog, introducing Lens as a way to search what's on their screen.">
-@@ -2426,7 +2426,7 @@ Chromium is unable to recover your settings.
+@@ -2446,7 +2446,7 @@ Chromium is unable to recover your settings.
        <!-- OOBE -->
        <if expr="is_chromeos">
          <message name="IDS_INSTALLING_UPDATE" desc="Label shown on the updates installation screen during OOBE">
@@ -1937,7 +1939,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_EULA_SCREEN_ACCESSIBLE_TITLE" desc="Title to be spoken on opening the OOBE EULA screen">
            ChromiumOS terms
-@@ -2436,7 +2436,7 @@ Chromium is unable to recover your settings.
+@@ -2456,7 +2456,7 @@ Chromium is unable to recover your settings.
        <!-- Native notifications for Windows 10 -->
        <if expr="is_win">
          <message name="IDS_WIN_NOTIFICATION_SETTINGS_CONTEXT_MENU_ITEM_NAME" desc="The name of the button in Windows Notification Center which leads to Chrome notification settings.">
@@ -1946,7 +1948,7 @@ index b9b766e726..705073e80a 100644
          </message>
        </if>
        <!-- Relaunch notification bubble and dialog. -->
-@@ -2444,115 +2444,115 @@ Chromium is unable to recover your settings.
+@@ -2464,115 +2464,115 @@ Chromium is unable to recover your settings.
          <if expr="not is_chromeos">
            <message name="IDS_RELAUNCH_RECOMMENDED_TITLE" desc="The title of a dialog that tells users that a browser relaunch is recommended for an update available for some number of days.">
              {0, plural,
@@ -2102,7 +2104,7 @@ index b9b766e726..705073e80a 100644
          </message>
        </if>
  
-@@ -2566,104 +2566,104 @@ Chromium is unable to recover your settings.
+@@ -2586,42 +2586,42 @@ Chromium is unable to recover your settings.
        <!-- Chrome parent extension/app install blocking dialog. -->
        <if expr="enable_extensions_core">
          <message name="IDS_EXTENSION_PERMISSIONS_BLOCKED_BY_PARENT_PROMPT_MESSAGE" desc="Text for the dialog indicating that a parent has blocked extensions and apps.">
@@ -2156,6 +2158,8 @@ index b9b766e726..705073e80a 100644
          </message>
  
          <!-- First Run Experience -->
+@@ -2631,63 +2631,63 @@ Chromium is unable to recover your settings.
+ 
          <message name="IDS_FRE_SIGN_IN_TITLE_0" meaning="Title"
            desc="This string appears as a heading on a full-page screen that asks the user to sign in to Chromium with their Google Account. It appears when the user launches Chromium for the first time. When they sign in, they can personalize and customize Chromium and remember their settings in their Google Account. The tone should be inviting and alluring.">
 -          Sign in to Chromium
@@ -2235,7 +2239,7 @@ index b9b766e726..705073e80a 100644
          </message>
  
          <!-- Feature Showcase - Password Manager -->
-@@ -2671,7 +2671,7 @@ Chromium is unable to recover your settings.
+@@ -2695,7 +2695,7 @@ Chromium is unable to recover your settings.
            Stay safe with Password Manager
          </message>
          <message name="IDS_FEATURE_SHOWCASE_PASSWORD_MANAGER_SUBTITLE" desc="Description for the Password Manager page in the Feature Showcase.">
@@ -2244,7 +2248,7 @@ index b9b766e726..705073e80a 100644
          </message>
  
          <!-- Feature Showcase - Lens -->
-@@ -2684,14 +2684,14 @@ Chromium is unable to recover your settings.
+@@ -2708,14 +2708,14 @@ Chromium is unable to recover your settings.
  
          <!-- Feature Showcase - Gemini -->
          <message name="IDS_FEATURE_SHOWCASE_GEMINI_TITLE" desc="This is the headline for the Gemini (AI assistant) opt-in screen. It introduces the benefit of AI assistance for productivity. (CHAR LIMIT = 60)">
@@ -2261,7 +2265,7 @@ index b9b766e726..705073e80a 100644
        </message>
  
        <!-- Notification quiet permission IPH -->
-@@ -2704,20 +2704,20 @@ Chromium is unable to recover your settings.
+@@ -2728,20 +2728,20 @@ Chromium is unable to recover your settings.
  
        <!-- ChromeLabs bubble -->
        <message name="IDS_CHROMELABS_RELAUNCH_FOOTER_MESSAGE" desc="Text that shows in the footer of the Chrome Labs bubble when relaunch is needed for changes to take effect.">
@@ -2286,7 +2290,7 @@ index b9b766e726..705073e80a 100644
        </message>
        <message name="IDS_TAILORED_SECURITY_UNCONSENTED_PROMOTION_MESSAGE_DESCRIPTION" desc="Description shown in the message shown when a user changes their account-level tailored security setting encouraging them to enable Enhanced Safe Browsing">
          Enhanced protection does more to block phishing and malware
-@@ -2732,39 +2732,39 @@ Chromium is unable to recover your settings.
+@@ -2756,39 +2756,39 @@ Chromium is unable to recover your settings.
        <!--Launch On Startup-->
        <if expr="is_win">
          <message name="IDS_SETTINGS_FOREGROUND_LAUNCH_ON_STARTUP_LABEL" desc="Label for settings toggle button that enables or disables opening Chromium on system startup">
@@ -2336,7 +2340,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_NO_UPDATE_RESPONSE" desc="Updater response for no updates when handling install result.">
            No update is available
-@@ -2773,7 +2773,7 @@ Chromium is unable to recover your settings.
+@@ -2797,7 +2797,7 @@ Chromium is unable to recover your settings.
            Installation failed. Please try again.
          </message>
          <message name="IDS_INSTALLER_DISPLAY_NAME" desc="Name for the updater metainstaller.">
@@ -2345,7 +2349,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_CLOSE_BUTTON" desc="Close button tooltip">
            Close
-@@ -2812,13 +2812,13 @@ Chromium is unable to recover your settings.
+@@ -2836,13 +2836,13 @@ Chromium is unable to recover your settings.
            Canceling...
          </message>
          <message name="IDS_TEXT_RESTART_BROWSER" desc="For when a browser must be restarted to complete the installation.">
@@ -2362,7 +2366,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_UPDATER_CLOSE" desc="For close button on the UI post install completion.">
            Close
-@@ -3004,101 +3004,101 @@ Chromium is unable to recover your settings.
+@@ -3028,101 +3028,101 @@ Chromium is unable to recover your settings.
          <!--Windows service strings.-->
          <message name="IDS_UPDATER_SERVICE_DISPLAY_NAME"
                   desc="The name of the Windows service. Displayed in the Windows Services management console.">
@@ -2485,7 +2489,7 @@ index b9b766e726..705073e80a 100644
        </message>
        <message name="IDS_GLIC_STATUS_ICON_TOOLTIP_CANARY" translateable="false" desc="This is the tooltip that is shown when the glic status icon is hovered and the Glic window is closed. It indicates that this is the Canary version of the browser.">
          Open Gemini (Canary)
-@@ -3110,7 +3110,7 @@ Chromium is unable to recover your settings.
+@@ -3134,7 +3134,7 @@ Chromium is unable to recover your settings.
          Open Gemini (Beta)
        </message>
        <message name="IDS_GLIC_STATUS_ICON_TOOLTIP_CLOSE" translateable="false" desc="This is the tooltip that is shown when the glic status icon is hovered and the Glic window is open.">
@@ -2494,7 +2498,7 @@ index b9b766e726..705073e80a 100644
        </message>
        <message name="IDS_GLIC_STATUS_ICON_TOOLTIP_CLOSE_CANARY" translateable="false" desc="This is the tooltip that is shown when the glic status icon is hovered and the Glic window is open. It indicates that this is the Canary version of the browser.">
          Close Gemini (Canary)
-@@ -3122,7 +3122,7 @@ Chromium is unable to recover your settings.
+@@ -3146,7 +3146,7 @@ Chromium is unable to recover your settings.
          Close Gemini (Beta)
        </message>
        <message name="IDS_GLIC_STATUS_ICON_TOOLTIP_TOGGLE" translateable="false" desc="This is the tooltip that is shown when the glic status icon is hovered.">
@@ -2503,7 +2507,7 @@ index b9b766e726..705073e80a 100644
        </message>
        <message name="IDS_GLIC_STATUS_ICON_TOOLTIP_TOGGLE_CANARY" translateable="false" desc="This is the tooltip that is shown when the glic status icon is hovered. It indicates that this is the Canary version of the browser.">
          Toggle Gemini (Canary)
-@@ -3134,106 +3134,106 @@ Chromium is unable to recover your settings.
+@@ -3158,110 +3158,110 @@ Chromium is unable to recover your settings.
          Toggle Gemini (Beta)
        </message>
        <message name="IDS_GLIC_STATUS_ICON_MENU_SHOW" translateable="false" desc="This is the menu item for showing the glic UI.">
@@ -2517,6 +2521,10 @@ index b9b766e726..705073e80a 100644
        <message name="IDS_GLIC_STATUS_ICON_MENU_TOGGLE" translateable="false" desc="This is the menu item for toggling the glic UI.">
 -        Toggle Gemini in Chromium
 +        Toggle Gemini in Bare
+       </message>
+       <!-- TODO(crbug.com/532187976): Make strings translateable once finalized. -->
+       <message name="IDS_OMNIBOX_EVERYWHERE_STATUS_ICON_MENU_TOGGLE" desc="Label for the toggle item in the Omnibox Everywhere status tray context menu." translateable="false">
+         Toggle Search in Chromium
        </message>
        <message name ="IDS_GLIC_INELIGIBLE_PROFILE_NOTICE" translateable="false" desc="This is the text of the glic ineligible profile notice.">
 -        To use Gemini in Chromium, sign in with a different Google Account
@@ -2638,7 +2646,7 @@ index b9b766e726..705073e80a 100644
        </message>
        <message name="IDS_DICE_MIGRATION_CONFIRMATION_TOAST_BUTTON" desc="The text on the button of the confirmation toast shown after the user clicks the accept button on the Dice Migration dialog, that allows the users to control the sync settings or sign out of Chrome.">
          Manage
-@@ -3243,12 +3243,12 @@ Chromium is unable to recover your settings.
+@@ -3271,12 +3271,12 @@ Chromium is unable to recover your settings.
        <if expr="not is_android">
          <if expr="use_titlecase">
            <message name="IDS_PROFILE_MENU_ACCOUNT_SETTINGS_BUTTON" desc="Button in the avatar menu bubble view for opening Chrome account settings.">
@@ -2653,7 +2661,7 @@ index b9b766e726..705073e80a 100644
            </message>
          </if>
        </if>
-@@ -3262,10 +3262,10 @@ Chromium is unable to recover your settings.
+@@ -3290,10 +3290,10 @@ Chromium is unable to recover your settings.
          </message>
  
          <message name="IDS_DICTATION_ONBOARDING_TITLE" desc="The title string in the onboarding dialog for the dictation feature." translateable="false">
@@ -2666,7 +2674,7 @@ index b9b766e726..705073e80a 100644
          </message>
          <message name="IDS_DICTATION_ONBOARDING_BULLET_DISCLAIMER" desc="The disclaimer text in the onboarding dialog describing the use of AI and potential for mistakes and providing a link for more details." translateable="false">
            Dictation uses AI and can make mistakes. <ph name="LEARN_MORE_LINK">$1<ex>Learn more</ex></ph>
-@@ -3275,140 +3275,140 @@ Chromium is unable to recover your settings.
+@@ -3303,140 +3303,140 @@ Chromium is unable to recover your settings.
        <!--Desktop to iOS promo strings-->
        <if expr="not is_android">
          <message name="IDS_IOS_DESKTOP_ESB_PROMO_BUBBLE_DESCRIPTION_REMINDER" desc="The description for the iOS desktop ESB promo bubble with a reminder button.">
@@ -2849,7 +2857,7 @@ index b9b766e726..705073e80a 100644
          </message>
        </if>
  
-@@ -3419,7 +3419,7 @@ Chromium is unable to recover your settings.
+@@ -3447,7 +3447,7 @@ Chromium is unable to recover your settings.
        </message>
        <message name="IDS_DEFAULT_SEARCH_ENGINE_RESET_NOTIFICATION_BODY"
           desc="Body text of the notification shown when Chromium resets the default search engine, explaining that a change from outside Chromium was detected.">
@@ -2858,7 +2866,7 @@ index b9b766e726..705073e80a 100644
        </message>
        <message name="IDS_DEFAULT_SEARCH_ENGINE_RESET_NOTIFICATION_GOT_IT_BUTTON"
           desc="Label for the 'Got it' button in the default search engine reset notification, which dismisses the UI.">
-@@ -3447,23 +3447,23 @@ Chromium is unable to recover your settings.
+@@ -3475,23 +3475,23 @@ Chromium is unable to recover your settings.
  
        <!-- JS optimizations bubble -->
        <message name="IDS_JS_OPTIMIZATION_BUBBLE_BODY_NON_POLICY_BODY" desc="Body text for the JavaScript optimization bubble when disabled for other reasons.">
@@ -2888,10 +2896,10 @@ index b9b766e726..705073e80a 100644
      </messages>
    </release>
 diff --git a/chrome/app/generated_resources.grd b/chrome/app/generated_resources.grd
-index f1a722c200..4eba86d0ce 100644
+index 8df3f66084..6e26b6f951 100644
 --- a/chrome/app/generated_resources.grd
 +++ b/chrome/app/generated_resources.grd
-@@ -7321,7 +7321,7 @@ Keep your key file in a safe place. You will need it to create new versions of y
+@@ -7329,7 +7329,7 @@ Keep your key file in a safe place. You will need it to create new versions of y
            Reason: The inverted rule <ph name="REVERT_RULE">$1<ex>!example.com</ex></ph> was found in the "Force open in" list.
          </message>
          <message name="IDS_ABOUT_BROWSER_SWITCH_INTERNALS_OPEN_BROWSER_DEFAULT_REASON" desc="about:browser-switch/internals, section URL Checker, the explaination reason for check result, displayed when the entered URL did not match any listed rule and default browser will not get switched">
@@ -2901,10 +2909,10 @@ index f1a722c200..4eba86d0ce 100644
          <message name="IDS_ABOUT_BROWSER_SWITCH_INTERNALS_INVALID_URL" desc="about:browser-switch/internals, section URL Checker, specific error message when the url is invalid">
            Invalid URL. Make sure it is formatted properly.
 diff --git a/chrome/app/password_manager_ui_strings.grdp b/chrome/app/password_manager_ui_strings.grdp
-index 92aa9da16b..e560d5e468 100644
+index bcda83d1e5..44c0d4d75c 100644
 --- a/chrome/app/password_manager_ui_strings.grdp
 +++ b/chrome/app/password_manager_ui_strings.grdp
-@@ -881,7 +881,7 @@
+@@ -893,7 +893,7 @@
          Password Manager needs access to MacOS Keychain
        </message>
        <message name="IDS_PASSWORD_MANAGER_UI_RELAUNCH_CHROME_PROMO_CARD_DESCRIPTION" desc="Description for not branded Relaunch ChrChromiumome promo card.">
@@ -2913,7 +2921,7 @@ index 92aa9da16b..e560d5e468 100644
        </message>
      </else>
      </if>
-@@ -901,7 +901,7 @@
+@@ -913,7 +913,7 @@
          Password Manager needs more access
        </message>
        <message name="IDS_PASSWORD_MANAGER_UI_RELAUNCH_CHROME_PROMO_CARD_DESCRIPTION_LINUX" desc="Description for the Relaunch Chromium promo card.">
@@ -2922,7 +2930,7 @@ index 92aa9da16b..e560d5e468 100644
        </message>
      </else>
      </if>
-@@ -915,7 +915,7 @@
+@@ -927,7 +927,7 @@
      </then>
      <else>
        <message name="IDS_PASSWORD_MANAGER_UI_RELAUNCH_CHROME_PROMO_CARD_ACTION" desc="Action button for not branded Relaunch Chrome promo card.">
@@ -2931,7 +2939,7 @@ index 92aa9da16b..e560d5e468 100644
        </message>
      </else>
      </if>
-@@ -1004,7 +1004,7 @@
+@@ -1016,7 +1016,7 @@
    </then>
    <else>
      <message name="IDS_PASSWORD_MANAGER_UI_PASSWORD_CHANGE_TOAST_SIGN_IN_TO_CONTINUE" desc="The description for the automated password change entry in Password Manager settings.">
@@ -2940,7 +2948,7 @@ index 92aa9da16b..e560d5e468 100644
      </message>
    </else>
    </if>
-@@ -1044,7 +1044,7 @@
+@@ -1056,7 +1056,7 @@
    </then>
    <else>
      <message name="IDS_PASSWORD_MANAGER_UI_PASSWORD_CHANGE_SETTINGS_DESCRIPTION" desc="The description for the automated password change entry in Password Manager settings.">
@@ -2949,7 +2957,7 @@ index 92aa9da16b..e560d5e468 100644
      </message>
    </else>
    </if>
-@@ -1062,7 +1062,7 @@
+@@ -1074,7 +1074,7 @@
      </message>
    </if>
    <message name="IDS_PASSWORD_MANAGER_UI_PASSWORD_CHANGE_CHECKUP_BUTTON_ARIA_DESCRIPTION" desc="An accessibility description for the automated password change button in Password Manager checkup.">
@@ -2958,7 +2966,7 @@ index 92aa9da16b..e560d5e468 100644
    </message>
    <message name="IDS_PASSWORD_MANAGER_UI_PASSWORD_CHANGE_ATTEMPTING_SIGN_IN" desc="Status text on the button when automated password change is attempting to sign the user in.">
      Attempting sign-in...
-@@ -1090,7 +1090,7 @@
+@@ -1102,7 +1102,7 @@
    </then>
    <else>
      <message name="IDS_SETTINGS_PASSWORD_CHANGE_SUBLABEL_WITH_LEARN_MORE" desc="Sublabel for password change entry in settings. The description of the feature beneath the 'Automated password change' feature title. This and the bullets beneath this paragraph represent the full description of the feature. * 'public' does two things: 1) it provides distance between 'Chrome' and 'data breach', because we don’t want users to associate the breach with Chrome (Chrome didn’t have a data leak, 2) and related, it might reassure the user to know that Chrome is using public information to establish these lists of compromised passwords. * 'Google Password Manager can offer…': The user has to agree to have this feature update their password for them each time. So Google Password Manager is ‘offering’ to do something for the user.">
@@ -2967,7 +2975,7 @@ index 92aa9da16b..e560d5e468 100644
      </message>
    </else>
    </if>
-@@ -1111,7 +1111,7 @@
+@@ -1123,7 +1123,7 @@
      </then>
      <else>
        <message name="IDS_PASSWORD_MANAGER_UI_USER_INTERVENTION_NEEDED_TITLE" desc="Title of a dialog shown when the automated password change stops because the website requires identity verification.">
@@ -2977,7 +2985,7 @@ index 92aa9da16b..e560d5e468 100644
      </else>
    </if>
 diff --git a/chrome/app/settings_chromium_strings.grdp b/chrome/app/settings_chromium_strings.grdp
-index acd6c44274..145ec4fc29 100644
+index 237b2a8517..ab8be8b7db 100644
 --- a/chrome/app/settings_chromium_strings.grdp
 +++ b/chrome/app/settings_chromium_strings.grdp
 @@ -4,7 +4,7 @@
@@ -3075,7 +3083,7 @@ index acd6c44274..145ec4fc29 100644
          </message>
        </else>
      </if>
-@@ -97,351 +97,351 @@
+@@ -97,352 +97,352 @@
  
    <!-- Preloading Page-->
    <message name="IDS_SETTINGS_PRELOAD_PAGES_STANDARD_PRELOADING_WHEN_ON_BULLET_TWO" desc="Bullet point in the standard preloading and when on column. Informs the user about what the standard preloading setting does.">
@@ -3527,9 +3535,10 @@ index acd6c44274..145ec4fc29 100644
 -    Use them alongside other Gemini features in Chromium
 +    Use them alongside other Gemini features in Bare
    </message>
- </grit-part>
+   <!-- Dictation Settings Page -->
+   <!-- TODO(b/510738735): Make these translatable when finalized. -->
 diff --git a/chrome/app/settings_strings.grdp b/chrome/app/settings_strings.grdp
-index 611504349c..e4877163a7 100644
+index 63c989a76d..1339ff2b7c 100644
 --- a/chrome/app/settings_strings.grdp
 +++ b/chrome/app/settings_strings.grdp
 @@ -387,7 +387,7 @@
@@ -3542,10 +3551,10 @@ index 611504349c..e4877163a7 100644
      <message name="IDS_SETTINGS_SUBPAGE_BUTTON" desc="Accessibility description for a button navigating the user from a settings page to one of the settings subpages.">
        Subpage button
 diff --git a/chrome/browser/ui/android/strings/android_chrome_strings.grd b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-index 887d8fb0ff..5fffea7dd6 100644
+index 739c7a7dd1..11fa22b2c4 100644
 --- a/chrome/browser/ui/android/strings/android_chrome_strings.grd
 +++ b/chrome/browser/ui/android/strings/android_chrome_strings.grd
-@@ -5758,7 +5758,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5833,7 +5833,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
  
        <!-- AuthTab -->
        <message name="IDS_AUTH_TAB_SECURED_BY_CHROME_TEMPLATE" desc="Message template that used to indicating that the Auth Tab is securely running on Chrome. [CHAR_LIMIT=32]">
@@ -3554,7 +3563,7 @@ index 887d8fb0ff..5fffea7dd6 100644
        </message>
  
        <!-- WebAPK/TWA related strings -->
-@@ -5769,7 +5769,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
+@@ -5844,7 +5844,7 @@ To change this setting, <ph name="BEGIN_LINK">BEGIN_LINK</ph>delete the Chrome d
          Running in Bare
        </message>
        <message name="IDS_TWA_RUNNING_IN_CHROME_TEMPLATE" desc="Message template that used to indicating that the current Activity may use Chrome data (the rest of the app may not be). [CHAR_LIMIT=32]">
@@ -3602,7 +3611,7 @@ index d085e0ec9a..7b2a298d9d 100644
      </if>
    </if>
 diff --git a/components/autofill_strings.grdp b/components/autofill_strings.grdp
-index 7cdff39ad1..6322079fef 100644
+index fe22181d98..860033daa1 100644
 --- a/components/autofill_strings.grdp
 +++ b/components/autofill_strings.grdp
 @@ -65,13 +65,13 @@
@@ -3622,7 +3631,7 @@ index 7cdff39ad1..6322079fef 100644
      </message>
    </if>
    <message name="IDS_AUTOFILL_REMOVE_HOME_PROFILE_SUGGESTION_CONFIRMATION_TITLE" desc="Title in a dialog to confirm that the user wants to delete their Home address from Autofill." formatter_data="android_java">
-@@ -1817,13 +1817,13 @@
+@@ -1835,13 +1835,13 @@
    </if>
    <if expr="not _google_chrome">
      <message name="IDS_SETTINGS_AUTOFILL_AI_TOGGLE_SUB_LABEL" desc="The description of the setting. By 'understand forms better', we mean that when a user submits a form on a website, and if they're using smarter form understanding, this feature can offer to save the user's submitted info. When Chromium saves that info, we save the submitted values and consider the page context." formatter_data="android_java">
@@ -3640,7 +3649,7 @@ index 7cdff39ad1..6322079fef 100644
    </if>
  
 diff --git a/components/components_chromium_strings.grd b/components/components_chromium_strings.grd
-index 4864368f4a..7b59d17367 100644
+index 154a930642..7981b2a1fb 100644
 --- a/components/components_chromium_strings.grd
 +++ b/components/components_chromium_strings.grd
 @@ -196,7 +196,7 @@
@@ -3737,7 +3746,7 @@ index 4864368f4a..7b59d17367 100644
          </message>
        </if>
  
-@@ -298,35 +298,35 @@
+@@ -298,24 +298,24 @@
          </then>
          <else>
            <message name="IDS_PAGE_INFO_INTERNAL_PAGE" desc="Message to display in the page info bubble when the page you are on is a chrome:// page or about:something.">
@@ -3766,20 +3775,6 @@ index 4864368f4a..7b59d17367 100644
        </message>
  
        <!-- Desktop-to-Mobile Promo Notifications -->
-       <message name="IDS_IOS_DESKTOP_PASSWORD_PROMO_NOTIFICATION_TITLE" desc="The title for the iOS desktop Password promo notification.">
--        Chromium Tip: Save Passwords
-+        Bare Tip: Save Passwords
-       </message>
-       <message name="IDS_IOS_DESKTOP_SAFE_BROWSING_PROMO_NOTIFICATION_TITLE" desc="The title for the iOS desktop Enhanced Safe Browsing promo notification.">
--        Chromium Tip: Enhanced Safe Browsing
-+        Bare Tip: Enhanced Safe Browsing
-       </message>
-       <message name="IDS_IOS_DESKTOP_LENS_PROMO_NOTIFICATION_TITLE" desc="The title for the iOS desktop Lens promo notification.">
--        Chromium Tip: Search With Lens
-+        Bare Tip: Search With Lens
-       </message>
-     </messages>
-   </release>
 diff --git a/components/management_strings.grdp b/components/management_strings.grdp
 index 602d9c66dc..1bc574e9cc 100644
 --- a/components/management_strings.grdp
@@ -3907,19 +3902,10 @@ index 39fb72e3de..f34f93de76 100644
      <if expr="use_titlecase">
        <message name="IDS_PASSWORD_MANAGER_RELAUNCH_CHROME_BUBBLE_CANCEL_BUTTON" desc="Text that appears in the cancel button of the relaunch Chrome bubble.">
 diff --git a/components/privacy_sandbox_strings.grd b/components/privacy_sandbox_strings.grd
-index cefd4e6bcf..a53d0e8589 100644
+index c5c4f5959b..602ef9c0c4 100644
 --- a/components/privacy_sandbox_strings.grd
 +++ b/components/privacy_sandbox_strings.grd
-@@ -297,7 +297,7 @@
-         </then>
-         <else>
-           <message name="IDS_MODE_B_ROLLBACK_DESCRIPTION" desc="Description text on the 3PCD rollback notice. Explains to the user that their settings state has been updated to allow third-party cookies and that this can be changed in settings." formatter_data="android_java">
--            Your current Chromium settings have been updated to allow websites to access third-party cookies. You can change this setting any time.
-+            Your current Bare settings have been updated to allow websites to access third-party cookies. You can change this setting any time.
-           </message>
-         </else>
-       </if>
-@@ -324,7 +324,7 @@
+@@ -305,7 +305,7 @@
          </then>
          <else>
            <message name="IDS_SETTINGS_COOKIES_BLOCK_THIRD_PARTY_SETTINGS_ALLOW_BULLET_THREE" desc="This text is for a bullet that provides detail about the first setting option. It describes the key new detail that now applies to this setting option." formatter_data="android_java">
@@ -3928,7 +3914,7 @@ index cefd4e6bcf..a53d0e8589 100644
            </message>
          </else>
        </if>
-@@ -362,7 +362,7 @@
+@@ -343,7 +343,7 @@
          </then>
          <else>
            <message name="IDS_PRIVACY_GUIDE_COOKIE_SETTINGS_ALLOW_THINGS_TO_CONSIDER_BULLET_TWO" desc="This text is for a bullet that provides key considerations about the first setting option. It describes the key new detail that now applies to this setting option.">
@@ -3955,7 +3941,7 @@ index 4e631a5d0c..1699356103 100644
    </if>
  </grit-part>
 diff --git a/components/search_engine_choice_strings.grdp b/components/search_engine_choice_strings.grdp
-index c466a86968..a447718055 100644
+index 9d1c295837..6234ec898a 100644
 --- a/components/search_engine_choice_strings.grdp
 +++ b/components/search_engine_choice_strings.grdp
 @@ -64,7 +64,7 @@
@@ -3967,7 +3953,7 @@ index c466a86968..a447718055 100644
        </message>
      </if>
  
-@@ -116,25 +116,25 @@
+@@ -116,22 +116,22 @@
      <if expr="not _google_chrome">
        <if expr="use_titlecase">
          <message name="IDS_SEARCH_ENGINE_CHOICE_INFO_DIALOG_TITLE" desc="This string is the heading of a card that explains why users are being prompted to choose a search engine, and what a search engine does in Chromium. (A search engine provides answers to search queries; this is different from a browser, which displays web pages. A search engine powers many experiences within a browser.) This screen appears when the user taps or clicks “Learn more” on the search engine choice screen. This string is before the “Based on a law in your region...” string. We want users to read this screen and understand that they can use any search engine with Chromium and what the impact of their choice might be.">
@@ -3994,13 +3980,9 @@ index c466a86968..a447718055 100644
 +        You can change your search engine anytime in Bare’s settings.
        </message>
        <message name="IDS_SEARCH_ENGINE_CHOICE_INFO_DIALOG_BODY_THIRD_PARAGRAPH_INSTRUCTIVE" desc="This is the third paragraph of the body text of a card that explains why users are being prompted to choose a search engine, and what a search engine does in Chromium. This screen provides the following details: 1. the list includes search engines that are popular in the user’s region and the order includes randomization (not in order of recommendation); 2. features may be unavailable if the chosen default search engine doesn’t support them; 3. the user can change their mind at any time. For JSA, we add more information on how to add non-regional search engines. This card appears when the user taps or clicks “Learn more” on the search engine choice screen. The headline for this card is “Your search engine in Chromium”.">
--        You can change your search engine anytime in Chromium’s settings. If you don’t see your preferred search engine, you can perform a search from their site. You’ll see the provider as a recently visited search provider in Chromium Settings, and you can make it your default.
-+        You can change your search engine anytime in Bare’s settings. If you don’t see your preferred search engine, you can perform a search from their site. You’ll see the provider as a recently visited search provider in Bare Settings, and you can make it your default.
-       </message>
-     </if>
- 
+         You can change your search engine anytime in Chromium’s settings. If you don’t see your preferred search engine, you can perform a search from their site. You’ll see it listed as a recently visited search engine in Chromium settings, and you can make it your default.
 diff --git a/components/security_interstitials_strings.grdp b/components/security_interstitials_strings.grdp
-index 50f8a0a9c5..e5422bf9e7 100644
+index 21552bd3df..47848e83ea 100644
 --- a/components/security_interstitials_strings.grdp
 +++ b/components/security_interstitials_strings.grdp
 @@ -174,7 +174,7 @@

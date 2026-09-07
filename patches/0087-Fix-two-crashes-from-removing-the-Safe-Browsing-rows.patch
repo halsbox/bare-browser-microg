@@ -1,4 +1,4 @@
-From cebdcc50aac5969f914fff7f392176fcb85c004c Mon Sep 17 00:00:00 2001
+From f3cc8a5034bad63afae436cbd55cbd85cb957cbd Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 23 Aug 2026 18:14:24 +0000
 Subject: [PATCH] Fix two crashes from removing the Safe Browsing rows
