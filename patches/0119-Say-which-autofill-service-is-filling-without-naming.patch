@@ -1,0 +1,88 @@
+From 9185e8973a8341f32284a5db44d05cd295be1cc9 Mon Sep 17 00:00:00 2001
+From: Bare <git@barebrowser.org>
+Date: Tue, 8 Sep 2026 23:02:51 +0000
+Subject: [PATCH] Say which autofill service is filling, without naming Google
+
+Payment methods and Addresses and more both opened on a card headed "Google
+isn't your autofill provider", with the G mark beside it and a body offering to
+use payment info from a Google Account.
+
+The card itself is right and should stay. It appears when
+getAndroidAutofillFrameworkAvailability reports AVAILABLE, which means a
+non-Google Android autofill service is selected and usable, and it explains why
+the toggles beneath it are greyed out. Its button opens the Autofill services
+screen, which patch 0046 already renamed. Google's own provider reports
+ANDROID_AUTOFILL_SERVICE_IS_GOOGLE instead, so the card never described this
+build accurately: the service doing the filling here is whatever the user chose
+in Android, and the alternative is Autofill with Bare rather than a Google
+Account.
+
+So the wording says that instead, and the icon is the neutral ic_info_24dp that
+the extensions menu and Safety check already use, rather than a new asset.
+
+The condition is untouched. The same availability call decides WebauthnMode in
+ChromeAuthenticatorFactory, where AVAILABLE means CHROME_3PP_ENABLED, so
+narrowing it to quiet a string would have moved passkeys off the chosen
+provider. Nothing here reaches autofill behaviour, provider selection,
+Credential Manager or WebAuthn.
+
+Settings search needs no separate change. AutofillPaymentMethodsFragment adds
+the card to the index by string id under the same condition, so the search
+result reads the new wording too.
+---
+ .../autofill/settings/AutofillAiDelegate.java        |  2 +-
+ .../settings/AutofillPaymentMethodsFragment.java     |  2 +-
+ components/autofill_strings.grdp                     | 12 ++++++------
+ 3 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/autofill/settings/AutofillAiDelegate.java b/chrome/android/java/src/org/chromium/chrome/browser/autofill/settings/AutofillAiDelegate.java
+index 17db273b95..a8d63be990 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/autofill/settings/AutofillAiDelegate.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/autofill/settings/AutofillAiDelegate.java
+@@ -415,7 +415,7 @@ public class AutofillAiDelegate {
+                 mFragment
+                         .getResources()
+                         .getString(R.string.autofill_disable_settings_button_label));
+-        disabledSettingsInfoPref.setIconResource(R.drawable.ic_google_services_24dp);
++        disabledSettingsInfoPref.setIconResource(R.drawable.ic_info_24dp);
+         disabledSettingsInfoPref.setOnButtonClick(
+                 () -> {
+                     SettingsNavigation settingsNavigation =
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/autofill/settings/AutofillPaymentMethodsFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/autofill/settings/AutofillPaymentMethodsFragment.java
+index ade4afa1d4..5a2f5fe393 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/autofill/settings/AutofillPaymentMethodsFragment.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/autofill/settings/AutofillPaymentMethodsFragment.java
+@@ -175,7 +175,7 @@ public class AutofillPaymentMethodsFragment extends ChromeBaseSettingsFragment
+             disabledSettingsInfoPref.setSummary(R.string.autofill_disable_settings_explanation);
+             disabledSettingsInfoPref.setButtonText(
+                     getResources().getString(R.string.autofill_disable_settings_button_label));
+-            disabledSettingsInfoPref.setIconResource(R.drawable.ic_google_services_24dp);
++            disabledSettingsInfoPref.setIconResource(R.drawable.ic_info_24dp);
+             disabledSettingsInfoPref.setOnButtonClick(
+                     () -> {
+                         SettingsNavigation settingsNavigation =
+diff --git a/components/autofill_strings.grdp b/components/autofill_strings.grdp
+index 860033daa1..afec714f4a 100644
+--- a/components/autofill_strings.grdp
++++ b/components/autofill_strings.grdp
+@@ -434,14 +434,14 @@
+   <message name="IDS_AUTOFILL_GMAIL_OTP_FILLING_TOGGLE_DESCRIPTION" desc="Description for the toggle that enables autofilling verification codes from Gmail.">
+     Autofill verification codes sites use to improve your security. Bare can get these codes from your Gmail. <ph name="BEGIN_LINK">&lt;a href="$1" tabindex="0" aria-description="$2" target="_blank"&gt;</ph>Learn more about this feature<ph name="LINK_END">&lt;/a&gt;</ph>
+   </message>
+-  <message name="IDS_AUTOFILL_DISABLE_SETTINGS_EXPLANATION_TITLE" desc="Title of the card explaining why the settings page was disabled. Sentence-Cased." formatter_data="android_java">
+-    Google isn’t your autofill provider
++  <message name="IDS_AUTOFILL_DISABLE_SETTINGS_EXPLANATION_TITLE" desc="Title of the card explaining why the settings page was disabled, because another Android autofill service is filling instead of the browser. Sentence-Cased." formatter_data="android_java">
++    Another autofill service is active
+   </message>
+-  <message name="IDS_AUTOFILL_DISABLE_SETTINGS_EXPLANATION" desc="Explanation why the settings page was disabled. Sentence-Cased." formatter_data="android_java">
+-    To enable these settings and use payment info from your Google Account, visit autofill services settings.
++  <message name="IDS_AUTOFILL_DISABLE_SETTINGS_EXPLANATION" desc="Explanation why the payment settings page was disabled, and where the user changes which service fills. Sentence-Cased." formatter_data="android_java">
++    These settings are off while another autofill service fills your payment info. Change it in autofill services settings.
+   </message>
+-  <message name="IDS_AUTOFILL_DISABLE_SETTINGS_EXPLANATION_V2" desc="The body text of the info banner. It explains why the rest of the page is greyed out (disabled) and instructs the user on how to fix it by changing their provider back to Google." formatter_data="android_java">
+-    To enable these settings and use info from your Google Account, visit autofill services settings
++  <message name="IDS_AUTOFILL_DISABLE_SETTINGS_EXPLANATION_V2" desc="The body text of the info banner. It explains why the rest of the page is greyed out (disabled) and where the user changes which service fills." formatter_data="android_java">
++    These settings are off while another autofill service fills your info. Change it in autofill services settings
+   </message>
+   <message name="IDS_AUTOFILL_DISABLE_SETTINGS_BUTTON_LABEL" desc="Button that opens the autofill services settings page. Sentence-Cased." formatter_data="android_java">
+     Autofill services settings
