@@ -1,4 +1,4 @@
-From c58350c7343f508e20a54f40757e8c603fcaad04 Mon Sep 17 00:00:00 2001
+From 006047ce7ea5a5bdc58e0b3986b3b830afb6c1c5 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 29 Aug 2026 23:10:12 +0000
 Subject: [PATCH] Keep the app menu where the user can always reach it

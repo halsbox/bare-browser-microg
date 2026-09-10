@@ -1,4 +1,4 @@
-From c4e23fd827a155ed82e2a251c9c15ce176428242 Mon Sep 17 00:00:00 2001
+From 9c48d8dc7aa23af4fab3aabbf913d90209717ad2 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Mon, 7 Sep 2026 07:19:57 +0000
 Subject: [PATCH] Do not offer AI Mode, whatever the search engine is

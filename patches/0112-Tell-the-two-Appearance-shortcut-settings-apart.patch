@@ -1,4 +1,4 @@
-From 26b8a5242010511a30e3b5ed330f32349380e16a Mon Sep 17 00:00:00 2001
+From 0ffeb83d7702c58c0fd22c7bd8037ff5bb96b618 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 6 Sep 2026 19:58:37 +0000
 Subject: [PATCH] Tell the two Appearance shortcut settings apart

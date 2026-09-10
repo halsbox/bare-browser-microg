@@ -1,4 +1,4 @@
-From f6cdea44f6c1a2f258662d8130b7715f369461e5 Mon Sep 17 00:00:00 2001
+From a6b741ed68f9fa55c7cee0b830e7ba48d8a62465 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 8 Sep 2026 00:20:47 +0000
 Subject: [PATCH] Draw the extensions toolbar into the captured toolbar bitmap

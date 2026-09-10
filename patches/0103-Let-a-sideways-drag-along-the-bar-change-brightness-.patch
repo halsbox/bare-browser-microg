@@ -1,5 +1,5 @@
-From 399084ad2cc6a6434b42cae0cce0b7afd0c04b38 Mon Sep 17 00:00:00 2001
-From: Bare <57wsdx6b8d@privaterelay.appleid.com>
+From ca2b5911c6793484317ff8fe64e5623eee24e39c Mon Sep 17 00:00:00 2001
+From: Bare <git@barebrowser.org>
 Date: Fri, 28 Aug 2026 22:43:11 +0000
 Subject: [PATCH] Let a sideways drag along the bar change brightness or volume
 

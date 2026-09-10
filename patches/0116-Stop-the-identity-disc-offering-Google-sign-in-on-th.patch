@@ -1,4 +1,4 @@
-From 832ad5a73f55eb7db6cde54e60a9cf8c7ec3da63 Mon Sep 17 00:00:00 2001
+From 9010ea160a8fb9a5aa63933323ebd2c2e9d2cebf Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 8 Sep 2026 01:58:37 +0000
 Subject: [PATCH] Stop the identity disc offering Google sign-in on the new tab
@@ -15,7 +15,7 @@ data provider, where it wins the optional slot on any new tab page. Patch 0020
 covers the first branch alone, by pinning that button's properties off.
 
 The flag is FEATURE_DISABLED_BY_DEFAULT, but the field trial testing study
-ProfileDiscOnAllPages enables it on Android. Every build up to RC3 therefore
+ProfileDiscOnAllPages enables it on Android. Every earlier build therefore
 took the branch 0020 covers, and no avatar appeared. Setting
 disable_fieldtrial_testing_config for the release build returned the flag to
 its code default and uncovered the other branch.

@@ -1,4 +1,4 @@
-From 307d0616e8e2409a832522ece8a06b23c6bd223f Mon Sep 17 00:00:00 2001
+From 33881bb9949a8c0d6d0bbfd67adc9ac2df100b9c Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 6 Sep 2026 21:25:11 +0000
 Subject: [PATCH] Offer the tab switcher as a list as well as a grid

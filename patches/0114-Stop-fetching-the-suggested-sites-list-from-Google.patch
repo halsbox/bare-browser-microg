@@ -1,4 +1,4 @@
-From b3e1dae86476cb5b38699457fa7a3e91ab364c1c Mon Sep 17 00:00:00 2001
+From fa58b71f0b4a298a714ac74e52a5a585d84f0b7e Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Mon, 7 Sep 2026 07:20:01 +0000
 Subject: [PATCH] Stop fetching the suggested sites list from Google

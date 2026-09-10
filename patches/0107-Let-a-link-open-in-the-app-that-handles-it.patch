@@ -1,4 +1,4 @@
-From a189dd94fbdd5acc62d021097874be1f2b16fa7b Mon Sep 17 00:00:00 2001
+From 4eb651d9c60beae99d2e8477692ebd2847f75da9 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sat, 5 Sep 2026 17:21:49 +0000
 Subject: [PATCH] Let a link open in the app that handles it

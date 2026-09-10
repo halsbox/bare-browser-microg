@@ -1,5 +1,5 @@
-From 97255a07f422c69c1524627f5bdb5c5dd0eb7485 Mon Sep 17 00:00:00 2001
-From: Bare <57wsdx6b8d@privaterelay.appleid.com>
+From 90525d1bf185a4f2bba2aacbf580f3c5199860d5 Mon Sep 17 00:00:00 2001
+From: Bare <git@barebrowser.org>
 Date: Fri, 28 Aug 2026 18:49:21 +0000
 Subject: [PATCH] Let the bottom bar show the toolbar buttons it does not have
 

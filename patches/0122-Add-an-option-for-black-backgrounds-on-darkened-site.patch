@@ -1,4 +1,4 @@
-From b8daae0b3521afcfad6fafc834a97e344fb5c100 Mon Sep 17 00:00:00 2001
+From ef95ce57d9efe0e38a4fefb1bf31c22a6b3307f4 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 9 Sep 2026 05:06:41 +0000
 Subject: [PATCH] Add an option for black backgrounds on darkened sites

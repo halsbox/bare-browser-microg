@@ -1,5 +1,5 @@
-From 54027ad715da7bdeab00dadbd37c82d17497b781 Mon Sep 17 00:00:00 2001
-From: Bare <57wsdx6b8d@privaterelay.appleid.com>
+From d2d598928938b6c03b6bae8af3e51f695ff939eb Mon Sep 17 00:00:00 2001
+From: Bare <git@barebrowser.org>
 Date: Fri, 28 Aug 2026 21:47:10 +0000
 Subject: [PATCH] Let the toolbar be arranged from settings
 

@@ -1,4 +1,4 @@
-From 5689bcc5d297c96bfaea5b04deaea10b276b3873 Mon Sep 17 00:00:00 2001
+From 0f46b792d6d61e73a732c0b15b865d7bf024d4eb Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 6 Sep 2026 16:01:18 +0000
 Subject: [PATCH] Judge a web page wrapped in an intent as the page, not the

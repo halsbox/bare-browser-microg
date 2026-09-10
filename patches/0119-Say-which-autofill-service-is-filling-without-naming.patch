@@ -1,4 +1,4 @@
-From 9185e8973a8341f32284a5db44d05cd295be1cc9 Mon Sep 17 00:00:00 2001
+From 29bffce8af109fb221b011a01a1a471a8501dd00 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 8 Sep 2026 23:02:51 +0000
 Subject: [PATCH] Say which autofill service is filling, without naming Google

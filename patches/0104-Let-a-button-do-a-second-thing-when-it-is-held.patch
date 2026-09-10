@@ -1,5 +1,5 @@
-From 8c2e5b93a8bb85f124b17e46fe3a3afb9e207227 Mon Sep 17 00:00:00 2001
-From: Bare <57wsdx6b8d@privaterelay.appleid.com>
+From 8c59e8622e9095d968dab0e98217469d8b564282 Mon Sep 17 00:00:00 2001
+From: Bare <git@barebrowser.org>
 Date: Sat, 29 Aug 2026 06:40:40 +0000
 Subject: [PATCH] Let a button do a second thing when it is held
 

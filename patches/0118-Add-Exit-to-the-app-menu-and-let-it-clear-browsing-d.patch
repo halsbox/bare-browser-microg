@@ -1,4 +1,4 @@
-From b0f1ec3c9226823270fe24d8fab28cc209d26efa Mon Sep 17 00:00:00 2001
+From 2464402185e5006f73837fe0a56023ed504d6f93 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 8 Sep 2026 21:48:39 +0000
 Subject: [PATCH] Add Exit to the app menu, and let it clear browsing data

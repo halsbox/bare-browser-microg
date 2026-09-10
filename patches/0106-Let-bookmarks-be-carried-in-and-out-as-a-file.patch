@@ -1,4 +1,4 @@
-From 4818a5e04ff5ce9e2f9db9e9ba0d3533846fad0f Mon Sep 17 00:00:00 2001
+From 826ca40f89e22645efabebe5247f285896bf7ff0 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Mon, 31 Aug 2026 03:43:53 +0000
 Subject: [PATCH] Let bookmarks be carried in and out as a file

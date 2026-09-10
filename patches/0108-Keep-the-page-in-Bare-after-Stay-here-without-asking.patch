@@ -1,4 +1,4 @@
-From 01aca77d9025481b26ba8dfacc9f5b106edacd3d Mon Sep 17 00:00:00 2001
+From 9150036353572633e787731366184fcb5711a703 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 6 Sep 2026 05:54:09 +0000
 Subject: [PATCH] Keep the page in Bare after Stay here without asking again

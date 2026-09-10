@@ -1,4 +1,4 @@
-From 272a728d5e975a8d05fc97281aa0b7a82f122ef4 Mon Sep 17 00:00:00 2001
+From 21073d1728793511060ae59b72ab41f0d7aa634d Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Wed, 9 Sep 2026 00:55:39 +0000
 Subject: [PATCH] Let the pin setting hide the extensions menu button on a

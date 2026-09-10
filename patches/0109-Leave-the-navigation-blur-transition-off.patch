@@ -1,4 +1,4 @@
-From 533cf24f14fc071d6dbbe506b79fad774fe5749b Mon Sep 17 00:00:00 2001
+From bf3aab58caf4f7d59e91deb4e1ae8bdb44715bd2 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Sun, 6 Sep 2026 05:54:10 +0000
 Subject: [PATCH] Leave the navigation blur transition off

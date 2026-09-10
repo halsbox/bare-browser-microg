@@ -1,4 +1,4 @@
-From dca78b02c95a4a3f26b93bcb67459c8fb97cab7d Mon Sep 17 00:00:00 2001
+From 69dd27f031407065dbb2fe27279ef4177bb49c79 Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Tue, 8 Sep 2026 23:03:41 +0000
 Subject: [PATCH] Keep the bottom bar on the new tab page
@@ -11,7 +11,7 @@ disable_on_ntp is a cached parameter of AndroidBottomBar and its upstream
 default is true. Bare never saw that, because the field trial testing config
 sets it to false: study GlicAndroid, arm
 Enabled_Arm2_BottomBar_1A_with_GLIC_filled, which also enables the feature.
-Every build up to RC3 compiled that config in. Setting
+Every earlier build compiled that config in. Setting
 disable_fieldtrial_testing_config for the release build returned the parameter
 to its upstream default and took the bar off the new tab page. The feature
 itself is enabled by default, which is why the bar survived everywhere else.
@@ -30,7 +30,7 @@ lands one launch after the build that carries it.
 
 This is the fourth thing disable_fieldtrial_testing_config uncovered, after the
 navigation blur it was added for, the identity disc in 0116 and the password
-manager row in 0117. The sweep in section 19.5 missed it because it compared
+manager row in 0117. The earlier sweep missed it because it compared
 which features the config turns on and off and never compared their parameters.
 ---
  .../org/chromium/chrome/browser/flags/ChromeFeatureList.java    | 2 +-
