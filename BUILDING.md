@@ -8,9 +8,10 @@ the build environment, and the docs are tracked. Build output and APKs stay loca
 ## Matched snapshot
 
 - Snapshot platform: `AndroidDesktop_arm64`
-- Snapshot position: `1676236`
-- Chromium commit: `945b51156108ba94d62f235a75379772da8ced30`
-- Chromium version: `153.0.7999.0`
+- Commit position: `refs/branch-heads/8010@{#871}`
+- Branched from: `refs/heads/main@{#1681091}`
+- Chromium commit: `ac9b84a0b321cc741e9eb650f29e7177b68f0f48`
+- Chromium version: `153.0.8010.27`
 
 ## Builder commands
 
@@ -80,7 +81,7 @@ that `build/android/chromium-debug.keystore` provides by default. That keystore
 is checked into Chromium and public, so anything signed with it can be replaced
 by an APK anyone can build.
 
-    tools/sign-release.sh out/PixelFold/apks/ChromePublic.apk Bare-1.0.0-alpha.1.apk
+    tools/sign-release.sh out/Bare-arm64/apks/ChromePublic.apk Bare-1.0.0-alpha.2.apk
 
 The key sits outside this repo and its password is in the macOS login keychain,
 read only when it signs. Neither is ever written where the build or

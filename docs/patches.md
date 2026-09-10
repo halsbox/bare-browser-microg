@@ -51,7 +51,6 @@ themselves are in [`patches/`](../patches); this is the summary of what each one
 | 0044 | Rename the browser in the remaining Android strings | 337 strings still said Chrome; Google's own products keep their names |
 | 0045 | Remove the Autofill AI and personal context settings | "Smarter form understanding" shared page URLs and content with Google |
 | 0046 | Use the installed password manager by default | And relabel the built-in option, which claimed to use your Google Account |
-| 0047 | Animate a new tab from the button that opened it | From the tab switcher it grew from the top corner, ignoring the bottom bar |
 | 0048 | Keep the search engine icon round in thumbnails | Outline clipping is skipped when a view is drawn into a software canvas |
 | 0049 | Add a Video autostart site setting | Chromium stored an autoplay setting nothing ever read |
 | 0050 | Keep sites told the page is visible in the background | Sites paused their own video on `visibilitychange`, defeating background playback |
@@ -104,6 +103,35 @@ themselves are in [`patches/`](../patches); this is the summary of what each one
 | 0097 | Give incognito its extension background pages back | The incognito ProcessManager waited for an embedder callback that Android does not have, so a split-mode extension allowed in incognito never got a background page and never filtered |
 | 0098 | Let the bundled blocker work in incognito without being asked | uBlock Origin starts with incognito access and nothing else does; the default is applied once, using the same preference the chrome://extensions toggle writes, so turning it off keeps it off |
 | 0099 | Let Android retry lower GLES versions instead of losing the GPU | Upstream answers yes to a SwiftShader fallback Android never builds, which switches off the ES-version retry, so a driver that refuses an ES3 context left the GPU process dead instead of walking down to 3.0 or 2.0 |
+| 0100 | Give the bottom bar slots so its buttons can move later | Fixed positions became named slots, with nothing visible changing yet |
+| 0101 | Let the bottom bar show the toolbar buttons it does not have | An adapter drives a bar button from the same provider the toolbar uses, so both stay in step |
+| 0102 | Let the toolbar be arranged from settings | Which button sits in which slot, chosen rather than fixed |
+| 0103 | Let a sideways drag along the bar change brightness or volume | Off by default; the bar is the only place in reach of a thumb that has nothing else to do |
+| 0104 | Let a button do a second thing when it is held | A second action per slot, so one button covers two without a menu |
+| 0105 | Keep the app menu where the user can always reach it | Arranging the toolbar could move the menu out of reach, leaving no way back |
+| 0106 | Let bookmarks be carried in and out as a file | Import and export without a sync account, which this build has no way to offer |
+| 0107 | Let a link open in the app that handles it | Always, Ask or Never, defaulting to Never, the behaviour 0005 applied to everything |
+| 0108 | Keep the page in Bare after Stay here without asking again | The question came back on every navigation to the same site |
+| 0109 | Leave the navigation blur transition off | A field trial turned on a transition that flashed white between pages |
+| 0110 | Judge a web page wrapped in an intent as the page, not the wrapper | An `intent://` carrying an `http(s)` payload was treated as an app link whatever the setting said |
+| 0111 | Offer the tab switcher as a list as well as a grid | Thumbnails are a poor index of many tabs; the list shows titles |
+| 0112 | Tell the two Appearance shortcut settings apart | Two rows with the same name, one for the address bar and one for the toolbar |
+| 0113 | Do not offer AI Mode whatever the search engine is | The button returned when the default search engine changed |
+| 0114 | Stop fetching the suggested sites list from Google | The new tab page asked gstatic for tiles it never showed |
+| 0115 | Draw the extensions toolbar into the captured toolbar | The composited toolbar bitmap is drawn from a fixed child list, so extensions vanished during a tab switch |
+| 0116 | Stop the identity disc offering Google sign-in on the new tab page | A second avatar surface 0020 never covered, uncovered when the field trial config went off |
+| 0117 | Hide the Google Password Manager row on the older settings path too | 0009 covered one path; the other one still reached it |
+| 0118 | Add Exit to the app menu, and let it clear browsing data first | Off by default; the selection is a profile preference and deletion goes through Chromium's own path |
+| 0119 | Say which autofill service is filling, without naming Google | The card was right and the wording was not: the service is whichever one Android has |
+| 0120 | Keep the bottom bar on the new tab page | A field trial parameter, not a feature flag, took the bar off the new tab page |
+| 0121 | Let the pin setting hide the extensions menu button on a phone | The switch changed its own state and nothing else, because the phone toolbar registers no width consumer |
+| 0122 | Add an option for black backgrounds on darkened sites | Auto Dark leaves a white page at `#121212`; this maps eligible backgrounds to black without touching text or images |
+| 0123 | Move the update check to the current account and bound what it reads | The three release URLs named the old account, and the feed could say things the parser was not ready for |
+| 0124 | Let policy refuse a download before another app is offered it | The external handoff ran above the blocklist check, and the chooser still offered Bare itself |
+| 0125 | Keep the page here when there is nowhere to ask about leaving | Ask launched without asking when no Activity could host the dialog |
+| 0126 | Clear the pending flag when there is nothing left to delete | An interrupted exit could leave the flag set for good once the selection was emptied |
+| 0127 | Put two annotations and a javadoc back on what they describe | Two insertions landed between a javadoc and the declaration it belonged to |
+| 0128 | Name Google's help centre as Google's | The rename caught the anchor text and left the link pointing at Google |
 
 Patches 0001 and 0002 are bug fixes that happen to be prerequisites. 0003 is a usability fix.
 0004 through 0010 are the de-Googling, as are 0014 through 0021. 0011 through 0013 fix
@@ -116,8 +144,21 @@ own search engine. 0036 drops the built-in Google AI search shortcuts and 0037 f
 of the engine icon in the omnibox. 0038 through 0042 are the rebrand to Bare, and 0044 finishes
 the naming the first pass missed. 0043 adds background media playback. 0045 and 0046 continue
 the de-Googling in autofill: removing the AI sections, and defaulting to whichever password
-manager the user already has. 0047 and 0048 are small visual fixes found by using the build:
-where a new tab animation starts, and an icon that was clipped round rather than drawn round.
+manager the user already has. 0048 is a small visual fix found by using the build: an icon
+that was clipped round rather than drawn round.
+
+**There is no patch 0047.** It animated a new tab from the button that opened it, and it was
+dropped during the move to 153.0.8010.27 when upstream changed that animation underneath it. The
+numbers after it were already in use elsewhere, so renumbering the series would have broken every
+reference to them. The gap is the honest record of a patch that existed and no longer does.
+
+0100 through 0105 build the arrangeable toolbar, one step at a time: slots first, then a way to
+drive a bar button from the toolbar's own provider, then the settings screen, then a drag and a
+hold, and finally a guard so the app menu can never be arranged out of reach. 0106 through 0114
+are a mixture of features and de-Googling found by daily use. 0115 through 0122 came out of
+release testing, and four of them exist because
+`disable_fieldtrial_testing_config = true` changed what the browser follows. 0123 through 0128
+came out of the pre-publication audit.
 
 Sign-in has no single gate in Chromium. Patches 0009, 0010, 0015, 0016 and 0020 each remove a
 different entry point: the settings row, the "You and Google" section, the first-run screen,

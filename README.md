@@ -20,16 +20,16 @@ powerful features like browser extensions and uBlock Origin. Bare also adds back
 playback, the ability to save media from sites that normally block it, support for choosing your
 preferred download manager, and much more.
 
-It is a patch series rather than a fork: 99 patches against one pinned revision of **Chromium
+It is a patch series rather than a fork: 127 patches against one pinned revision of **Chromium
 Desktop Android**, so what this repository holds is exactly the difference between stock Chromium
 and Bare, and nothing else.
 
 Built and used on a Pixel 10 Pro XL. Not affiliated with Google or the Chromium project.
 
-- **Base:** Chromium `153.0.7999.0` (commit `945b5115`)
-- **Target:** `is_desktop_android = true`, `target_cpu = "arm64"`
-- **Version:** `1.0.0-alpha.2`, versionCode `801000035` (arm64) / `801000030` (32-bit arm)
-- **Size:** 99 patches, 6262 insertions across 239 files
+- **Base:** Chromium `153.0.8010.27` (commit `ac9b84a0`)
+- **Target:** `is_desktop_android = true`, `target_cpu = "arm64"` and `"arm"`
+- **Version:** `1.0.0-alpha.2`, versionCode `801000055` (arm64) / `801000050` (32-bit arm)
+- **Size:** 127 patches, 14,582 insertions across 341 files
 
 ## What you get
 
@@ -60,12 +60,22 @@ Built and used on a Pixel 10 Pro XL. Not affiliated with Google or the Chromium 
 
 | | |
 | --- | --- |
-| <img src="assets/screenshots/Screenshot_02.png" width="260"> | <img src="assets/screenshots/Screenshot_03.png" width="260"> |
-| Screenshot 1 | Screenshot 2 |
-| <img src="assets/screenshots/Screenshot_04.png" width="260"> | <img src="assets/screenshots/Screenshot_05.png" width="260"> |
-| Screenshot 3 | Screenshot 4 |
-| <img src="assets/screenshots/Screenshot_06.png" width="260"> | <img src="assets/screenshots/Screenshot_07.png" width="260"> |
-| Screenshot 5 | Screenshot 6 |
+| <img src="assets/screenshots/welcome-screen.png" width="260"> | <img src="assets/screenshots/new-tab-noai.png" width="260"> |
+| The welcome screen, where the choices are made | A new tab, with no logo to fetch |
+| <img src="assets/screenshots/ublock-origin-popup.png" width="260"> | <img src="assets/screenshots/extension-toolbar.png" width="260"> |
+| uBlock Origin, the full version | Extensions in the toolbar |
+| <img src="assets/screenshots/save-image-menu.png" width="260"> | <img src="assets/screenshots/download-video-menu.png" width="260"> |
+| Saving an image | Saving video a site does not offer |
+| <img src="assets/screenshots/video-download-dialog.png" width="260"> | <img src="assets/screenshots/clean-address-bar.png" width="260"> |
+| Picking a stream to keep | The address bar |
+| <img src="assets/screenshots/toolbar-shortcuts.png" width="260"> | <img src="assets/screenshots/toolbar-tap-hold-actions.png" width="260"> |
+| Arranging the toolbar | A second action on a hold |
+| <img src="assets/screenshots/toolbar-swipe-action.png" width="260"> | <img src="assets/screenshots/open-links-in-apps.png" width="260"> |
+| A sideways drag along the bar | Whether links leave for an app |
+| <img src="assets/screenshots/theme-settings.png" width="260"> | <img src="assets/screenshots/clear-on-exit.png" width="260"> |
+| Themes, including AMOLED | Choosing what Exit deletes |
+| <img src="assets/screenshots/tab-view-setting.png" width="260"> | <img src="assets/screenshots/tab-list-view.png" width="260"> |
+| Grid or list | Tabs as a list |
 
 ## Support the project
 
@@ -88,8 +98,9 @@ patch series rather than a fork, so every change stays readable and reviewable.
 
 ## What the patches do
 
-Ninety-one patches against one pinned Chromium revision: crash fixes, the extensions toolbar on
-phone layouts, every Google callback and AI surface removed, and the features Bare adds on top.
+A hundred and twenty-seven patches against one pinned Chromium revision: crash fixes, the
+extensions toolbar on phone layouts, every Google callback and AI surface removed, and the
+features Bare adds on top.
 
 **[The full list, patch by patch, is in docs/patches.md](docs/patches.md)** along with what is
 removed by build flag instead of by patch, and what is deliberately kept.
@@ -199,7 +210,7 @@ git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git ~/dep
 mkdir -p /work/chromium && cd /work/chromium
 fetch --nohooks android
 cd src
-git checkout 945b5115
+git checkout ac9b84a0b321cc741e9eb650f29e7177b68f0f48
 gclient sync -D --force --reset
 ./build/install-build-deps.sh --android
 ```
@@ -245,16 +256,23 @@ enable_arcore = false
 enable_cardboard = false
 enable_openxr = false
 
+disable_fieldtrial_testing_config = true
+
 chrome_public_manifest_package = "org.barebrowser"
-android_override_version_code = "801000035"
+android_override_version_code = "801000055"
 android_override_version_name = "1.0.0-alpha.2"
 ```
 
 The last two lines are what `tools/version.py gn arm64` emits, and they matter: they are written into
 the manifest, so a build without them will not match the release.
 
+`disable_fieldtrial_testing_config` matters as much. Without it the build follows
+`testing/variations/fieldtrial_testing_config.json` instead of the code defaults, and several
+patches here are inert. [docs/build-constraints.md](docs/build-constraints.md) has the four
+behaviours that came from that file rather than from the code.
+
 The 32-bit build differs in exactly three lines: `target_cpu = "arm"`, the version code
-`801000020` that `tools/version.py gn arm` emits, and `clang_use_default_sample_profile = false`,
+`801000050` that `tools/version.py gn arm` emits, and `clang_use_default_sample_profile = false`,
 which stops GN demanding an AFDO profile this checkout never syncs.
 
 ```bash
@@ -268,7 +286,7 @@ autoninja -C out/Bare chrome_public_apk
 carries a signature only its key can produce. Everything else should match:
 
 ```bash
-tools/apk-content-hash.py out/Bare/apks/ChromePublic.apk Bare-1.0.0-alpha.1.apk
+tools/apk-content-hash.py out/Bare/apks/ChromePublic.apk Bare-1.0.0-alpha.2.apk
 ```
 
 See [BUILDING.md](BUILDING.md) for the rest of the workflow, including versioning and how
@@ -285,7 +303,7 @@ person as the file, so on its own it proves nothing about where the file came fr
 **Is it genuinely Bare?** Check who signed it. Nothing signed by any other key is Bare.
 
 ```bash
-apksigner verify --print-certs Bare-1.0.0-alpha.1.apk
+apksigner verify --print-certs Bare-1.0.0-alpha.2.apk
 ```
 
     SHA-256  ae:2a:0e:7f:b7:a1:32:ec:51:7d:26:a8:e7:c8:3d:27
@@ -304,7 +322,7 @@ can produce it, but everything else is. Follow [Build it yourself](#build-it-you
 including the version arguments, then compare:
 
 ```bash
-tools/apk-content-hash.py out/Bare/apks/ChromePublic.apk Bare-1.0.0-alpha.1.apk
+tools/apk-content-hash.py out/Bare/apks/ChromePublic.apk Bare-1.0.0-alpha.2.apk
 ```
 
 It hashes every entry except the signature, so two builds of the same source agree whoever signed
@@ -320,9 +338,11 @@ them. [What has been measured, and what has not](docs/reproducibility.md).
 - **The omnibox is squeezed** when several extensions are pinned. `ToolbarPhone` has none of
   the `ToolbarWidthConsumer` negotiation `ToolbarTablet` uses. Unpinning all but one extension
   works around it.
-- **Patch 0005 is blunt.** All `http(s)` navigations stay in the browser. Some OAuth flows and
-  deep links legitimately expect an app handoff and will no longer get one. Explicit schemes
-  (`intent://`, `tel:`, `mailto:`, `sms:`) are untouched.
+- **Links leave for an app only when you say so.** Patch 0005 kept every `http(s)` navigation
+  in the browser; 0107 turned that into a setting, Never by default, and 0110 judges a web page
+  wrapped in an `intent://` as the page rather than the wrapper. On Never, an OAuth flow or deep
+  link that expects an app handoff will not get one, and the app menu is the way to reach the
+  app. `tel:`, `mailto:` and `sms:` are untouched by any of it.
 - **The DuckDuckGo default only applies to new profiles.** Patch 0014 seeds the default at
   first run. An existing profile has `kDefaultSearchProviderData` persisted and
   `DefaultSearchManager` prefers it, so upgrading over an older install keeps Google until you
@@ -378,20 +398,20 @@ them. [What has been measured, and what has not](docs/reproducibility.md).
 - **Third-party autofill can stop being offered** until you navigate away and back. Bitwarden has
   been seen to go quiet mid-session with no error anywhere; the silent early return that causes
   it is known, the reason it triggers is not.
-- **arm64 only.** There is no build for armeabi-v7a or x86, so an older phone or an emulator
-  cannot install it.
+- **No x86 build**, so an emulator cannot install it. arm64 and armeabi-v7a are both released.
 
 ## Not done yet
 
-Each has an exact file and line reference in [docs/stage-1-2.md](docs/stage-1-2.md):
+Each is described in [docs/build-constraints.md](docs/build-constraints.md):
 
 - Safe Browsing, blocked by one un-gated call site in the Android JNI bridge
 - Google XR SDKs (ARCore, Cardboard, VrCore, OpenXR), blocked by three omnibox call sites;
   the flags are coupled in both directions and there is no GN-only configuration that works
 - `build_with_model_execution`, `enable_supervised_users`, `enable_offline_pages`, each
   blocked by a single GN `assert()`
-- The New Tab Page still carries an AI Mode button and Discover. Its Google logo is gone as a
-  side effect of 0014, the NTP logo follows the default search engine
+- The New Tab Page still carries Discover. The AI Mode button is gone: 0025 turned it off by
+  default and 0113 stopped it depending on the search engine. Its Google logo is gone as a side
+  effect of 0014, the NTP logo follows the default search engine
 - ARCore, Cardboard and Daydream manifest entries persist from library manifests, though their
   code is gone
 
@@ -400,7 +420,7 @@ Each has an exact file and line reference in [docs/stage-1-2.md](docs/stage-1-2.
 Worth knowing before anyone patches them: a public (non-Chrome-branded) Chromium build already
 sends no usage metrics, no URL-keyed metrics and no crash reports, because upstream withholds
 those endpoints from forks. Translate is likewise disabled without a Google API key. Details and
-evidence are in [docs/stage-1-2.md](docs/stage-1-2.md).
+evidence are in [docs/build-constraints.md](docs/build-constraints.md).
 
 ## Repository layout
 
@@ -415,8 +435,7 @@ VERSION                  Bare's version, independent of Chromium's
 third_party/             uBlock Origin as shipped, with its provenance
 docs/patches.md          what every patch does
 docs/reproducibility.md  what rebuilding has and has not proven
-docs/design.md           design decisions and rationale
-docs/stage-1-2.md        execution notes, diagnoses, and results
+docs/build-constraints.md  what a build flag cannot switch off, and what upstream already did
 ```
 
 The Chromium checkout, build output, and APKs are not tracked: they live in a Docker volume
