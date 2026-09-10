@@ -172,10 +172,10 @@ consumers of the same Firebase machinery, which is why removing one did not cove
 
 0069 through 0079 came out of using the build on a Pixel Fold and a Pixel 10 Pro XL. 0069 and
 0071 are the AMOLED theme and the relaunch it triggers. 0070 and 0073 close the last Gemini and
-Google account surfaces, and 0072 the last of the naming. 0074 is the only thing in the browser
-that contacts a server the user did not navigate to. 0075, 0077 and 0078 are all the same class
-of bug: something asked a Context, or the build target, a question only the browser could answer,
-and got the system's answer back.
+Google account surfaces, and 0072 the last of the naming. 0074 adds Bare's own update check, the
+one request the browser makes on Bare's behalf rather than Chromium's. 0075, 0077 and 0078 are all
+the same class of bug: something asked a Context, or the build target, a question only the browser
+could answer, and got the system's answer back.
 
 ## Removed by build flag
 

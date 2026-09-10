@@ -1,4 +1,4 @@
-From 074714fd4bbd473f08e16a8df2dbeff33ac0376e Mon Sep 17 00:00:00 2001
+From cc58cf2ec827777756a0c7ca2a584c90e71b821d Mon Sep 17 00:00:00 2001
 From: Bare <git@barebrowser.org>
 Date: Thu, 10 Sep 2026 17:51:35 +0000
 Subject: [PATCH] Say that the update check sends the version, because it does
@@ -13,7 +13,9 @@ identifies anything: no cookies, no cache, no device model, no Android build,
 no installation identifier. The platform default User-Agent would have carried
 the model and the build, which is why it is replaced rather than left alone.
 
-Comments only. The request is unchanged.
+Comments and tests only. The request itself is unchanged. The tests cover the
+version ordering this release turns on, since a build that reads its own release
+tag as newer than itself would offer an update forever.
 ---
  .../chrome/browser/bare/BareUpdateCheck.java  | 13 ++++++-----
  .../browser/bare/BareUpdateCheckUnitTest.java | 22 +++++++++++++++++++

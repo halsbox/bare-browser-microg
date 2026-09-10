@@ -20,7 +20,7 @@ powerful features like browser extensions and uBlock Origin. Bare also adds back
 playback, the ability to save media from sites that normally block it, support for choosing your
 preferred download manager, and much more.
 
-It is a patch series rather than a fork: 127 patches against one pinned revision of **Chromium
+It is a patch series rather than a fork: 128 patches against one pinned revision of **Chromium
 Desktop Android**, so what this repository holds is exactly the difference between stock Chromium
 and Bare, and nothing else.
 
@@ -29,7 +29,7 @@ Built and used on a Pixel 10 Pro XL. Not affiliated with Google or the Chromium 
 - **Base:** Chromium `153.0.8010.27` (commit `ac9b84a0`)
 - **Target:** `is_desktop_android = true`, `target_cpu = "arm64"` and `"arm"`
 - **Version:** `1.0.0-alpha.3`, versionCode `801000065` (arm64) / `801000060` (32-bit arm)
-- **Size:** 127 patches, 14,582 insertions across 341 files
+- **Size:** 128 patches, 14,605 insertions across 341 files
 
 ## What you get
 
@@ -98,7 +98,7 @@ patch series rather than a fork, so every change stays readable and reviewable.
 
 ## What the patches do
 
-A hundred and twenty-seven patches against one pinned Chromium revision: crash fixes, the
+A hundred and twenty-eight patches against one pinned Chromium revision: crash fixes, the
 extensions toolbar on phone layouts, every Google callback and AI surface removed, and the
 features Bare adds on top.
 
@@ -137,11 +137,12 @@ fetching the filter lists it ships enabled, from the list maintainers and their 
 from Google. That happens once and then on the extension's own schedule.
 
 **The update check contacts GitHub**, and only after the welcome screen has been completed and an
-update preference stored. It is at most one request a day, to a public release feed. The request
-sends `User-Agent: Bare/<version>`, so it does say which version is asking, and nothing else: no
-cookies, no installation identifier, no device model and no Android build. The platform default
-User-Agent would have carried the last two, so it is replaced. Choosing manual means nothing
-leaves the device until the Check for updates row is tapped.
+update preference stored. It is at most one request a day, to a public release feed. It sends two
+headers, `User-Agent: Bare/<version>` and `Accept: application/atom+xml`, so the request does say
+which version is asking. What it carries beyond that is nothing that identifies you or the phone:
+no cookies, no installation identifier, no device model, no Android build. The platform default
+User-Agent would have carried the model and the build, so it is replaced. Choosing manual means
+nothing leaves the device until the Check for updates row is tapped.
 
 **What no longer happens**, each verified by re-running the same capture:
 
