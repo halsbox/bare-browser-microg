@@ -28,7 +28,7 @@ Built and used on a Pixel 10 Pro XL. Not affiliated with Google or the Chromium 
 
 - **Base:** Chromium `153.0.8010.27` (commit `ac9b84a0`)
 - **Target:** `is_desktop_android = true`, `target_cpu = "arm64"` and `"arm"`
-- **Version:** `1.0.0-alpha.2`, versionCode `801000055` (arm64) / `801000050` (32-bit arm)
+- **Version:** `1.0.0-alpha.3`, versionCode `801000065` (arm64) / `801000060` (32-bit arm)
 - **Size:** 127 patches, 14,582 insertions across 341 files
 
 ## What you get
@@ -137,10 +137,11 @@ fetching the filter lists it ships enabled, from the list maintainers and their 
 from Google. That happens once and then on the extension's own schedule.
 
 **The update check contacts GitHub**, and only after the welcome screen has been completed and an
-update preference stored. It is at most one request a day, to a public release feed, sending
-`User-Agent: Bare/<version>` and nothing else: no identifier, no cookies, no version in the
-request. Choosing manual means nothing leaves the device until the Check for updates row is
-tapped.
+update preference stored. It is at most one request a day, to a public release feed. The request
+sends `User-Agent: Bare/<version>`, so it does say which version is asking, and nothing else: no
+cookies, no installation identifier, no device model and no Android build. The platform default
+User-Agent would have carried the last two, so it is replaced. Choosing manual means nothing
+leaves the device until the Check for updates row is tapped.
 
 **What no longer happens**, each verified by re-running the same capture:
 
@@ -259,8 +260,8 @@ enable_openxr = false
 disable_fieldtrial_testing_config = true
 
 chrome_public_manifest_package = "org.barebrowser"
-android_override_version_code = "801000055"
-android_override_version_name = "1.0.0-alpha.2"
+android_override_version_code = "801000065"
+android_override_version_name = "1.0.0-alpha.3"
 ```
 
 The last two lines are what `tools/version.py gn arm64` emits, and they matter: they are written into
@@ -272,7 +273,7 @@ patches here are inert. [docs/build-constraints.md](docs/build-constraints.md) h
 behaviours that came from that file rather than from the code.
 
 The 32-bit build differs in exactly three lines: `target_cpu = "arm"`, the version code
-`801000050` that `tools/version.py gn arm` emits, and `clang_use_default_sample_profile = false`,
+`801000060` that `tools/version.py gn arm` emits, and `clang_use_default_sample_profile = false`,
 which stops GN demanding an AFDO profile this checkout never syncs.
 
 ```bash
@@ -286,7 +287,7 @@ autoninja -C out/Bare chrome_public_apk
 carries a signature only its key can produce. Everything else should match:
 
 ```bash
-tools/apk-content-hash.py out/Bare/apks/ChromePublic.apk Bare-1.0.0-alpha.2.apk
+tools/apk-content-hash.py out/Bare/apks/ChromePublic.apk Bare-1.0.0-alpha.3.apk
 ```
 
 See [BUILDING.md](BUILDING.md) for the rest of the workflow, including versioning and how
@@ -303,7 +304,7 @@ person as the file, so on its own it proves nothing about where the file came fr
 **Is it genuinely Bare?** Check who signed it. Nothing signed by any other key is Bare.
 
 ```bash
-apksigner verify --print-certs Bare-1.0.0-alpha.2.apk
+apksigner verify --print-certs Bare-1.0.0-alpha.3.apk
 ```
 
     SHA-256  ae:2a:0e:7f:b7:a1:32:ec:51:7d:26:a8:e7:c8:3d:27
@@ -322,7 +323,7 @@ can produce it, but everything else is. Follow [Build it yourself](#build-it-you
 including the version arguments, then compare:
 
 ```bash
-tools/apk-content-hash.py out/Bare/apks/ChromePublic.apk Bare-1.0.0-alpha.2.apk
+tools/apk-content-hash.py out/Bare/apks/ChromePublic.apk Bare-1.0.0-alpha.3.apk
 ```
 
 It hashes every entry except the signature, so two builds of the same source agree whoever signed

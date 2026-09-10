@@ -132,6 +132,7 @@ themselves are in [`patches/`](../patches); this is the summary of what each one
 | 0126 | Clear the pending flag when there is nothing left to delete | An interrupted exit could leave the flag set for good once the selection was emptied |
 | 0127 | Put two annotations and a javadoc back on what they describe | Two insertions landed between a javadoc and the declaration it belonged to |
 | 0128 | Name Google's help centre as Google's | The rename caught the anchor text and left the link pointing at Google |
+| 0129 | Say that the update check sends the version, because it does | Two comments claimed the request carried no version; the User-Agent has always carried one |
 
 Patches 0001 and 0002 are bug fixes that happen to be prerequisites. 0003 is a usability fix.
 0004 through 0010 are the de-Googling, as are 0014 through 0021. 0011 through 0013 fix
@@ -158,7 +159,7 @@ hold, and finally a guard so the app menu can never be arranged out of reach. 01
 are a mixture of features and de-Googling found by daily use. 0115 through 0122 came out of
 release testing, and four of them exist because
 `disable_fieldtrial_testing_config = true` changed what the browser follows. 0123 through 0128
-came out of the pre-publication audit.
+came out of the pre-publication audit, and 0129 from the release that followed it.
 
 Sign-in has no single gate in Chromium. Patches 0009, 0010, 0015, 0016 and 0020 each remove a
 different entry point: the settings row, the "You and Google" section, the first-run screen,
