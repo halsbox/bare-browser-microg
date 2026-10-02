@@ -1,0 +1,825 @@
+From 97420f32be3693663ff760c7a6ca7aa56fd99a46 Mon Sep 17 00:00:00 2001
+From: Bare <git@barebrowser.org>
+Date: Fri, 2 Oct 2026 22:23:34 +0300
+Subject: [PATCH 1/2] Add MicroG account and token support
+
+Integrate the account and token APIs exposed by standard MicroG, ReVanced, and MicroG-RE. Restore sync invalidation delivery while preserving package identity checks.
+---
+ chrome/android/java/AndroidManifest.xml       |  67 +-
+ .../gcm/ChromeGcmListenerService.java         |  33 +
+ components/signin/public/android/BUILD.gn     |   1 +
+ .../signin/AccountManagerFacadeProvider.java  |   6 +-
+ .../signin/MicroGAccountManagerDelegate.java  | 630 ++++++++++++++++++
+ 5 files changed, 718 insertions(+), 19 deletions(-)
+ create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java
+ create mode 100644 components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
+
+diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
+index c6de539..4e51d1c 100644
+--- a/chrome/android/java/AndroidManifest.xml
++++ b/chrome/android/java/AndroidManifest.xml
+@@ -39,6 +39,10 @@ by a child template that "extends" this file.
+     <uses-permission-sdk-23 android:name="android.permission.ACCESS_WIFI_STATE" />
+     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+ 
++    <uses-permission android:name="android.permission.FAKE_PACKAGE_SIGNATURE" />
++    <uses-permission android:name="app.revanced.android.c2dm.permission.RECEIVE" />
++    <uses-permission android:name="org.microg.android.c2dm.permission.RECEIVE" />
++
+     <uses-permission-sdk-23 android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" />
+     <uses-permission-sdk-23 android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30"/>
+     <uses-permission-sdk-23 android:name="android.permission.BLUETOOTH_CONNECT"/>
+@@ -186,23 +190,26 @@ by a child template that "extends" this file.
+     {% block extra_keyset_definitions %}
+     {% endblock %}
+ 
+-    {% if channel in ['default'] %}
+-      <!--
+-        Android 11 (R) restricts querying for installed packages. WebXR uses
+-        ARCore and/or GVR, and needs to be able to check their installation
+-        status so that it can show install/update infobars if necessary.
+-        Official builds (stable, beta, dev, canary) handle this differently,
+-        this setting is for locally deployed ToT builds only.
+-
+-        TODO(crbug.com/40715928): remove if this is replaced by an
+-        alternate mechanism.
+-      -->
+-      <queries>
++    <queries>
++      {% if channel in ['default'] %}
++        <!--
++          Android 11 (R) restricts querying for installed packages. WebXR uses
++          ARCore and/or GVR, and needs to be able to check their installation
++          status so that it can show install/update infobars if necessary.
++          Official builds (stable, beta, dev, canary) handle this differently,
++          this setting is for locally deployed ToT builds only.
++
++          TODO(crbug.com/40715928): remove if this is replaced by an
++          alternate mechanism.
++        -->
+         {% if enable_vr == "true" %}
+           <package android:name="com.google.vr.vrcore" />
+         {% endif %}
+-      </queries>
+-    {% endif %}
++      {% endif %}
++      <package android:name="com.google.android.gms" />
++      <package android:name="app.revanced.android.gms" />
++      <package android:name="org.microg.gms" />
++    </queries>
+ 
+     <!-- Set android:largeHeap to "true" to allow more than the default
+          Java heap limit (32Mb on Nexus S, 48Mb on Xoom). -->
+@@ -1070,6 +1077,22 @@ by a child template that "extends" this file.
+                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
+             </intent-filter>
+         </service>
++        <receiver
++            android:name="org.chromium.chrome.browser.services.gcm.ChromeGcmListenerService$ReVancedInstanceIdReceiver"
++            android:exported="true"
++            android:permission="app.revanced.android.c2dm.permission.SEND">
++            <intent-filter>
++                <action android:name="app.revanced.android.c2dm.intent.RECEIVE" />
++            </intent-filter>
++        </receiver>
++        <receiver
++            android:name="org.chromium.chrome.browser.services.gcm.ChromeGcmListenerService$MicroGInstanceIdReceiver"
++            android:exported="true"
++            android:permission="org.microg.android.c2dm.permission.SEND">
++            <intent-filter>
++                <action android:name="org.microg.android.c2dm.intent.RECEIVE" />
++            </intent-filter>
++        </receiver>
+         <service android:name="org.chromium.chrome.browser.services.gcm.GCMBackgroundService"
+             android:exported="false"/>
+         <service android:name="org.chromium.chrome.browser.services.gcm.InvalidationGcmUpstreamSender"
+@@ -1511,6 +1534,22 @@ by a child template that "extends" this file.
+ 
+       {% block base_application_definitions %}
+       {% endblock %}
++
++      <meta-data android:name="app.revanced.android.gms.SPOOFED_PACKAGE_NAME"
++          android:value="com.android.chrome" />
++      <meta-data android:name="app.revanced.android.gms.SPOOFED_PACKAGE_SIGNATURE"
++          android:value="38918a453d07199354f8b19af05ec6562ced5788" />
++      <meta-data android:name="com.google.android.gms.SPOOFED_PACKAGE_NAME"
++          android:value="com.android.chrome" />
++      <meta-data android:name="com.google.android.gms.SPOOFED_PACKAGE_SIGNATURE"
++          android:value="38918a453d07199354f8b19af05ec6562ced5788" />
++      <meta-data android:name="org.microg.gms.SPOOFED_PACKAGE_NAME"
++          android:value="com.android.chrome" />
++      <meta-data android:name="org.microg.gms.SPOOFED_PACKAGE_SIGNATURE"
++          android:value="38918a453d07199354f8b19af05ec6562ced5788" />
++      <meta-data android:name="fake-signature"
++          android:value="308204433082032ba003020102020900c2e08746644a308d300d06092a864886f70d01010405003074310b3009060355040613025553311330110603550408130a43616c69666f726e6961311630140603550407130d4d6f756e7461696e205669657731143012060355040a130b476f6f676c6520496e632e3110300e060355040b1307416e64726f69643110300e06035504031307416e64726f6964301e170d3038303832313233313333345a170d3336303130373233313333345a3074310b3009060355040613025553311330110603550408130a43616c69666f726e6961311630140603550407130d4d6f756e7461696e205669657731143012060355040a130b476f6f676c6520496e632e3110300e060355040b1307416e64726f69643110300e06035504031307416e64726f696430820120300d06092a864886f70d01010105000382010d00308201080282010100ab562e00d83ba208ae0a966f124e29da11f2ab56d08f58e2cca91303e9b754d372f640a71b1dcb130967624e4656a7776a92193db2e5bfb724a91e77188b0e6a47a43b33d9609b77183145ccdf7b2e586674c9e1565b1f4c6a5955bff251a63dabf9c55c27222252e875e4f8154a645f897168c0b1bfc612eabf785769bb34aa7984dc7e2ea2764cae8307d8c17154d7ee5f64a51a44a602c249054157dc02cd5f5c0e55fbef8519fbe327f0b1511692c5a06f19d18385f5c4dbc2d6b93f68cc2979c70e18ab93866b3bd5db8999552a0e3b4c99df58fb918bedc182ba35e003c1b4b10dd244a8ee24fffd333872ab5221985edab0fc0d0b145b6aa192858e79020103a381d93081d6301d0603551d0e04160414c77d8cc2211756259a7fd382df6be398e4d786a53081a60603551d2304819e30819b8014c77d8cc2211756259a7fd382df6be398e4d786a5a178a4763074310b3009060355040613025553311330110603550408130a43616c69666f726e6961311630140603550407130d4d6f756e7461696e205669657731143012060355040a130b476f6f676c6520496e632e3110300e060355040b1307416e64726f69643110300e06035504031307416e64726f6964820900c2e08746644a308d300c0603551d13040530030101ff300d06092a864886f70d010104050003820101006dd252ceef85302c360aaace939bcff2cca904bb5d7a1661f8ae46b2994204d0ff4a68c7ed1a531ec4595a623ce60763b167297a7ae35712c407f208f0cb109429124d7b106219c084ca3eb3f9ad5fb871ef92269a8be28bf16d44c8d9a08e6cb2f005bb3fe2cb96447e868e731076ad45b33f6009ea19c161e62641aa99271dfd5228c5c587875ddb7f452758d661f6cc0cccb7352e424cc4365c523532f7325137593c4ae341f4db41edda0d0b1071a7c440f0fe9ea01cb627ca674369d084bd2fd911ff06cdbf2cfa10dc0f893ae35762919048c7efc64c7144178342f70581c9de573af55b390dd7fdb9418631895d5f759f30112687ff621410c069308a" />
++
+       {% block extra_application_definitions_for_test %}
+       {% endblock %}
+     </application>
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java b/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java
+new file mode 100644
+index 0000000..d7cf47d
+--- /dev/null
++++ b/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java
+@@ -0,0 +1,33 @@
++// Copyright 2020 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.chrome.browser.services.gcm;
++
++import android.annotation.SuppressLint;
++
++import com.google.firebase.iid.FirebaseInstanceIdReceiver;
++
++import org.chromium.build.annotations.IdentifierNameString;
++import org.chromium.build.annotations.NullMarked;
++import org.chromium.chrome.browser.base.SplitCompatGcmListenerService;
++
++/**
++ * See {@link ChromeGcmListenerServiceImpl}.
++ * Suppressing linting as onNewToken() is implemented in base class.
++ */
++@SuppressLint("MissingFirebaseInstanceTokenRefresh")
++@NullMarked
++public class ChromeGcmListenerService extends SplitCompatGcmListenerService {
++    @SuppressWarnings("FieldCanBeFinal") // @IdentifierNameString requires non-final
++    private static @IdentifierNameString String sImplClassName =
++            "org.chromium.chrome.browser.services.gcm.ChromeGcmListenerServiceImpl";
++
++    public ChromeGcmListenerService() {
++        super(sImplClassName);
++    }
++
++    public static class ReVancedInstanceIdReceiver extends FirebaseInstanceIdReceiver {}
++
++    public static class MicroGInstanceIdReceiver extends FirebaseInstanceIdReceiver {}
++}
+diff --git a/components/signin/public/android/BUILD.gn b/components/signin/public/android/BUILD.gn
+index df9a234..4f794bc 100644
+--- a/components/signin/public/android/BUILD.gn
++++ b/components/signin/public/android/BUILD.gn
+@@ -45,6 +45,7 @@ android_library("java") {
+     "java/src/org/chromium/components/signin/AccountsChangeObserver.java",
+     "java/src/org/chromium/components/signin/AuthException.java",
+     "java/src/org/chromium/components/signin/ConnectionRetry.java",
++    "java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java",
+     "java/src/org/chromium/components/signin/NullAccountManagerDelegate.java",
+     "java/src/org/chromium/components/signin/PatternMatcher.java",
+     "java/src/org/chromium/components/signin/PlatformAccount.java",
+diff --git a/components/signin/public/android/java/src/org/chromium/components/signin/AccountManagerFacadeProvider.java b/components/signin/public/android/java/src/org/chromium/components/signin/AccountManagerFacadeProvider.java
+index 779a09f..0560aea 100644
+--- a/components/signin/public/android/java/src/org/chromium/components/signin/AccountManagerFacadeProvider.java
++++ b/components/signin/public/android/java/src/org/chromium/components/signin/AccountManagerFacadeProvider.java
+@@ -24,11 +24,7 @@ public class AccountManagerFacadeProvider {
+         private static final AccountManagerFacade INSTANCE;
+ 
+         static {
+-            AccountManagerDelegate delegate =
+-                    ServiceLoaderUtil.maybeCreate(AccountManagerDelegate.class);
+-            if (delegate == null) {
+-                delegate = new NullAccountManagerDelegate();
+-            }
++            AccountManagerDelegate delegate = new MicroGAccountManagerDelegate();
+             INSTANCE = new AccountManagerFacadeImpl(delegate);
+         }
+     }
+diff --git a/components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java b/components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
+new file mode 100644
+index 0000000..cd1f0a9
+--- /dev/null
++++ b/components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
+@@ -0,0 +1,630 @@
++// Copyright 2025 The Chromium Authors
++// Use of this source code is governed by a BSD-style license that can be
++// found in the LICENSE file.
++
++package org.chromium.components.signin;
++
++import static org.chromium.build.NullUtil.assumeNonNull;
++
++import android.accounts.Account;
++import android.accounts.AccountManager;
++import android.accounts.AccountManagerCallback;
++import android.accounts.AccountManagerFuture;
++import android.accounts.AuthenticatorException;
++import android.accounts.OperationCanceledException;
++import android.annotation.SuppressLint;
++import android.app.Activity;
++import android.content.BroadcastReceiver;
++import android.content.ContentResolver;
++import android.content.Context;
++import android.content.Intent;
++import android.content.IntentFilter;
++import android.content.pm.PackageManager;
++import android.net.Uri;
++import android.os.Bundle;
++import android.os.Parcelable;
++
++import com.google.android.gms.auth.GoogleAuthException;
++import com.google.android.gms.auth.GoogleAuthUtil;
++
++import org.chromium.base.Callback;
++import org.chromium.base.ContextUtils;
++import org.chromium.base.Log;
++import org.chromium.base.ThreadUtils;
++import org.chromium.build.annotations.NullMarked;
++import org.chromium.build.annotations.Nullable;
++import org.chromium.build.annotations.ServiceImpl;
++import org.chromium.google_apis.gaia.GaiaId;
++import org.chromium.google_apis.gaia.GoogleServiceAuthError;
++import org.chromium.google_apis.gaia.GoogleServiceAuthErrorState;
++
++import java.io.BufferedReader;
++import java.io.IOException;
++import java.io.InputStreamReader;
++import java.net.HttpURLConnection;
++import java.net.URL;
++import java.security.MessageDigest;
++import java.security.NoSuchAlgorithmException;
++import java.util.concurrent.ConcurrentHashMap;
++
++@ServiceImpl(AccountManagerDelegate.class)
++@NullMarked
++public class MicroGAccountManagerDelegate implements AccountManagerDelegate {
++    private static final String TAG = "MicroGAccountDelegate";
++    private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
++    private static final String REVANCED_ACCOUNT_TYPE = "app.revanced";
++    private static final String REVANCED_GMS_PACKAGE = "app.revanced.android.gms";
++    private static final String MICROG_RE_ACCOUNT_TYPE = "org.microg";
++    private static final String MICROG_RE_GMS_PACKAGE = "org.microg.gms";
++    private static final String PROVIDER_METHOD_GET_ACCOUNTS = "get_accounts";
++    private static final String PROVIDER_EXTRA_ACCOUNTS = "accounts";
++
++    private final AccountManager mAccountManager;
++    private final String mAccountType;
++    private @Nullable AccountsChangeObserver mObserver;
++
++    private static final long ACCOUNT_CHANGE_DEBOUNCE_MS = 2000;
++    private long mLastAccountChangeTime = 0;
++
++    private static final int CONTENT_PROVIDER_MAX_RETRIES = 3;
++    private static final long CONTENT_PROVIDER_RETRY_DELAY_MS = 100;
++
++    private static final ConcurrentHashMap<String, String> sRealGaiaIdCache = new ConcurrentHashMap<>();
++    private static final String GAIA_ID_PREFS = "microg_gaia_ids";
++
++    private static @Nullable String persistedGaiaId(String email) {
++        return ContextUtils.getApplicationContext()
++                .getSharedPreferences(GAIA_ID_PREFS, Context.MODE_PRIVATE)
++                .getString(email, null);
++    }
++
++    private static String rememberGaiaId(String email, String gaiaId) {
++        String existing = persistedGaiaId(email);
++        if (existing != null) {
++            sRealGaiaIdCache.put(email, existing);
++            return existing;
++        }
++        sRealGaiaIdCache.put(email, gaiaId);
++        ContextUtils.getApplicationContext()
++                .getSharedPreferences(GAIA_ID_PREFS, Context.MODE_PRIVATE)
++                .edit()
++                .putString(email, gaiaId)
++                .apply();
++        return gaiaId;
++    }
++
++    private static final String LTAG = "MicroGAcctDeleg";
++
++    public MicroGAccountManagerDelegate() {
++        mAccountManager = AccountManager.get(ContextUtils.getApplicationContext());
++        mAccountType = detectAccountType();
++        Log.i(LTAG, "ctor: accountType=%s (microG pkg %s)", mAccountType,
++                !GOOGLE_ACCOUNT_TYPE.equals(mAccountType) ? "FOUND" : "NOT VISIBLE");
++    }
++
++    private Account toDelegateAccount(Account account) {
++        if (account == null || mAccountType.equals(account.type)) {
++            return account;
++        }
++        return new Account(account.name, mAccountType);
++    }
++
++    private String detectAccountType() {
++        PackageManager packageManager = ContextUtils.getApplicationContext().getPackageManager();
++        try {
++            packageManager.getPackageInfo(REVANCED_GMS_PACKAGE, 0);
++            return REVANCED_ACCOUNT_TYPE;
++        } catch (PackageManager.NameNotFoundException e) {
++            try {
++                packageManager.getPackageInfo(MICROG_RE_GMS_PACKAGE, 0);
++                return MICROG_RE_ACCOUNT_TYPE;
++            } catch (PackageManager.NameNotFoundException ignored) {
++                return GOOGLE_ACCOUNT_TYPE;
++            }
++        }
++    }
++
++    @Override
++    public void attachAccountsChangeObserver(AccountsChangeObserver observer) {
++        assert mObserver == null : "Another AccountsChangeObserver is already attached!";
++        mObserver = observer;
++        Context context = ContextUtils.getApplicationContext();
++        BroadcastReceiver receiver =
++                new BroadcastReceiver() {
++                    @Override
++                    public void onReceive(final Context context, final Intent intent) {
++                        long now = android.os.SystemClock.uptimeMillis();
++                        if (now - mLastAccountChangeTime < ACCOUNT_CHANGE_DEBOUNCE_MS) {
++                            return;
++                        }
++                        mLastAccountChangeTime = now;
++                        assumeNonNull(mObserver).onAccountsChanged();
++                    }
++                };
++        IntentFilter accountsChangedIntentFilter = new IntentFilter();
++        accountsChangedIntentFilter.addAction(AccountManager.LOGIN_ACCOUNTS_CHANGED_ACTION);
++        ContextUtils.registerProtectedBroadcastReceiver(
++                context, receiver, accountsChangedIntentFilter);
++    }
++
++    @Override
++    public Account[] getAccountsSynchronous() throws AccountManagerDelegateException {
++        if (!GOOGLE_ACCOUNT_TYPE.equals(mAccountType)) {
++            Account[] accounts = getAccountsViaContentProvider();
++            Log.i(LTAG, "getAccounts: contentProvider returned %d", accounts.length);
++            if (accounts.length > 0) {
++                return accounts;
++            }
++        }
++
++        try {
++            Account[] accounts = mAccountManager.getAccountsByType(mAccountType);
++            Log.i(LTAG, "getAccounts: getAccountsByType(%s) returned %d", mAccountType,
++                    accounts.length);
++            if (accounts.length > 0) {
++                return accounts;
++            }
++        } catch (SecurityException e) {
++            Log.w(LTAG, "getAccounts: getAccountsByType SecurityException (need GET_ACCOUNTS?)", e);
++        }
++
++        if (!GOOGLE_ACCOUNT_TYPE.equals(mAccountType)) {
++            Account[] accounts = getAccountsAllFallback();
++            Log.i(LTAG, "getAccounts: allAccounts fallback returned %d", accounts.length);
++            if (accounts.length > 0) {
++                return accounts;
++            }
++        }
++
++        Log.w(LTAG, "getAccounts: NO ACCOUNTS FOUND — sign-in UI will show a bare text row");
++        return new Account[] {};
++    }
++
++    private Account[] getAccountsViaContentProvider() {
++        ContentResolver resolver = ContextUtils.getApplicationContext().getContentResolver();
++        Uri uri = Uri.parse("content://" + mAccountType + ".android.gms.auth.accounts");
++
++        for (int retry = 0; retry < CONTENT_PROVIDER_MAX_RETRIES; retry++) {
++            try {
++                Bundle result = resolver.call(uri, PROVIDER_METHOD_GET_ACCOUNTS, mAccountType, null);
++                if (result != null) {
++                    Parcelable[] parcelables = result.getParcelableArray(PROVIDER_EXTRA_ACCOUNTS);
++                    if (parcelables != null && parcelables.length > 0) {
++                        Account[] accounts = new Account[parcelables.length];
++                        for (int i = 0; i < parcelables.length; i++) {
++                            accounts[i] = (Account) parcelables[i];
++                        }
++                        return accounts;
++                    }
++                }
++                Log.w(LTAG, "provider: call returned %s (retry %d)",
++                        result == null ? "null bundle" : "bundle with no accounts", retry);
++                if (retry < CONTENT_PROVIDER_MAX_RETRIES - 1) {
++                    try {
++                        Thread.sleep(CONTENT_PROVIDER_RETRY_DELAY_MS * (1 << retry));
++                    } catch (InterruptedException ie) {
++                        Thread.currentThread().interrupt();
++                        break;
++                    }
++                }
++            } catch (Exception e) {
++                Log.w(LTAG, "provider: call threw on retry %d", retry, e);
++                if (retry < CONTENT_PROVIDER_MAX_RETRIES - 1) {
++                    try {
++                        Thread.sleep(CONTENT_PROVIDER_RETRY_DELAY_MS * (1 << retry));
++                    } catch (InterruptedException ie) {
++                        Thread.currentThread().interrupt();
++                        break;
++                    }
++                }
++            }
++        }
++        return new Account[] {};
++    }
++
++    @SuppressLint("MissingPermission")
++    private Account[] getAccountsAllFallback() {
++        try {
++            Account[] allAccounts = mAccountManager.getAccounts();
++            int count = 0;
++            for (Account a : allAccounts) {
++                if (mAccountType.equals(a.type)) count++;
++            }
++            if (count > 0) {
++                Account[] filtered = new Account[count];
++                int idx = 0;
++                for (Account a : allAccounts) {
++                    if (mAccountType.equals(a.type)) {
++                        filtered[idx++] = a;
++                    }
++                }
++                return filtered;
++            }
++        } catch (SecurityException e) {
++        }
++        return new Account[] {};
++    }
++
++    @Override
++    public AccessTokenData getAccessToken(Account account, String authTokenScope)
++            throws AuthException {
++        ThreadUtils.assertOnBackgroundThread();
++
++        Log.i(LTAG, "getAccessToken: acct.type=%s scope=%s", account.type, authTokenScope);
++        try {
++            String token = GoogleAuthUtil.getTokenWithNotification(
++                    ContextUtils.getApplicationContext(), account, authTokenScope, null);
++
++            if (token != null) {
++                Log.i(LTAG, "getAccessToken: OK (len=%d)", token.length());
++                if (!sRealGaiaIdCache.containsKey(account.name)) {
++                    fetchAndCacheRealGaiaId(account.name, token);
++                }
++                return new AccessTokenData(token);
++            }
++        } catch (GoogleAuthException ex) {
++            Log.e(LTAG, "getAccessToken: GoogleAuthException for scope %s", authTokenScope, ex);
++            throw new AuthException(
++                    "Error while getting token for scope '" + authTokenScope + "'",
++                    ex,
++                    new GoogleServiceAuthError(
++                            GoogleServiceAuthErrorState.INVALID_GAIA_CREDENTIALS));
++        } catch (IOException ex) {
++            Log.e(LTAG, "getAccessToken: IOException for scope %s", authTokenScope, ex);
++            throw new AuthException(
++                    "Error while getting token for scope '" + authTokenScope + "'",
++                    ex,
++                    new GoogleServiceAuthError(GoogleServiceAuthErrorState.CONNECTION_FAILED));
++        } catch (RuntimeException ex) {
++            Log.e(LTAG, "getAccessToken: unchecked exception for scope %s", authTokenScope, ex);
++            throw new AuthException(
++                    "Unexpected error getting token for scope '" + authTokenScope + "'",
++                    ex,
++                    new GoogleServiceAuthError(
++                            GoogleServiceAuthErrorState.INVALID_GAIA_CREDENTIALS));
++        }
++
++        Log.e(LTAG, "getAccessToken: microG returned a NULL token for scope %s", authTokenScope);
++        throw new AuthException(
++                "Null token returned for scope '" + authTokenScope + "'",
++                new RuntimeException("Null token"),
++                new GoogleServiceAuthError(
++                        GoogleServiceAuthErrorState.INVALID_GAIA_CREDENTIALS));
++    }
++
++    private void fetchAndCacheRealGaiaId(String email, String accessToken) {
++        try {
++            URL url = new URL("https://www.googleapis.com/oauth2/v3/userinfo");
++            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
++            conn.setRequestMethod("GET");
++            conn.setRequestProperty("Authorization", "Bearer " + accessToken);
++            conn.setConnectTimeout(5000);
++            conn.setReadTimeout(5000);
++
++            int responseCode = conn.getResponseCode();
++            if (responseCode == 200) {
++                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
++                StringBuilder response = new StringBuilder();
++                String line;
++                while ((line = reader.readLine()) != null) {
++                    response.append(line);
++                }
++                reader.close();
++
++                String json = response.toString();
++                String realGaiaId = extractSubFromJson(json);
++                if (realGaiaId != null && !realGaiaId.isEmpty()) {
++                    rememberGaiaId(email, realGaiaId);
++                }
++            }
++            conn.disconnect();
++        } catch (Exception e) {
++        }
++    }
++
++    private String extractSubFromJson(String json) {
++        int subIndex = json.indexOf("\"sub\"");
++        if (subIndex < 0) return null;
++
++        int colonIndex = json.indexOf(':', subIndex);
++        if (colonIndex < 0) return null;
++
++        int startQuote = json.indexOf('"', colonIndex);
++        if (startQuote < 0) return null;
++
++        int endQuote = json.indexOf('"', startQuote + 1);
++        if (endQuote < 0) return null;
++
++        return json.substring(startQuote + 1, endQuote);
++    }
++
++    @Override
++    public void invalidateAccessToken(String authToken) throws AuthException {
++        try {
++            GoogleAuthUtil.clearToken(ContextUtils.getApplicationContext(), authToken);
++        } catch (GoogleAuthException ex) {
++            throw new AuthException(
++                    "Error while invalidating access token",
++                    ex,
++                    new GoogleServiceAuthError(
++                            GoogleServiceAuthErrorState.INVALID_GAIA_CREDENTIALS));
++        } catch (IOException ex) {
++            throw new AuthException(
++                    "Error while invalidating access token",
++                    ex,
++                    new GoogleServiceAuthError(GoogleServiceAuthErrorState.CONNECTION_FAILED));
++        }
++    }
++
++    @Override
++    public int hasCapability(@Nullable Account account, String capability) {
++        if (account != null && capability != null) {
++            try {
++                boolean hasFeature = mAccountManager
++                        .hasFeatures(toDelegateAccount(account), new String[] {capability},
++                                null, null)
++                        .getResult();
++                return hasFeature ? AccountManagerDelegate.CapabilityResponse.YES
++                        : AccountManagerDelegate.CapabilityResponse.NO;
++            } catch (AuthenticatorException | IOException | OperationCanceledException e) {
++            }
++        }
++        return AccountManagerDelegate.CapabilityResponse.EXCEPTION;
++    }
++
++    @SuppressLint("MissingPermission")
++    @Override
++    public void createAddAccountIntent(
++            @Nullable String prefilledEmail, Callback<@Nullable Intent> callback) {
++        AccountManagerCallback<Bundle> accountManagerCallback =
++                accountManagerFuture -> {
++                    try {
++                        Bundle bundle = accountManagerFuture.getResult();
++                        callback.onResult(bundle.getParcelable(AccountManager.KEY_INTENT));
++                    } catch (OperationCanceledException | IOException | AuthenticatorException e) {
++                        callback.onResult(null);
++                    }
++                };
++        mAccountManager.addAccount(
++                mAccountType, null, null, null, null, accountManagerCallback, null);
++    }
++
++    @SuppressLint("MissingPermission")
++    @Override
++    public void updateCredentials(
++            Account account, Activity activity, final @Nullable Callback<Boolean> callback) {
++        ThreadUtils.assertOnUiThread();
++        AccountManagerCallback<Bundle> realCallback =
++                future -> {
++                    Bundle bundle = null;
++                    try {
++                        bundle = future.getResult();
++                    } catch (AuthenticatorException | IOException | OperationCanceledException e) {
++                    }
++                    boolean success =
++                            bundle != null
++                                    && bundle.getString(AccountManager.KEY_ACCOUNT_TYPE) != null;
++                    if (callback != null) {
++                        callback.onResult(success);
++                    }
++                };
++        Bundle emptyOptions = new Bundle();
++        mAccountManager.updateCredentials(
++                toDelegateAccount(account), "android", emptyOptions, activity, realCallback, null);
++    }
++
++    @Override
++    public @Nullable GaiaId getAccountGaiaId(String accountEmail) {
++        String cachedRealId = sRealGaiaIdCache.get(accountEmail);
++        if (cachedRealId == null) {
++            cachedRealId = persistedGaiaId(accountEmail);
++            if (cachedRealId != null) sRealGaiaIdCache.put(accountEmail, cachedRealId);
++        }
++        if (cachedRealId != null) {
++            return new GaiaId(cachedRealId);
++        }
++
++        if (!GOOGLE_ACCOUNT_TYPE.equals(mAccountType)) {
++            String realGaiaId = fetchRealGaiaIdSync(accountEmail);
++            if (realGaiaId != null && !realGaiaId.isEmpty()) {
++                return new GaiaId(rememberGaiaId(accountEmail, realGaiaId));
++            }
++
++            return new GaiaId(rememberGaiaId(accountEmail, generateFakeGaiaId(accountEmail)));
++        }
++
++        try {
++            Account[] accounts = mAccountManager.getAccountsByType(mAccountType);
++            for (Account account : accounts) {
++                if (account.name.equals(accountEmail)) {
++                    String gaiaId = mAccountManager.getUserData(account, "gaia_id");
++                    if (gaiaId != null) {
++                        return new GaiaId(gaiaId);
++                    }
++                    return null;
++                }
++            }
++        } catch (SecurityException e) {
++        }
++        return null;
++    }
++
++    private String fetchRealGaiaIdSync(String accountEmail) {
++        try {
++            Account account = new Account(accountEmail, mAccountType);
++
++            String token = null;
++            try {
++                token = GoogleAuthUtil.getTokenWithNotification(
++                        ContextUtils.getApplicationContext(),
++                        account,
++                        "oauth2:https://www.google.com/accounts/OAuthLogin",
++                        null);
++            } catch (Exception e) {
++            }
++
++            if (token != null) {
++                String gaiaId = getGaiaIdFromTokenInfo(token, accountEmail);
++                if (gaiaId != null) {
++                    return gaiaId;
++                }
++            }
++
++            try {
++                token = GoogleAuthUtil.getTokenWithNotification(
++                        ContextUtils.getApplicationContext(),
++                        account,
++                        "oauth2:email",
++                        null);
++                if (token != null) {
++                    String gaiaId = getGaiaIdFromTokenInfo(token, accountEmail);
++                    if (gaiaId != null) {
++                        return gaiaId;
++                    }
++                }
++            } catch (Exception e) {
++            }
++
++            try {
++                token = GoogleAuthUtil.getTokenWithNotification(
++                        ContextUtils.getApplicationContext(),
++                        account,
++                        "oauth2:openid",
++                        null);
++                if (token != null) {
++                    String gaiaId = extractSubFromJwt(token);
++                    if (gaiaId != null) {
++                        return gaiaId;
++                    }
++                    gaiaId = getGaiaIdFromTokenInfo(token, accountEmail);
++                    if (gaiaId != null) {
++                        return gaiaId;
++                    }
++                }
++            } catch (Exception e) {
++            }
++
++        } catch (Exception e) {
++        }
++
++        return null;
++    }
++
++    private String getGaiaIdFromTokenInfo(String accessToken, String accountEmail) {
++        try {
++            URL url = new URL("https://www.googleapis.com/oauth2/v3/userinfo");
++            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
++            conn.setRequestMethod("GET");
++            conn.setRequestProperty("Authorization", "Bearer " + accessToken);
++            conn.setConnectTimeout(10000);
++            conn.setReadTimeout(10000);
++
++            int responseCode = conn.getResponseCode();
++            if (responseCode == 200) {
++                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
++                StringBuilder response = new StringBuilder();
++                String line;
++                while ((line = reader.readLine()) != null) {
++                    response.append(line);
++                }
++                reader.close();
++                conn.disconnect();
++
++                String json = response.toString();
++
++                String gaiaId = extractFieldFromJson(json, "sub");
++                if (gaiaId == null) {
++                    gaiaId = extractFieldFromJson(json, "user_id");
++                }
++
++                if (gaiaId != null && !gaiaId.isEmpty()) {
++                    return gaiaId;
++                }
++            }
++            conn.disconnect();
++        } catch (Exception e) {
++        }
++        return null;
++    }
++
++    private String extractSubFromJwt(String token) {
++        try {
++            String[] parts = token.split("\\.");
++            if (parts.length != 3) {
++                return null;
++            }
++
++            String payload = new String(android.util.Base64.decode(parts[1],
++                    android.util.Base64.URL_SAFE | android.util.Base64.NO_PADDING | android.util.Base64.NO_WRAP));
++
++            return extractFieldFromJson(payload, "sub");
++        } catch (Exception e) {
++            return null;
++        }
++    }
++
++    private String extractIdFromJson(String json) {
++        String id = extractFieldFromJson(json, "id");
++        if (id != null) return id;
++        return extractFieldFromJson(json, "sub");
++    }
++
++    private String extractFieldFromJson(String json, String fieldName) {
++        String searchStr = "\"" + fieldName + "\"";
++        int fieldIndex = json.indexOf(searchStr);
++        if (fieldIndex < 0) return null;
++
++        int colonIndex = json.indexOf(':', fieldIndex);
++        if (colonIndex < 0) return null;
++
++        int startQuote = json.indexOf('"', colonIndex);
++        if (startQuote < 0) return null;
++
++        int endQuote = json.indexOf('"', startQuote + 1);
++        if (endQuote < 0) return null;
++
++        return json.substring(startQuote + 1, endQuote);
++    }
++
++    @Override
++    public void confirmCredentials(
++            Account account, @Nullable Activity activity, Callback<@Nullable Bundle> callback) {
++        AccountManagerCallback<Bundle> accountManagerCallback =
++                (accountManagerFuture) -> {
++                    @Nullable Bundle result = null;
++                    try {
++                        result = accountManagerFuture.getResult();
++                    } catch (Exception e) {
++                    }
++                    callback.onResult(result);
++                };
++        mAccountManager.confirmCredentials(
++                toDelegateAccount(account), new Bundle(), activity, accountManagerCallback, null);
++    }
++
++    private String generateFakeGaiaId(String email) {
++        try {
++            MessageDigest md = MessageDigest.getInstance("SHA-256");
++            byte[] digest = md.digest(email.getBytes());
++            StringBuilder sb = new StringBuilder();
++            for (int i = 0; i < digest.length && sb.length() < 21; i++) {
++                int val = digest[i] & 0xFF;
++                if (val < 10) sb.append('0');
++                sb.append(val);
++            }
++            while (sb.length() < 21) {
++                sb.insert(0, '0');
++            }
++            if (sb.length() > 21) {
++                sb.setLength(21);
++            }
++            return sb.toString();
++        } catch (NoSuchAlgorithmException e) {
++            long hash = 0;
++            for (int i = 0; i < email.length(); i++) {
++                hash = 31 * hash + email.charAt(i);
++            }
++            return String.format("%021d", Math.abs(hash) % 1000000000000000000L);
++        }
++    }
++}
+-- 
+2.39.5
+

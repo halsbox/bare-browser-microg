@@ -1,0 +1,74 @@
+From 57f2ba7a3e10216d5b93a2e0c6ba6d1757c3ab91 Mon Sep 17 00:00:00 2001
+From: Bare <git@barebrowser.org>
+Date: Fri, 2 Oct 2026 22:23:34 +0300
+Subject: [PATCH 2/2] Keep MicroG accounts signed in after restart
+
+Chromium assigns its server Gaia ID while MicroG can report another ID. Reconcile the account by its stable email in both Java and native account tracking.
+---
+ .../browser/signin/services/SigninManagerImpl.java   | 12 ++++++++++++
+ components/signin/core/browser/account_reconcilor.cc |  3 ++-
+ .../identity_manager/account_tracker_service.cc      |  7 ++++++-
+ 3 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/chrome/browser/signin/services/android/java/src/org/chromium/chrome/browser/signin/services/SigninManagerImpl.java b/chrome/browser/signin/services/android/java/src/org/chromium/chrome/browser/signin/services/SigninManagerImpl.java
+index c1e8586..dd682f2 100644
+--- a/chrome/browser/signin/services/android/java/src/org/chromium/chrome/browser/signin/services/SigninManagerImpl.java
++++ b/chrome/browser/signin/services/android/java/src/org/chromium/chrome/browser/signin/services/SigninManagerImpl.java
+@@ -172,6 +172,18 @@ class SigninManagerImpl implements SigninManager, AccountsChangeObserver {
+             seedThenReloadAllAccountsFromSystem(accounts, primaryAccountInfo.getId());
+             return;
+         }
++        AccountInfo matchedByEmail =
++                AccountUtils.findAccountByEmail(accounts, primaryAccountInfo.getEmail());
++        if (matchedByEmail != null) {
++            Log.i(
++                    TAG,
++                    "Primary account Gaia ID mismatch, but email found; keeping signed in for MicroG.");
++            List<AccountInfo> reconciled = new ArrayList<>(accounts);
++            reconciled.set(reconciled.indexOf(matchedByEmail), primaryAccountInfo);
++            seedThenReloadAllAccountsFromSystem(
++                    reconciled, CoreAccountInfo.getIdFrom(primaryAccountInfo));
++            return;
++        }
+         if (isOperationInProgress()) {
+             // Re-check whether there's still a primary account after the current operation.
+             runAfterOperationInProgress(this::onAccountsChanged);
+diff --git a/components/signin/core/browser/account_reconcilor.cc b/components/signin/core/browser/account_reconcilor.cc
+index f9f5827..83809ad 100644
+--- a/components/signin/core/browser/account_reconcilor.cc
++++ b/components/signin/core/browser/account_reconcilor.cc
+@@ -431,7 +431,8 @@ void AccountReconcilor::StartReconcile(Trigger trigger) {
+ 
+   // In the case of a forced reconciliation, we will not rely on ListAccounts,
+   // and consider the cookie jar to be empty.
+-  if (trigger_ == Trigger::kForcedReconcile) {
++  if (trigger_ == Trigger::kForcedReconcile ||
++      trigger_ == Trigger::kEnableReconcile) {
+     OnAccountsInCookieUpdated(
+         /*accounts_in_cookie_jar_info=*/signin::AccountsInCookieJarInfo(
+             /*accounts_are_fresh=*/true,
+diff --git a/components/signin/internal/identity_manager/account_tracker_service.cc b/components/signin/internal/identity_manager/account_tracker_service.cc
+index ea4b307..9e830d6 100644
+--- a/components/signin/internal/identity_manager/account_tracker_service.cc
++++ b/components/signin/internal/identity_manager/account_tracker_service.cc
+@@ -301,11 +301,16 @@ void AccountTrackerService::SetAccountInfoFromUserInfo(
+       PickAccountIdForAccount(fetched_user_info.gaia, fetched_user_info.email);
+ 
+   // Whether the existing account in pref matches the fetched account.
+-  bool accounts_matching = user_info_copy.account_id == account_info.account_id;
++  bool accounts_matching =
++      user_info_copy.account_id == account_info.account_id ||
++      (user_info_copy.email == account_info.email && !account_info.email.empty());
+   base::UmaHistogramBoolean("Signin.AccountInPref.MatchingFetchedAccount",
+                             accounts_matching);
+ 
+   if (accounts_matching) {
++    if (user_info_copy.account_id != account_info.account_id) {
++      user_info_copy.account_id = account_info.account_id;
++    }
+     account_info.UpdateWith(user_info_copy);
+   } else {
+     DLOG(ERROR) << "Cannot set account info from user info as account ids "
+-- 
+2.39.5
+

@@ -29,7 +29,7 @@ Built and used on a Pixel 10 Pro XL. Not affiliated with Google or the Chromium 
 - **Base:** Chromium `153.0.8010.27` (commit `ac9b84a0`)
 - **Target:** `is_desktop_android = true`, `target_cpu = "arm64"` and `"arm"`
 - **Version:** `1.0.0-alpha.3`, versionCode `801000065` (arm64) / `801000060` (32-bit arm)
-- **Size:** 128 patches, 14,605 insertions across 341 files
+- **Patch series:** 128 patches; see [the full list](docs/patches.md)
 
 ## What you get
 
@@ -38,9 +38,11 @@ Built and used on a Pixel 10 Pro XL. Not affiliated with Google or the Chromium 
 - **[uBlock Origin](https://github.com/gorhill/uBlock), already installed.** The full version,
   not Lite, because Bare keeps Manifest V2 working. Shipped exactly as its author publishes
   it. Remove it like anything else if you would rather not have it.
-- **No telemetry, no AI, no sign-in prompts.** DuckDuckGo is the default from first launch. Two
+- **No telemetry, no AI, no unsolicited sign-in prompts.** DuckDuckGo is the default from first launch. Two
   things still reach a server on their own, and both are named in
   [Network behaviour](#network-behaviour) rather than glossed over.
+- **Optional Google Sync through MicroG GmsCore.** Sign in from Settings and choose which browser
+  data to sync. Bare supports standard MicroG, ReVanced MicroG and MicroG-RE.
 - **Save what a page is playing.** Long press a video or an audio player and Bare offers you the
   file, including on sites that stream in pieces and normally offer nothing at all.
 - **Video keeps playing in the background.** Lock the phone or switch apps and the audio carries
@@ -99,8 +101,8 @@ patch series rather than a fork, so every change stays readable and reviewable.
 ## What the patches do
 
 A hundred and twenty-eight patches against one pinned Chromium revision: crash fixes, the
-extensions toolbar on phone layouts, every Google callback and AI surface removed, and the
-features Bare adds on top.
+extensions toolbar on phone layouts, unsolicited Google and AI surfaces removed, optional
+MicroG-backed Sync, and the features Bare adds on top.
 
 **[The full list, patch by patch, is in docs/patches.md](docs/patches.md)** along with what is
 removed by build flag instead of by patch, and what is deliberately kept.
@@ -108,8 +110,9 @@ removed by build flag instead of by patch, and what is deliberately kept.
 ## Network behaviour
 
 Measured on a Pixel 3 running Android 12 and an Android 17 emulator, by watching the sockets
-opened under Bare's own uid on a wiped profile. What follows is what was actually observed, not
-what was intended.
+opened under Bare's own uid on a wiped profile. The account and Sync behavior below is newly
+enabled and still needs a device capture; the earlier measurements describe behavior before
+Sync was restored.
 
 **On a second and later start, with an established profile, one host is contacted without being
 asked: `update.googleapis.com`.** That is Chromium's component updater. It is kept deliberately,
@@ -144,12 +147,11 @@ no cookies, no installation identifier, no device model, no Android build. The p
 User-Agent would have carried the model and the build, so it is replaced. Choosing manual means
 nothing leaves the device until the Check for updates row is tapped.
 
-**What no longer happens**, each verified by re-running the same capture:
+**What no longer happens**, each verified by re-running the same capture before Sync was restored:
 
-- No Firebase or InstanceID registration. A fresh profile previously fetched two FCM tokens for
-  Chromium's cloud-policy invalidation projects and kept them in shared preferences as durable
-  identifiers. Patches 0081 and 0086 removed both consumers; the token files are no longer
-  created at all.
+- No cloud-policy Firebase registration. A fresh profile previously fetched two FCM tokens for
+  Chromium's cloud-policy invalidation projects. Patch 0086 removes those requests. Sync uses
+  GmsCore messaging after the user turns Sync on.
 - No lookup against `accounts.google.com`, from the omnibox or at startup. Typing in the address
   bar used to reach GAIA ListAccounts to decide whether to personalise suggestions. Separately, a
   fresh profile used to POST to ListAccounts about a tenth of a second into every cold start,
@@ -157,11 +159,17 @@ nothing leaves the device until the Check for updates row is tapped.
   behind the startup one: two services asked for the cookie jar while the profile was still being
   built, both only to report metrics, and reading the cookie jar fetched it from Google whenever
   the cached answer was stale. Patch 0093 stops the read from reaching the network, so the answer
-  now comes from the cache. Visiting Google sites and signing in to them is unaffected.
+  now comes from the cache. Visiting Google sites and signing in to them is unaffected. Starting
+  browser sign-in or Sync can make the account requests those actions require.
 - No Safe Browsing traffic. There was never any: see below.
 
-Traffic from Android itself and from Google Play Services is separate from all of this and is not
-affected by anything Bare does.
+**Sync is opt-in and sends selected browser data to Google.** When the user signs in from Settings
+and enables Sync, Chromium sends the selected data types to Google's Sync service. GmsCore supplies
+account tokens and delivers Sync invalidations. The network measurements above watch Bare's UID;
+they do not include GmsCore's own traffic, including requests triggered by Sync.
+
+Other traffic from Android and Google Play Services is outside those measurements and is not
+affected by Bare's component update setting.
 
 **Safe Browsing does not work in this build, and no longer claims to.** Chromium Android performs
 lookups through a handler that Google injects in its own build and that no public build has. The
@@ -227,8 +235,8 @@ mkdir -p chrome/browser/resources/bare
 cp /exchange/uBlockOrigin-1.73.0.crx chrome/browser/resources/bare/ublock_origin.crx
 ```
 
-**5. Configure.** This is the complete configuration the published release was built with,
-nothing omitted:
+**5. Configure.** This starts with the configuration used for Bare's published release and
+includes the OAuth credentials needed for Sync:
 
 ```gn
 target_os = "android"
@@ -263,6 +271,8 @@ disable_fieldtrial_testing_config = true
 chrome_public_manifest_package = "org.barebrowser"
 android_override_version_code = "801000065"
 android_override_version_name = "1.0.0-alpha.3"
+google_default_client_id = "77185425430.apps.googleusercontent.com"
+google_default_client_secret = "OTJgUOQcT7lO7GsGZq2G4IlT"
 ```
 
 The last two lines are what `tools/version.py gn arm64` emits, and they matter: they are written into
@@ -283,6 +293,11 @@ $EDITOR out/Bare/args.gn          # paste the block above
 gn gen out/Bare
 autoninja -C out/Bare chrome_public_apk
 ```
+
+The OAuth defaults match `microg-ungoogled-chromium`'s release build. They stay in the local,
+ignored `args.gn`; Chromium embeds them in the APK, where they can be extracted, so the client
+secret is not confidential. Replace both values in `args.gn` to use your own OAuth client. Set
+`google_api_key` there too only if you have an API key; the companion release does not supply one.
 
 **6. Compare.** Your APK will not be byte-identical to the published one, because that one
 carries a signature only its key can produce. Everything else should match:
@@ -368,7 +383,9 @@ them. [What has been measured, and what has not](docs/reproducibility.md).
   had trusted an earlier self-built Bare you will see "browser signature does not match"
   instead, because release builds are signed with a different key than local ones: delete the
   stale entry, then trust it again.
-- **Web Push is gone**, as a consequence of removing the GCM channel in patch 0007.
+- **Trusted Vault key recovery is not supplied by this account adapter.** Sync keeps Chromium's
+  existing error and passphrase flows; it does not fabricate recovery keys. Key retrieval requires a
+  GmsCore backend that implements Chromium's Trusted Vault contract.
 - **Password managers need one setting turned on.** Chromium uses its own autofill by default
   and never consults Android's autofill framework, so Bitwarden, 1Password and similar are
   simply never asked. Turn on Settings → Autofill options → use another service and they work.
@@ -459,6 +476,11 @@ inside it, the corresponding source is the upstream release, and provenance and 
 [third_party/ublock_origin](third_party/ublock_origin). Bundling it beside a BSD project is mere
 aggregation; uBlock Origin remains under the GPL and Bare's licence does not touch it. Bare is
 not affiliated with or endorsed by the uBlock Origin project.
+
+**[microg-ungoogled-chromium](https://github.com/bearinmindcat/microg-ungoogled-chromium)** is
+the source for Bare's MicroG Sync integration. Patches 0130 and 0131 adapt its MicroG account,
+token and account-reconciliation changes to Bare's Chromium revision and supported GmsCore
+variants.
 
 **[Titanium](https://github.com/jqssun/android-titanium-browser)**, by jqssun, is built from the
 same `is_desktop_android` target and ships to phones, which makes it a working reference for the

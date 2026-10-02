@@ -11,20 +11,19 @@ themselves are in [`patches/`](../patches); this is the summary of what each one
 | 0004 | Remove variations and network-time callbacks | Two periodic requests to Google, sent regardless of activity |
 | 0005 | Keep web navigations in the browser | `http(s)` links no longer get handed to whichever app claims the domain |
 | 0006 | Stop Autofill crowdsourcing uploads | Form structure was uploaded to Google to train its field-classification heuristics |
-| 0007 | Remove the GCM push channel | Google Cloud Messaging services, the c2dm permission and the Firebase receiver |
+| 0007 | Drop Google Now account access | Removes the account permission used by Google Now |
 | 0008 | Guard omnibox vector icon calls | Unblocks disabling the Google XR SDKs, which previously broke the build |
-| 0009 | Hide Google Password Manager and sign-in promo | Both were permanently non-functional and advertised as broken |
-| 0010 | Remove the "You and Google" settings section | Sign-in and Google services entries, neither of which can work here |
+| 0009 | Hide Google Password Manager and sign-in promo | The built-in password backend is unavailable; the sign-in promo is unsolicited |
 | 0011 | Ignore page requests to lock screen orientation | Fullscreen video forced landscape, overriding the system rotation lock |
 | 0012 | Draw fullscreen content into the display cutout | Fullscreen video was letterboxed off the camera edge, leaving it off-centre |
 | 0013 | Size fullscreen video to its picture | The seekbar sat at the bottom of the screen instead of on the video |
 | 0014 | DuckDuckGo as the default search provider | Google was the shipped default, selected by engine ID rather than list order |
-| 0015 | Remove the sign-in first-run screen | Promoted a sign-in this build cannot do, and claimed data is sent to Google |
-| 0016 | Stop showing the NTP sign-in card | "Get better content": sign in to personalise a feed this build cannot use |
+| 0015 | Keep sign-in out of first run | The sign-in page claimed data is sent to Google; signing in is available later from Settings |
+| 0016 | Stop showing the NTP sign-in card | Removes an unsolicited invitation to sign in for personalised content |
 | 0017 | Remove the Chrome tips module | A carousel of Google promos: history sync, sign-in, passwords, Safe Browsing |
-| 0018 | Remove the web app restore promo | Restores apps from devices "connected to this account", impossible here |
+| 0018 | Remove the web app restore promo | Removes the cross-device restore prompt from the app menu |
 | 0019 | Remove the Ask Gemini button | The bottom bar's extra slot resolved to Gemini, which demands account verification |
-| 0020 | Remove the avatar sign-in button | "Signed out. Opens options to sign in." on every new tab page |
+| 0020 | Remove the avatar sign-in button | Keeps the toolbar from prompting for sign-in on every new tab page |
 | 0021 | Stop offering Gemini as a toolbar shortcut | Otherwise the button removed in 0019 could be put back from Settings |
 | 0022 | Offer downloads to an installed download manager | Hands a download to an app such as 1DM instead of fetching it in the browser |
 | 0023 | Add a setting to choose the download manager | Settings → Downloads, off by default |
@@ -76,7 +75,6 @@ themselves are in [`patches/`](../patches); this is the summary of what each one
 | 0070 | Turn off Glic, the Gemini integration | Every Glic surface asks one class first, so closing that gate removes all of them at once |
 | 0071 | Cover the activity relaunch when the theme changes | Switching theme recreates the activity, which flashed the outgoing colours on the way through |
 | 0072 | Rename the browser in eleven more strings | The strings the earlier renaming passes missed |
-| 0073 | Make Google sign-in and sync unreachable | Five ways in: the settings rows, two deep-link routes and the settings-search entries |
 | 0074 | Look for Bare's own updates on GitHub | One plain request to the public release feed, no identifier and nothing scheduled; automatic or manual |
 | 0075 | Stop the launch splash flashing white on a dark theme | Android resolves the splash against the system's night mode, before any of the browser runs |
 | 0076 | Let the current page row reach the omnibox on phones | The desktop Android target hid share, copy and edit for the page you are on |
@@ -86,10 +84,10 @@ themselves are in [`patches/`](../patches); this is the summary of what each one
 | 0080 | Stop advertising Safe Browsing | No public Chromium Android build has the handler the lookups need, so the settings, the Safety Hub module and the promo card all described nothing |
 | 0081 | Stop the caBLE messaging token | An InstanceID token was fetched at every cold start for a phone-as-security-key feature that needs Chrome Sync |
 | 0082 | Stop the omnibox asking who is signed in | Typing reached GAIA ListAccounts at accounts.google.com, only to decide whether to personalise suggestions |
-| 0083 | Remove Send to your devices | Upstream shows it to signed-out users on purpose, to recruit a Google sign-in that cannot complete here |
+| 0083 | Remove Send to your devices | Removes the cross-device send action; this build does not expose that feature |
 | 0084 | Fix the welcome screen on Android 12 | The reveal was driven only by the splash exit; when that never fired the rows stayed invisible and the circle silently banked defaults |
 | 0085 | Register twelve fewer components | Each registration announces the install to update.googleapis.com; the security-carrying ones are kept and listed |
-| 0086 | Stop the cloud-policy Firebase tokens | A fresh profile fetched two FCM tokens as durable identifiers, for enterprise invalidations this build can never receive |
+| 0086 | Stop the cloud-policy Firebase tokens | Removes enterprise cloud-policy registration tokens; Sync has a separate opt-in registration path |
 | 0087 | Fix two crashes from patch 0080 | Removing a preference row leaves the Java that looks it up holding null; Privacy and security and Safety check both crashed |
 | 0088 | Stop the update dot reappearing | Opening the row cleared it, but the next daily check saw the same release was still newer and put it straight back |
 | 0089 | Send the update row to the release it found | It announced a version and then did nothing when tapped; the page for the found tag now opens in a tab, with no download |
@@ -97,7 +95,7 @@ themselves are in [`patches/`](../patches); this is the summary of what each one
 | 0091 | Stop the bottom bar reacting to a long press | A label repeated what the icon meant, and once that was cleared the gesture fell through and opened a tab or switched to incognito |
 | 0092 | Make a second welcome a review, not a reset | The search engine, autofill provider and background media rows live in the profile, which is not up when the welcome is built, so a repeat showing drew defaults over settings the user had chosen and wrote them back on Start |
 | 0093 | Stop the startup ListAccounts to accounts.google.com | Two metrics-only services read the cookie jar while the profile was still being built, and reading it fetched from Google whenever the cached answer was stale, on every cold start |
-| 0094 | Drop the Safety Hub password check that can never run | The row reported that it could not check passwords in a Google Account and offered a Sign in to Chrome button, in a build with no browser sign-in, and its permanent failure held the whole page at a warning |
+| 0094 | Drop the Safety Hub password check that cannot run | The Google password check has no working backend in this public build and its permanent failure held the whole page at a warning |
 | 0095 | Stop shipping the XR module when XR is switched off | chrome_module_descs never consulted the XR buildflags, so about 20 MB of AndroidX XR and ARCore native code was packaged in a build where enable_vr, enable_arcore, enable_openxr and enable_cardboard are all off |
 | 0096 | Keep the Start circle off the welcome footer | The column needed more height than a Pixel 3 has, so the spacer collapsed and the circle ran past the padding reserved for the footer, which was pinned to the frame and took no part in the layout |
 | 0097 | Give incognito its extension background pages back | The incognito ProcessManager waited for an embedder callback that Android does not have, so a split-mode extension allowed in incognito never got a background page and never filtered |
@@ -109,7 +107,7 @@ themselves are in [`patches/`](../patches); this is the summary of what each one
 | 0103 | Let a sideways drag along the bar change brightness or volume | Off by default; the bar is the only place in reach of a thumb that has nothing else to do |
 | 0104 | Let a button do a second thing when it is held | A second action per slot, so one button covers two without a menu |
 | 0105 | Keep the app menu where the user can always reach it | Arranging the toolbar could move the menu out of reach, leaving no way back |
-| 0106 | Let bookmarks be carried in and out as a file | Import and export without a sync account, which this build has no way to offer |
+| 0106 | Let bookmarks be carried in and out as a file | Import and export bookmarks without signing in or enabling Sync |
 | 0107 | Let a link open in the app that handles it | Always, Ask or Never, defaulting to Never, the behaviour 0005 applied to everything |
 | 0108 | Keep the page in Bare after Stay here without asking again | The question came back on every navigation to the same site |
 | 0109 | Leave the navigation blur transition off | A field trial turned on a transition that flashed white between pages |
@@ -133,9 +131,11 @@ themselves are in [`patches/`](../patches); this is the summary of what each one
 | 0127 | Put two annotations and a javadoc back on what they describe | Two insertions landed between a javadoc and the declaration it belonged to |
 | 0128 | Name Google's help centre as Google's | The rename caught the anchor text and left the link pointing at Google |
 | 0129 | Say that the update check sends the version, because it does | Two comments claimed the request carried no version; the User-Agent has always carried one |
+| 0130 | Add MicroG account and token support | Enables settings-based sign-in and Sync messaging with standard MicroG, ReVanced and MicroG-RE |
+| 0131 | Keep MicroG accounts signed in after restart | Reconciles Chromium and MicroG account IDs by stable email |
 
 Patches 0001 and 0002 are bug fixes that happen to be prerequisites. 0003 is a usability fix.
-0004 through 0010 are the de-Googling, as are 0014 through 0021. 0011 through 0013 fix
+0004 through 0009 are the initial de-Googling pass, as are 0014 through 0021. 0011 through 0013 fix
 fullscreen video behaviour. 0022 and 0023 add the external download manager option. 0024
 through 0028 are usability changes: the Web Store, the AI Mode button, what the new tab page
 shows by default, and where the toolbars sit. 0029 through 0033 continue in that vein: choosing
@@ -161,9 +161,9 @@ release testing, and four of them exist because
 `disable_fieldtrial_testing_config = true` changed what the browser follows. 0123 through 0128
 came out of the pre-publication audit, and 0129 from the release that followed it.
 
-Sign-in has no single gate in Chromium. Patches 0009, 0010, 0015, 0016 and 0020 each remove a
-different entry point: the settings row, the "You and Google" section, the first-run screen,
-the New Tab Page card, and the toolbar avatar. Assume there are more rather than fewer.
+Sign-in has no single gate in Chromium. Patches 0015, 0016 and 0020 keep it out of first run,
+the New Tab Page and the toolbar; 0067 suppresses sign-in promos throughout the browser. Patch
+0130 restores deliberate sign-in from Settings.
 
 0080 through 0087 are the release-hardening pass, driven by a runtime audit rather than by
 reading code. 0080 and 0087 belong together: removing the Safe Browsing rows crashed two settings
@@ -171,8 +171,8 @@ screens, which only showed up by opening them on a device. 0081 and 0086 are two
 consumers of the same Firebase machinery, which is why removing one did not cover the other.
 
 0069 through 0079 came out of using the build on a Pixel Fold and a Pixel 10 Pro XL. 0069 and
-0071 are the AMOLED theme and the relaunch it triggers. 0070 and 0073 close the last Gemini and
-Google account surfaces, and 0072 the last of the naming. 0074 adds Bare's own update check, the
+0071 are the AMOLED theme and the relaunch it triggers. 0070 closes the Gemini surface, and 0072
+finishes the naming. 0074 adds Bare's own update check, the
 one request the browser makes on Bare's behalf rather than Chromium's. 0075, 0077 and 0078 are all
 the same class of bug: something asked a Context, or the build target, a question only the browser
 could answer, and got the system's answer back.

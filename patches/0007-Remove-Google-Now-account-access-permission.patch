@@ -1,0 +1,25 @@
+From 1c09dd351af2c2a179bb2ed92ce94f6325f7d46d Mon Sep 17 00:00:00 2001
+From: Bare <git@barebrowser.org>
+Date: Fri, 2 Oct 2026 22:24:42 +0300
+Subject: [PATCH] Remove Google Now account access permission
+
+---
+ chrome/android/java/AndroidManifest.xml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
+index c6de539..35c3c1d 100644
+--- a/chrome/android/java/AndroidManifest.xml
++++ b/chrome/android/java/AndroidManifest.xml
+@@ -161,7 +161,7 @@ by a child template that "extends" this file.
+     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+ 
+-    <uses-permission android:name="com.google.android.apps.now.CURRENT_ACCOUNT_ACCESS" />
++    <!-- De-Googled build: Google Now account access is not requested. -->
+ 
+     <!-- Permission for using pinned windowing layer for document picture-in-picture. -->
+     <uses-permission android:name="android.permission.USE_PINNED_WINDOWING_LAYER" />
+-- 
+2.39.5
+
