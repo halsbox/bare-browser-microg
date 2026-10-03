@@ -9,8 +9,8 @@ Integrate the account and token APIs exposed by standard MicroG, ReVanced, and M
  .../gcm/ChromeGcmListenerService.java         |  25 +
  components/signin/public/android/BUILD.gn     |   1 +
  .../signin/AccountManagerFacadeProvider.java  |   6 +-
- .../signin/MicroGAccountManagerDelegate.java  | 630 ++++++++++++++++++
- 5 files changed, 710 insertions(+), 19 deletions(-)
+ .../signin/MicroGAccountManagerDelegate.java  | 631 ++++++++++++++++++
+ 5 files changed, 711 insertions(+), 19 deletions(-)
  create mode 100644 components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
 
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
@@ -188,10 +188,10 @@ index 779a09f..0560aea 100644
      }
 diff --git a/components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java b/components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
 new file mode 100644
-index 0000000..cd1f0a9
+index 0000000..80c9d96
 --- /dev/null
 +++ b/components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
-@@ -0,0 +1,630 @@
+@@ -0,0 +1,631 @@
 +// Copyright 2025 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
