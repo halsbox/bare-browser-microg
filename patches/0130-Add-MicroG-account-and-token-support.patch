@@ -6,12 +6,11 @@ Subject: [PATCH 1/2] Add MicroG account and token support
 Integrate the account and token APIs exposed by standard MicroG, ReVanced, and MicroG-RE. Restore sync invalidation delivery while preserving package identity checks.
 ---
  chrome/android/java/AndroidManifest.xml       |  67 +-
- .../gcm/ChromeGcmListenerService.java         |  33 +
+ .../gcm/ChromeGcmListenerService.java         |   6 +
  components/signin/public/android/BUILD.gn     |   1 +
  .../signin/AccountManagerFacadeProvider.java  |   6 +-
  .../signin/MicroGAccountManagerDelegate.java  | 630 ++++++++++++++++++
- 5 files changed, 718 insertions(+), 19 deletions(-)
- create mode 100644 chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java
+ 5 files changed, 691 insertions(+), 19 deletions(-)
  create mode 100644 components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
 
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
@@ -117,44 +116,27 @@ index c6de539..4e51d1c 100644
        {% endblock %}
      </application>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java b/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java
-new file mode 100644
-index 0000000..d7cf47d
---- /dev/null
+index 6afadd1ca1db7272e851bb0c3ad16018e7af2c8e..d7cf47d220233dc1876738909f21d93e5377ee8b 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java
-@@ -0,0 +1,33 @@
-+// Copyright 2020 The Chromium Authors
-+// Use of this source code is governed by a BSD-style license that can be
-+// found in the LICENSE file.
-+
-+package org.chromium.chrome.browser.services.gcm;
-+
-+import android.annotation.SuppressLint;
-+
+@@ -6,6 +6,8 @@ package org.chromium.chrome.browser.services.gcm;
+ 
+ import android.annotation.SuppressLint;
+ 
 +import com.google.firebase.iid.FirebaseInstanceIdReceiver;
 +
-+import org.chromium.build.annotations.IdentifierNameString;
-+import org.chromium.build.annotations.NullMarked;
-+import org.chromium.chrome.browser.base.SplitCompatGcmListenerService;
-+
-+/**
-+ * See {@link ChromeGcmListenerServiceImpl}.
-+ * Suppressing linting as onNewToken() is implemented in base class.
-+ */
-+@SuppressLint("MissingFirebaseInstanceTokenRefresh")
-+@NullMarked
-+public class ChromeGcmListenerService extends SplitCompatGcmListenerService {
-+    @SuppressWarnings("FieldCanBeFinal") // @IdentifierNameString requires non-final
-+    private static @IdentifierNameString String sImplClassName =
-+            "org.chromium.chrome.browser.services.gcm.ChromeGcmListenerServiceImpl";
-+
-+    public ChromeGcmListenerService() {
-+        super(sImplClassName);
-+    }
+ import org.chromium.build.annotations.IdentifierNameString;
+ import org.chromium.build.annotations.NullMarked;
+ import org.chromium.chrome.browser.base.SplitCompatGcmListenerService;
+@@ -24,4 +26,8 @@ public class ChromeGcmListenerService extends SplitCompatGcmListenerService {
+     public ChromeGcmListenerService() {
+         super(sImplClassName);
+     }
 +
 +    public static class ReVancedInstanceIdReceiver extends FirebaseInstanceIdReceiver {}
 +
 +    public static class MicroGInstanceIdReceiver extends FirebaseInstanceIdReceiver {}
-+}
+ }
 diff --git a/components/signin/public/android/BUILD.gn b/components/signin/public/android/BUILD.gn
 index df9a234..4f794bc 100644
 --- a/components/signin/public/android/BUILD.gn
@@ -822,4 +804,3 @@ index 0000000..cd1f0a9
 +}
 -- 
 2.39.5
-

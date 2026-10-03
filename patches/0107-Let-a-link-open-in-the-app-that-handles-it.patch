@@ -264,14 +264,14 @@ index cef12613db..c453b0a4fa 100644
      public static final String PREF_BASICS_SECTION = "basics_section";
      public static final String PREF_SEARCH_ENGINE = "search_engine";
      public static final String PREF_PASSWORDS = "passwords";
-@@ -419,6 +422,7 @@ public class MainSettings extends ChromeBaseSettingsFragment
-         }
- 
+@@ -413,6 +416,7 @@ public class MainSettings extends ChromeBaseSettingsFragment
+         cachePreferences();
+         updateAutofillPreferences();
+         updateGlicPreference();
          setUpUpdateRow();
 +        setUpOpenLinksInAppsRow();
  
-         cachePreferences();
-         updateAutofillPreferences();
+         // TODO(crbug.com/40242060): Remove the passwords managed subtitle for local and UPM
 @@ -645,6 +649,55 @@ public class MainSettings extends ChromeBaseSettingsFragment
          return preferenceInAllPreferences;
      }
