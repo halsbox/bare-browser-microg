@@ -444,10 +444,11 @@ index 0000000..cd1f0a9
 +            throws AuthException {
 +        ThreadUtils.assertOnBackgroundThread();
 +
-+        Log.i(LTAG, "getAccessToken: acct.type=%s scope=%s", account.type, authTokenScope);
++        Account microGAccount = toDelegateAccount(account);
++        Log.i(LTAG, "getAccessToken: acct.type=%s scope=%s", microGAccount.type, authTokenScope);
 +        try {
 +            String token = GoogleAuthUtil.getTokenWithNotification(
-+                    ContextUtils.getApplicationContext(), account, authTokenScope, null);
++                    ContextUtils.getApplicationContext(), microGAccount, authTokenScope, null);
 +
 +            if (token != null) {
 +                Log.i(LTAG, "getAccessToken: OK (len=%d)", token.length());
