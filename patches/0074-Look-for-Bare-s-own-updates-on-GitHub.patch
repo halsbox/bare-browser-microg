@@ -579,15 +579,11 @@ index c625c564de..3bc126844e 100644
      public static final String PREF_BASICS_SECTION = "basics_section";
      public static final String PREF_SEARCH_ENGINE = "search_engine";
      public static final String PREF_PASSWORDS = "passwords";
-@@ -416,6 +418,8 @@ public class MainSettings extends ChromeBaseSettingsFragment
-                     signinCoordinatorSupplier);
-         }
- 
-+        setUpUpdateRow();
-+
+@@ -416,3 +416,4 @@ public class MainSettings extends ChromeBaseSettingsFragment
          cachePreferences();
          updateAutofillPreferences();
          updateGlicPreference();
++        setUpUpdateRow();
 @@ -641,6 +645,45 @@ public class MainSettings extends ChromeBaseSettingsFragment
          return preferenceInAllPreferences;
      }
