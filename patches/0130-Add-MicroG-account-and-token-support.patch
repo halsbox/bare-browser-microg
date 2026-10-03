@@ -6,11 +6,11 @@ Subject: [PATCH 1/2] Add MicroG account and token support
 Integrate the account and token APIs exposed by standard MicroG, ReVanced, and MicroG-RE. Restore sync invalidation delivery while preserving package identity checks.
 ---
  chrome/android/java/AndroidManifest.xml       |  67 +-
- .../gcm/ChromeGcmListenerService.java         |   6 +
+ .../gcm/ChromeGcmListenerService.java         |  25 +
  components/signin/public/android/BUILD.gn     |   1 +
  .../signin/AccountManagerFacadeProvider.java  |   6 +-
  .../signin/MicroGAccountManagerDelegate.java  | 630 ++++++++++++++++++
- 5 files changed, 691 insertions(+), 19 deletions(-)
+ 5 files changed, 710 insertions(+), 19 deletions(-)
  create mode 100644 components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
 
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
@@ -116,26 +116,46 @@ index c6de539..4e51d1c 100644
        {% endblock %}
      </application>
 diff --git a/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java b/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java
-index 6afadd1ca1db7272e851bb0c3ad16018e7af2c8e..d7cf47d220233dc1876738909f21d93e5377ee8b 100644
+index 6afadd1ca1db7272e851bb0c3ad16018e7af2c8e..58d1150b21979d6fb9f21f1481f6c591b6e18ef2 100644
 --- a/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java
 +++ b/chrome/android/java/src/org/chromium/chrome/browser/services/gcm/ChromeGcmListenerService.java
-@@ -6,6 +6,8 @@ package org.chromium.chrome.browser.services.gcm;
+@@ -5,7 +5,12 @@
+ package org.chromium.chrome.browser.services.gcm;
  
  import android.annotation.SuppressLint;
- 
-+import com.google.firebase.iid.FirebaseInstanceIdReceiver;
++import android.content.BroadcastReceiver;
++import android.content.Context;
++import android.content.Intent;
 +
++import com.google.firebase.iid.FirebaseInstanceIdReceiver;
+ 
  import org.chromium.build.annotations.IdentifierNameString;
  import org.chromium.build.annotations.NullMarked;
  import org.chromium.chrome.browser.base.SplitCompatGcmListenerService;
-@@ -24,4 +26,8 @@ public class ChromeGcmListenerService extends SplitCompatGcmListenerService {
+@@ -24,4 +29,24 @@
      public ChromeGcmListenerService() {
          super(sImplClassName);
      }
 +
-+    public static class ReVancedInstanceIdReceiver extends FirebaseInstanceIdReceiver {}
++    private static void forwardMicroGMessage(Context context, Intent intent) {
++        Intent firebaseIntent = new Intent(intent);
++        firebaseIntent.setAction("com.google.android.c2dm.intent.RECEIVE");
++        new FirebaseInstanceIdReceiver().onReceive(context, firebaseIntent);
++    }
 +
-+    public static class MicroGInstanceIdReceiver extends FirebaseInstanceIdReceiver {}
++    public static class ReVancedInstanceIdReceiver extends BroadcastReceiver {
++        @Override
++        public void onReceive(Context context, Intent intent) {
++            forwardMicroGMessage(context, intent);
++        }
++    }
++
++    public static class MicroGInstanceIdReceiver extends BroadcastReceiver {
++        @Override
++        public void onReceive(Context context, Intent intent) {
++            forwardMicroGMessage(context, intent);
++        }
++    }
  }
 diff --git a/components/signin/public/android/BUILD.gn b/components/signin/public/android/BUILD.gn
 index df9a234..4f794bc 100644
