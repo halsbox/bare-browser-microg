@@ -9,8 +9,8 @@ Integrate the account and token APIs exposed by standard MicroG, ReVanced, and M
  .../gcm/ChromeGcmListenerService.java         |  25 +
  components/signin/public/android/BUILD.gn     |   1 +
  .../signin/AccountManagerFacadeProvider.java  |   6 +-
- .../signin/MicroGAccountManagerDelegate.java  | 631 ++++++++++++++++++
- 5 files changed, 711 insertions(+), 19 deletions(-)
+ .../signin/MicroGAccountManagerDelegate.java  | 603 ++++++++++++++++++
+ 5 files changed, 683 insertions(+), 19 deletions(-)
  create mode 100644 components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
 
 diff --git a/chrome/android/java/AndroidManifest.xml b/chrome/android/java/AndroidManifest.xml
@@ -188,10 +188,10 @@ index 779a09f..0560aea 100644
      }
 diff --git a/components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java b/components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
 new file mode 100644
-index 0000000..80c9d96
+index 0000000..ac5bf67
 --- /dev/null
 +++ b/components/signin/public/android/java/src/org/chromium/components/signin/MicroGAccountManagerDelegate.java
-@@ -0,0 +1,631 @@
+@@ -0,0 +1,603 @@
 +// Copyright 2025 The Chromium Authors
 +// Use of this source code is governed by a BSD-style license that can be
 +// found in the LICENSE file.
@@ -217,9 +217,6 @@ index 0000000..80c9d96
 +import android.net.Uri;
 +import android.os.Bundle;
 +import android.os.Parcelable;
-+
-+import com.google.android.gms.auth.GoogleAuthException;
-+import com.google.android.gms.auth.GoogleAuthUtil;
 +
 +import org.chromium.base.Callback;
 +import org.chromium.base.ContextUtils;
@@ -447,8 +444,7 @@ index 0000000..80c9d96
 +        Account microGAccount = toDelegateAccount(account);
 +        Log.i(LTAG, "getAccessToken: acct.type=%s scope=%s", microGAccount.type, authTokenScope);
 +        try {
-+            String token = GoogleAuthUtil.getTokenWithNotification(
-+                    ContextUtils.getApplicationContext(), microGAccount, authTokenScope, null);
++            String token = mAccountManager.blockingGetAuthToken(microGAccount, authTokenScope, true);
 +
 +            if (token != null) {
 +                Log.i(LTAG, "getAccessToken: OK (len=%d)", token.length());
@@ -457,8 +453,8 @@ index 0000000..80c9d96
 +                }
 +                return new AccessTokenData(token);
 +            }
-+        } catch (GoogleAuthException ex) {
-+            Log.e(LTAG, "getAccessToken: GoogleAuthException for scope %s", authTokenScope, ex);
++        } catch (AuthenticatorException | OperationCanceledException ex) {
++            Log.e(LTAG, "getAccessToken: authenticator failed for scope %s", authTokenScope, ex);
 +            throw new AuthException(
 +                    "Error while getting token for scope '" + authTokenScope + "'",
 +                    ex,
@@ -535,20 +531,7 @@ index 0000000..80c9d96
 +
 +    @Override
 +    public void invalidateAccessToken(String authToken) throws AuthException {
-+        try {
-+            GoogleAuthUtil.clearToken(ContextUtils.getApplicationContext(), authToken);
-+        } catch (GoogleAuthException ex) {
-+            throw new AuthException(
-+                    "Error while invalidating access token",
-+                    ex,
-+                    new GoogleServiceAuthError(
-+                            GoogleServiceAuthErrorState.INVALID_GAIA_CREDENTIALS));
-+        } catch (IOException ex) {
-+            throw new AuthException(
-+                    "Error while invalidating access token",
-+                    ex,
-+                    new GoogleServiceAuthError(GoogleServiceAuthErrorState.CONNECTION_FAILED));
-+        }
++        mAccountManager.invalidateAuthToken(mAccountType, authToken);
 +    }
 +
 +    @Override
@@ -650,11 +633,8 @@ index 0000000..80c9d96
 +
 +            String token = null;
 +            try {
-+                token = GoogleAuthUtil.getTokenWithNotification(
-+                        ContextUtils.getApplicationContext(),
-+                        account,
-+                        "oauth2:https://www.google.com/accounts/OAuthLogin",
-+                        null);
++                token = mAccountManager.blockingGetAuthToken(
++                        account, "oauth2:https://www.google.com/accounts/OAuthLogin", true);
 +            } catch (Exception e) {
 +            }
 +
@@ -666,11 +646,7 @@ index 0000000..80c9d96
 +            }
 +
 +            try {
-+                token = GoogleAuthUtil.getTokenWithNotification(
-+                        ContextUtils.getApplicationContext(),
-+                        account,
-+                        "oauth2:email",
-+                        null);
++                token = mAccountManager.blockingGetAuthToken(account, "oauth2:email", true);
 +                if (token != null) {
 +                    String gaiaId = getGaiaIdFromTokenInfo(token, accountEmail);
 +                    if (gaiaId != null) {
@@ -681,11 +657,7 @@ index 0000000..80c9d96
 +            }
 +
 +            try {
-+                token = GoogleAuthUtil.getTokenWithNotification(
-+                        ContextUtils.getApplicationContext(),
-+                        account,
-+                        "oauth2:openid",
-+                        null);
++                token = mAccountManager.blockingGetAuthToken(account, "oauth2:openid", true);
 +                if (token != null) {
 +                    String gaiaId = extractSubFromJwt(token);
 +                    if (gaiaId != null) {
@@ -823,5 +795,3 @@ index 0000000..80c9d96
 +        }
 +    }
 +}
--- 
-2.39.5
