@@ -122,14 +122,12 @@ index 267032cc0b..735f6a9960 100644
                      SafetyHubFragment.SEARCH_INDEX_DATA_PROVIDER,
                      AccountManagementFragment.SEARCH_INDEX_DATA_PROVIDER,
                      AndroidPaymentAppsFragment.SEARCH_INDEX_DATA_PROVIDER,
-@@ -125,7 +120,6 @@ public final class SearchIndexProviderRegistry {
+@@ -125,5 +120,4 @@ public final class SearchIndexProviderRegistry {
                      NonCardPaymentMethodsManagementFragment.SEARCH_INDEX_DATA_PROVIDER,
                      PriceNotificationSettingsFragment.SEARCH_INDEX_DATA_PROVIDER,
                      PrivacySettings.SEARCH_INDEX_DATA_PROVIDER,
 -                    SafetyCheckSettingsFragment.SEARCH_INDEX_DATA_PROVIDER,
                      TabsSettings.SEARCH_INDEX_DATA_PROVIDER,
-                     ThemeSettingsFragment.SEARCH_INDEX_DATA_PROVIDER,
-                     DownloadSettings.SEARCH_INDEX_DATA_PROVIDER,
 diff --git a/chrome/browser/educational_tip/java/src/org/chromium/chrome/browser/educational_tip/EducationalTipCardProviderFactory.java b/chrome/browser/educational_tip/java/src/org/chromium/chrome/browser/educational_tip/EducationalTipCardProviderFactory.java
 index d36d9a101b..491546f5de 100644
 --- a/chrome/browser/educational_tip/java/src/org/chromium/chrome/browser/educational_tip/EducationalTipCardProviderFactory.java
